@@ -12,20 +12,20 @@ from dashboard.components.icons import get_svg_icon
 def render_forbes_masthead(tag: str, title: str, subtitle: str, badge_text: str = "", badge_status: str = "Active"):
     """Renders a Forbes-inspired minimalist serif masthead with status badge without any Markdown indentation issues."""
     badge_html = f"""
-    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #262626; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #94A3B8;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #262626; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #94A3B8; margin-top: 0.5rem;">
         <span style="color: #5DD62C; font-weight: 700;">{badge_status}</span> {badge_text}
     </div>
     """ if badge_text else ""
     
     masthead_html = f"""
-    <div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #222222; margin-bottom: 1.5rem; background: #0A0A0A; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.6);">
+    <div class="forbes-masthead" style="text-align: center; padding: 2rem 1.1rem 1.6rem 1.1rem; border-bottom: 1px solid #222222; margin-bottom: 1.5rem; background: #0A0A0A; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.6);">
         <div style="font-size: 0.85rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
             {tag}
         </div>
-        <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: 3rem; font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
+        <h1 class="forbes-masthead-title" style="font-family: 'Playfair Display', Georgia, serif !important; font-size: clamp(1.75rem, 5vw, 3rem); font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
             {title}
         </h1>
-        <div style="color: #94A3B8; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
+        <div class="forbes-masthead-subtitle" style="color: #94A3B8; font-size: clamp(0.88rem, 2.5vw, 1.05rem); max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
             {subtitle}
         </div>
         {badge_html}
@@ -43,11 +43,11 @@ def render_kpi_card(title: str, value: Any, subtitle: Optional[str] = None, icon
     sub_html = f"<div style='font-size: 0.78rem; color: #94A3B8; margin-top: 0.35rem; font-weight: 500;'>{subtitle}</div>" if subtitle else ""
 
     card_html = f"""
-    <div style="
+    <div class="forbes-kpi-card" style="
         background: #141414;
         border: 1px solid #262626;
         border-radius: 8px;
-        padding: 1.25rem 1.4rem;
+        padding: 1.15rem 1.25rem;
         margin-bottom: 0.75rem;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         transition: border-color 0.2s ease;
@@ -55,7 +55,7 @@ def render_kpi_card(title: str, value: Any, subtitle: Optional[str] = None, icon
         <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
             {title}
         </div>
-        <div style="font-size: 1.85rem; font-weight: 800; color: #F8FAFC; margin-top: 0.4rem; display: flex; align-items: center; letter-spacing: -0.02em;">
+        <div style="font-size: clamp(1.4rem, 3.8vw, 1.85rem); font-weight: 800; color: #F8FAFC; margin-top: 0.4rem; display: flex; align-items: center; letter-spacing: -0.02em;">
             {icon_html}{value}
         </div>
         {sub_html}

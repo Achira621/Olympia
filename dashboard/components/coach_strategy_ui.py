@@ -132,6 +132,30 @@ def render_antigravity_styles():
         margin-top: 1rem;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
     }
+
+    /* Mobile Responsive Rules for Coach Strategy Studio */
+    @media (max-width: 768px) {
+        .ag-glass-panel {
+            padding: 1.1rem 1.15rem !important;
+            border-radius: 14px !important;
+            margin-bottom: 1rem !important;
+        }
+        .ag-chip {
+            padding: 0.35rem 0.75rem !important;
+            font-size: 0.76rem !important;
+        }
+        .ag-playbook-card {
+            padding: 1.1rem 1.15rem !important;
+        }
+        .ag-clipboard-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
+        .ag-archetype-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.5rem !important;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -183,7 +207,7 @@ def plot_inclination_radar(athlete_profile: dict) -> go.Figure:
                 linecolor='rgba(255, 255, 255, 0.1)'
             ),
             angularaxis=dict(
-                tickfont=dict(color='#F8FAFC', size=11, family='Inter', weight=700),
+                tickfont=dict(color='#F8FAFC', size=10, family='Inter', weight=700),
                 gridcolor='rgba(255, 255, 255, 0.08)',
                 linecolor='rgba(255, 255, 255, 0.12)'
             ),
@@ -191,16 +215,17 @@ def plot_inclination_radar(athlete_profile: dict) -> go.Figure:
         ),
         paper_bgcolor='transparent',
         plot_bgcolor='transparent',
-        margin=dict(l=40, r=40, t=30, b=30),
+        margin=dict(l=25, r=25, t=25, b=25),
         legend=dict(
             orientation="h",
             yanchor="bottom",
             y=-0.22,
             xanchor="center",
             x=0.5,
-            font=dict(color='#E2E8F0', size=11)
+            font=dict(color='#E2E8F0', size=10)
         ),
-        height=380
+        height=340,
+        autosize=True
     )
     return fig
 
@@ -229,7 +254,7 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                         Milano-Cortina 2026 Ready
                     </span>
                 </div>
-                <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: 2.5rem; font-weight: 900; color: #F8FAFC; margin: 0 0 0.5rem 0; line-height: 1.15;">
+                <h1 style="font-family: 'Playfair Display', Georgia, serif; font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 900; color: #F8FAFC; margin: 0 0 0.5rem 0; line-height: 1.15;">
                     Olympic Coach Strategy Studio
                 </h1>
                 <div style="color: #94A3B8; font-size: 0.98rem; max-width: 820px; line-height: 1.55;">
@@ -308,7 +333,7 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                 <div style="font-size: 0.9rem; color: #CBD5E1; line-height: 1.55; margin-bottom: 0.9rem;">
                     {profile['archetype_desc']}
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; font-size: 0.82rem;">
+                <div class="ag-archetype-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; font-size: 0.82rem;">
                     <div style="background: #111; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid #222;">
                         <strong style="color: #94A3B8;">Pacing Bias:</strong><br><span style="color: #38BDF8; font-weight: 700;">{profile['pacing_bias']}</span>
                     </div>
@@ -511,7 +536,7 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
 
         st.markdown(f"""
         <div class="ag-playbook-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #337418; padding-bottom: 0.8rem; margin-bottom: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; border-bottom: 1px solid #337418; padding-bottom: 0.8rem; margin-bottom: 1rem;">
                 <div style="font-size: 1.3rem; font-weight: 800; color: #5DD62C; font-family: 'Inter', sans-serif;">
                     📋 Tactical Gameplan: {target_athlete_name}
                 </div>
@@ -519,7 +544,7 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                     Sport: {sport_val} • Protocol: {sim_res['pacing_strategy']}
                 </span>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
+            <div class="ag-clipboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
                 <div>
                     <h5 style="color: #38BDF8; margin-bottom: 0.4rem;">🎯 Operational Objectives</h5>
                     <ul style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">

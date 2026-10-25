@@ -313,6 +313,21 @@ def render_login_scrolling_background():
         [data-testid="stSidebarNavSeparator"] {{
             display: none !important;
         }}
+
+        /* Mobile optimizations for auth background */
+        @media (max-width: 768px) {{
+            .login-bg-container {{
+                gap: 0.8rem;
+                filter: blur(6px) brightness(0.35);
+            }}
+            .login-bg-col:nth-child(2),
+            .login-bg-col:nth-child(3) {{
+                display: none !important;
+            }}
+            .login-bg-col:nth-child(1) {{
+                width: 100% !important;
+            }}
+        }}
     </style>
 
     <div class="login-bg-container">
@@ -355,25 +370,25 @@ def render_landing_page():
     # Forbes-style Hero Banner
     brand_trophy = get_svg_icon("trophy", size=36, color="#5DD62C")
     _safe_html(f"""
-    <div style="text-align: center; padding: 2.4rem 1.2rem 1.6rem 1.2rem; background: #0A0A0A; border: 1px solid #222222; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.7);">
+    <div style="text-align: center; padding: 2.2rem 1.1rem 1.6rem 1.1rem; background: #0A0A0A; border: 1px solid #222222; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.7);">
         <div style="display: flex; justify-content: center; margin-bottom: 0.6rem;">{brand_trophy}</div>
         <div style="font-size: 0.8rem; color: #94A3B8; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.3rem;">
             The World's Olympic Intelligence Platform
         </div>
-        <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: 3.2rem; font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.1; letter-spacing: -0.01em;">
+        <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: clamp(2.1rem, 6vw, 3.2rem); font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.1; letter-spacing: -0.01em;">
             OLYMPIA
         </h1>
-        <div style="font-size: 1rem; color: #5DD62C; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.4rem;">
+        <div style="font-size: clamp(0.82rem, 2.4vw, 1rem); color: #5DD62C; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.4rem;">
             Olympic Performance Analytics & Intelligence System
         </div>
-        <p style="max-width: 680px; margin: 0.8rem auto 0 auto; color: #94A3B8; font-size: 0.95rem; line-height: 1.5;">
-            Explore 128 years of Olympic history (1896 – 2024) powered by a verified Star Schema Data Warehouse,
+        <p style="max-width: 680px; margin: 0.8rem auto 0 auto; color: #94A3B8; font-size: clamp(0.85rem, 2vw, 0.95rem); line-height: 1.5;">
+            Explore 130 years of Olympic history (1896 – 2026) powered by a verified Star Schema Data Warehouse,
             predictive machine learning, and multi-dimensional OLAP analytics.
         </p>
     </div>
     """)
 
-    st.markdown("<h3 style='text-align: center; color: #F8F8F8; font-family: Playfair Display, serif; margin-bottom: 1.5rem;'>Choose Your Portal Experience</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; color: #F8F8F8; font-family: Playfair Display, serif; font-size: clamp(1.2rem, 3.5vw, 1.5rem); margin-bottom: 1.5rem;'>Choose Your Portal Experience</h3>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3, gap="medium")
 
@@ -384,7 +399,7 @@ def render_landing_page():
     # 1. ADMIN ROLE CARD
     with col1:
         _safe_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.5rem; height: 320px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <div class="auth-role-card" style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem 1.25rem; min-height: 270px; height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">
             <div>
                 <div style="margin-bottom: 0.6rem;">{icon_db}</div>
                 <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 800; color: #F8F8F8;">Administrator</div>
@@ -393,19 +408,19 @@ def render_landing_page():
                     Data Warehouse inspection, ETL health, data quality audits, OLAP cube laboratory, and machine learning models.
                 </div>
             </div>
-            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem;">
+            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem; margin-top: 0.8rem;">
                 Default user: <code style="color: #5DD62C;">admin</code>
             </div>
         </div>
         """)
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
         if st.button("Enter as Administrator", key="btn_quick_admin", use_container_width=True):
             login("admin", ROLE_ADMIN, "System Administrator")
 
     # 2. SPORT ENTHUSIAST ROLE CARD
     with col2:
         _safe_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.5rem; height: 320px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <div class="auth-role-card" style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem 1.25rem; min-height: 270px; height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">
             <div>
                 <div style="margin-bottom: 0.6rem;">{icon_tr}</div>
                 <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 800; color: #F8F8F8;">Sport Enthusiast</div>
@@ -414,19 +429,19 @@ def render_landing_page():
                     Engaging Olympic storyboards, country highlights, sport milestones, head-to-head nation showdowns, and medal trends.
                 </div>
             </div>
-            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem;">
+            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem; margin-top: 0.8rem;">
                 Default user: <code style="color: #A3E635;">fan</code>
             </div>
         </div>
         """)
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
         if st.button("Enter as Enthusiast", key="btn_quick_fan", use_container_width=True):
             login("fan", ROLE_ENTHUSIAST, "Olympic Fan")
 
     # 3. PLAYER / ACADEMY ROLE CARD
     with col3:
         _safe_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.5rem; height: 320px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <div class="auth-role-card" style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem 1.25rem; min-height: 270px; height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">
             <div>
                 <div style="margin-bottom: 0.6rem;">{icon_lt}</div>
                 <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 800; color: #F8F8F8;">Player / Academy</div>
@@ -435,12 +450,12 @@ def render_landing_page():
                     Discipline competitiveness, competitor nation depth, global performance tiers, and historical Olympic benchmark trajectories.
                 </div>
             </div>
-            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem;">
+            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem; margin-top: 0.8rem;">
                 Default user: <code style="color: #5DD62C;">coach</code>
             </div>
         </div>
         """)
-        st.markdown("<div style='height: 10px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
         if st.button("Enter as Player / Academy", key="btn_quick_coach", use_container_width=True):
             login("coach", ROLE_ACADEMY, "Elite Sports Academy")
 

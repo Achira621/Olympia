@@ -486,6 +486,177 @@ render_html("""
         border-radius: 10px;
         background-color: #202020;
     }
+
+    /* ============================================================
+       RESPONSIVE MOBILE & TABLET OPTIMIZATIONS (Antigravity & Emil Kowalski)
+       ============================================================ */
+    @media (max-width: 768px) {
+        /* Container Spacing: Reclaim screen real estate on mobile devices */
+        .main .block-container, div[data-testid="stMainBlockContainer"] {
+            padding-top: 0.85rem !important;
+            padding-bottom: 2rem !important;
+            padding-left: 0.75rem !important;
+            padding-right: 0.75rem !important;
+        }
+
+        /* Fluid Typography Scaling */
+        h1, .hero-title, .forbes-masthead-title {
+            font-size: 1.85rem !important;
+            line-height: 1.2 !important;
+            letter-spacing: -0.01em !important;
+        }
+        h2 {
+            font-size: 1.45rem !important;
+        }
+        h3 {
+            font-size: 1.2rem !important;
+        }
+        .hero-banner {
+            padding: 1.2rem 1.1rem !important;
+            border-radius: 12px !important;
+        }
+        .hero-subtitle {
+            font-size: 0.88rem !important;
+        }
+
+        /* Responsive Columns: Stacks horizontally crushed column blocks */
+        div[data-testid="stHorizontalBlock"] {
+            flex-wrap: wrap !important;
+            gap: 0.75rem !important;
+        }
+        div[data-testid="stHorizontalBlock"] > div[data-testid="column"],
+        div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
+            min-width: 100% !important;
+            flex: 1 1 100% !important;
+            margin-bottom: 0.4rem !important;
+        }
+
+        /* Metric Tickers & KPI Cards: Full-width fluid layout */
+        .ticker-card {
+            padding: 1rem 1.15rem !important;
+            margin-bottom: 0.65rem !important;
+            width: 100% !important;
+            border-radius: 10px !important;
+        }
+        .ticker-value {
+            font-size: 1.45rem !important;
+        }
+        .ticker-label {
+            font-size: 0.75rem !important;
+        }
+
+        /* 3D Podium Cards: Vertical Stack on Mobile */
+        .podium-container {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+            padding: 0.5rem 0 !important;
+        }
+        .podium-step {
+            min-width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            padding: 1.2rem 1rem !important;
+            border-radius: 12px !important;
+        }
+        .podium-badge {
+            font-size: 2rem !important;
+        }
+        .podium-medals {
+            font-size: 1.6rem !important;
+        }
+
+        /* Touch-Friendly Tabs: Horizontal scroll bar */
+        div[data-baseweb="tab-list"] {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            scrollbar-width: thin !important;
+            gap: 0.25rem !important;
+            padding-bottom: 0.35rem !important;
+        }
+        button[data-baseweb="tab"] {
+            font-size: 0.88rem !important;
+            padding: 0.55rem 0.85rem !important;
+            white-space: nowrap !important;
+            flex-shrink: 0 !important;
+        }
+
+        /* Touch Targets: 44px Minimum for Accessibility & Apple HIG */
+        .stButton>button, .stDownloadButton>button {
+            min-height: 44px !important;
+            padding: 0.65rem 1.1rem !important;
+            font-size: 0.95rem !important;
+            width: 100% !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            touch-action: manipulation !important;
+        }
+
+        /* Form Inputs & Selects: Prevent iOS Safari Auto-Zoom */
+        input[type="text"], input[type="number"], input[type="password"], textarea {
+            font-size: 16px !important;
+            min-height: 44px !important;
+        }
+        div[data-baseweb="select"] > div {
+            min-height: 44px !important;
+        }
+
+        /* DataTables & DataFrames: Fluid horizontal scroll with momentum */
+        div[data-testid="stDataFrame"], div[data-testid="stTable"] {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            border-radius: 8px !important;
+        }
+
+        /* Plotly Visualizations: Ensure full container bounding without horizontal overflow */
+        .js-plotly-plot, .plot-container {
+            max-width: 100% !important;
+            width: 100% !important;
+            overflow-x: hidden !important;
+        }
+
+        /* Athlete Cards */
+        .athlete-card {
+            padding: 1.2rem 1.1rem !important;
+            border-radius: 12px !important;
+        }
+
+        /* Mobile Sidebar adjustments */
+        section[data-testid="stSidebar"] {
+            width: 85vw !important;
+            max-width: 320px !important;
+        }
+        [data-testid="stSidebarCollapseButton"] button,
+        button[kind="header"] {
+            min-width: 44px !important;
+            min-height: 44px !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .main .block-container, div[data-testid="stMainBlockContainer"] {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            padding-top: 0.65rem !important;
+        }
+        h1, .hero-title, .forbes-masthead-title {
+            font-size: 1.6rem !important;
+        }
+        .hero-banner {
+            padding: 1rem 0.85rem !important;
+        }
+        .ticker-card {
+            padding: 0.85rem 1rem !important;
+        }
+        .ticker-value {
+            font-size: 1.3rem !important;
+        }
+    }
 </style>
 """)
 
