@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="100%" height="100%">
+  <defs>
+    <linearGradient id="favBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2E2A25"/>
+      <stop offset="100%" stop-color="#141414"/>
+    </linearGradient>
+    <linearGradient id="favGold" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#AA820A"/>
+      <stop offset="40%" stop-color="#D4AF37"/>
+      <stop offset="80%" stop-color="#F3E7C5"/>
+      <stop offset="100%" stop-color="#D4AF37"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Squircle Container -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#favBg)" stroke="#D4AF37" stroke-width="1.2"/>
+
+  <!-- Embracing Arc -->
+  <circle cx="32" cy="34" r="23" fill="none" stroke="url(#favGold)" stroke-width="1.2" stroke-dasharray="110 30" opacity="0.8"/>
+
+  <!-- Left Pillar -->
+  <rect x="25" y="34" width="3.5" height="17" rx="1" fill="#FFFFFF"/>
+  <!-- Central Pillar -->
+  <rect x="30.5" y="28" width="4" height="23" rx="1" fill="#FFFFFF"/>
+  <!-- Right Pillar -->
+  <rect x="36.5" y="34" width="3.5" height="17" rx="1" fill="#FFFFFF"/>
+  <!-- Base -->
+  <rect x="23" y="52" width="19" height="1.8" rx="0.9" fill="url(#favGold)"/>
+
+  <!-- Flame -->
+  <path d="M31 26 C30 22 32 17 35 12 C36 10 38 8 39 6 C39.2 5.8 39.5 6 39.4 6.3 C38.5 9 38 12 38.5 15 C39 18 42 20 42 24 C42 27 39.5 29.5 36.5 30 C38.5 26.5 38 22 36 19 C35 17 33.5 15 33 13 C32.8 12.7 32.5 12.8 32.6 13.1 C33 15.5 32.5 19 31.5 21.5 C31 23 30.8 24.5 31 26 Z" fill="url(#favGold)"/>
+</svg>

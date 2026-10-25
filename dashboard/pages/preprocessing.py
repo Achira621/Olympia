@@ -57,9 +57,9 @@ def render_page(df: pd.DataFrame = None):
 
     with c_bfa1:
         st.markdown("""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.1rem 1.25rem;">
-            <div style="font-weight: 700; color: #EF4444; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">Raw Dataset (Before Preprocessing)</div>
-            <ul style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 14px; padding: 1.1rem 1.4rem; box-shadow: var(--shadow-subtle);">
+            <div style="font-weight: 700; color: #C41E3A; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.82rem; letter-spacing: 0.08em; font-family: 'Cinzel', serif;">Raw Dataset (Before Preprocessing)</div>
+            <ul style="color: #5A544A; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem; font-family: 'Inter', sans-serif;">
                 <li><strong>20,247 records</strong> with 10 raw textual columns</li>
                 <li><strong>3 exact duplicate rows</strong> detected and flagged</li>
                 <li><strong>4 voided / non-awarded</strong> historical event records</li>
@@ -71,10 +71,10 @@ def render_page(df: pd.DataFrame = None):
 
     with c_bfa2:
         st.markdown("""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.1rem 1.25rem;">
-            <div style="font-weight: 700; color: #5DD62C; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.85rem; letter-spacing: 0.05em;">Cleaned Star Schema (After Preprocessing)</div>
-            <ul style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">
-                <li><strong>20,240 verified facts</strong> across 5 normalized dimension tables</li>
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 14px; padding: 1.1rem 1.4rem; box-shadow: var(--shadow-subtle);">
+            <div style="font-weight: 700; color: #AA820A; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 0.82rem; letter-spacing: 0.08em; font-family: 'Cinzel', serif;">Cleaned Star Schema (After Preprocessing)</div>
+            <ul style="color: #5A544A; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem; font-family: 'Inter', sans-serif;">
+                <li><strong>20,582 verified facts</strong> across 5 normalized dimension tables</li>
                 <li><strong>Zero duplicate records</strong> (primary key integrity verified)</li>
                 <li><strong>Zero orphan foreign keys</strong> across all dimensions</li>
                 <li><strong>Missing athlete names imputed</strong> with 'Team / Not Listed'</li>

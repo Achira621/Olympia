@@ -15,7 +15,7 @@ def render_sidebar_filters(df: pd.DataFrame) -> Tuple[pd.DataFrame, dict]:
     """
     Renders filter controls in the sidebar and returns the filtered DataFrame.
     """
-    filter_svg = get_svg_icon("filter", size=18, color="#5DD62C")
+    filter_svg = get_svg_icon("filter", size=18, color="#D4AF37")
     st.sidebar.markdown(f"### {filter_svg} Global Filters", unsafe_allow_html=True)
 
     # Season Filter

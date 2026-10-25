@@ -6,8 +6,8 @@ Features:
 - High-Contrast Dark Theme Palette:
   * #0F0F0F (Pitch Black Canvas Background)
   * #202020 (Charcoal Surface Container)
-  * #5DD62C (Electric Lime Primary Accent & CTA)
-  * #337418 (Forest Green Secondary Accent)
+  * #D4AF37 (Electric Lime Primary Accent & CTA)
+  * #AA820A (Forest Green Secondary Accent)
   * #F8F8F8 (Off-White Primary Typography)
 - Zero HTML code-block indentation bugs (dedented raw HTML rendering)
 - Protected Layout margins & responsive z-indexes
@@ -74,10 +74,11 @@ from dashboard.auth import (
     ROLE_ACADEMY
 )
 from dashboard.components.icons import get_svg_icon, render_medal_pills
-from dashboard.components.knowledge_api import get_athlete_intel, get_country_intel
 from dashboard.components.coach_strategy_ui import render_coach_strategy_studio
+from dashboard.components.theme import inject_olympia_theme, get_olympia_logo
 from dashboard.components.metrics import (
     render_telemetry_hud,
+    render_hero_split_banner,
     render_kpi_card,
     render_kpi_row,
     render_podium_showcase,
@@ -100,746 +101,18 @@ st.set_page_config(
 # Helper function to render HTML safely without Markdown code-block interpretation
 def render_html(html_str: str):
     """Renders HTML safely using Streamlit's native st.html."""
+    cleaned = re.sub(r'\n\s*', ' ', html_str).strip()
     if hasattr(st, "html"):
-        st.html(html_str)
+        st.html(cleaned)
     else:
-        st.markdown(html_str, unsafe_allow_html=True)
+        st.markdown(cleaned, unsafe_allow_html=True)
+
 
 
 # ------------------------------------------------------------
-# 2. Design System: High-Contrast Modern Dark-Themed Styling
+# 2. Design System: OLYMPIA Marble White & Imperial Gold Architecture
 # ------------------------------------------------------------
-render_html("""
-<meta name="referrer" content="no-referrer" />
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Cinzel:wght@700;800&display=swap" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-    /* ============================================================
-       1. COLOR & SURFACE DESIGN TOKENS (KINETIC OLYMPIC TELEMETRY LAB)
-       ============================================================ */
-    :root {
-        --bg-void: #07080A;
-        --surface-glass-1: rgba(20, 22, 27, 0.65);
-        --surface-glass-2: rgba(32, 35, 42, 0.78);
-        --border-hairline: rgba(255, 255, 255, 0.08);
-        --border-glow: rgba(93, 214, 44, 0.45);
-        --accent-lime: #5DD62C;
-        --accent-cyan: #00F0FF;
-        --medal-gold: #FFD700;
-        --medal-silver: #E2E8F0;
-        --medal-bronze: #D97706;
-        --text-primary: #F8FAFC;
-        --text-muted: #94A3B8;
-        --text-dim: #475569;
-        --spring-snappy: cubic-bezier(0.22, 1, 0.36, 1);
-        --spring-float: cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Hide default Streamlit multi-page sidebar navigation list */
-    [data-testid="stSidebarNav"],
-    div[data-testid="stSidebarNavItems"],
-    ul[data-testid="stSidebarNavItems"],
-    [data-testid="stSidebarNavSeparator"],
-    section[data-testid="stSidebar"] div:has(> ul[data-testid="stSidebarNavItems"]),
-    section[data-testid="stSidebar"] [data-testid="stSidebarNav"] {
-        display: none !important;
-    }
-
-    /* ============================================================
-       2. TYPOGRAPHY & SCANNABLE HIERARCHY
-       ============================================================ */
-    html, body, [class*="css"], .stMarkdown {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    /* Display / Headers: Space Grotesk / Outfit with tight tracking */
-    h1, h2, h3, .hero-title, .forbes-masthead-title {
-        font-family: 'Space Grotesk', 'Outfit', 'Inter', sans-serif !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.03em !important;
-    }
-
-    /* Telemetry / Numbers / KPIs: JetBrains Mono with tabular-nums */
-    .bento-kpi-value, .ticker-value, .podium-pts, [data-testid="stMetricValue"],
-    .hud-ticker-pill, .hud-scrubber-pill, .hud-breadcrumb, .metric-container {
-        font-family: 'JetBrains Mono', monospace !important;
-        font-variant-numeric: tabular-nums !important;
-    }
-
-    h4, h5, h6, p, label, input, button, select, textarea, [data-testid="stMetricLabel"] {
-        font-family: 'Inter', sans-serif !important;
-    }
-
-    /* Material Symbols / Icons */
-    .material-symbols-outlined,
-    .material-symbols-rounded,
-    .material-icons,
-    [class*="material-symbols"],
-    [class*="material-icons"],
-    [data-testid*="stIcon"],
-    [data-testid="stSidebarCollapseButton"] span,
-    button[kind="header"] span {
-        font-family: 'Material Symbols Rounded', 'Material Symbols Outlined', 'Material Icons' !important;
-        font-weight: normal;
-        font-style: normal;
-        line-height: 1;
-        display: inline-block;
-        white-space: nowrap;
-        -webkit-font-smoothing: antialiased;
-    }
-
-    /* ============================================================
-       3. OBSIDIAN VOID CANVAS & CUSTOM SCROLLBARS
-       ============================================================ */
-    .stApp {
-        background-color: var(--bg-void, #07080A) !important;
-        background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px) !important;
-        background-size: 24px 24px !important;
-        color: var(--text-primary, #F8FAFC) !important;
-    }
-
-    /* 6px ultra-slim dark scrollbar with lime hover thumb */
-    ::-webkit-scrollbar {
-        width: 6px !important;
-        height: 6px !important;
-    }
-    ::-webkit-scrollbar-track {
-        background: #07080A !important;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.15) !important;
-        border-radius: 3px !important;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-        background: var(--accent-lime, #5DD62C) !important;
-        box-shadow: 0 0 10px rgba(93, 214, 44, 0.6) !important;
-    }
-
-    /* Custom Selection Highlight */
-    ::selection {
-        background: rgba(93, 214, 44, 0.25) !important;
-        color: #5DD62C !important;
-    }
-
-    /* Prevent content from sliding under sidebar */
-    .stMain {
-        position: relative !important;
-        z-index: 1 !important;
-    }
-
-    /* Sidebar Styling (Deep Obsidian Surface Dock) */
-    section[data-testid="stSidebar"] {
-        background-color: #0A0B0F !important;
-        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
-        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.7);
-        z-index: 99 !important;
-    }
-
-    /* Main Content Container Padding */
-    .main .block-container, div[data-testid="stMainBlockContainer"] {
-        padding-top: 1rem !important;
-        padding-bottom: 3rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
-        max-width: 100% !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* Top Header Bar */
-    header[data-testid="stHeader"] {
-        background-color: rgba(7, 8, 10, 0.85) !important;
-        backdrop-filter: blur(16px) !important;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
-    }
-
-    /* ============================================================
-       4. TOP TELEMETRY HUD BAR (GLOBAL HEADER)
-       ============================================================ */
-    .telemetry-hud-bar {
-        position: sticky;
-        top: 0.5rem;
-        z-index: 999;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0.65rem 1.25rem;
-        margin-bottom: 1.2rem;
-        background: rgba(20, 22, 27, 0.78);
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(93, 214, 44, 0.06);
-        transition: all 220ms var(--spring-snappy);
-    }
-    .telemetry-hud-bar:hover {
-        border-color: rgba(93, 214, 44, 0.35);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(93, 214, 44, 0.16);
-    }
-    .hud-left {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-    .hud-breadcrumb {
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-    }
-    .hud-brand {
-        color: #F8FAFC;
-    }
-    .hud-sep {
-        color: #475569;
-    }
-    .hud-role {
-        font-weight: 800;
-    }
-    .hud-module {
-        color: #94A3B8;
-    }
-    .hud-center {
-        display: flex;
-        align-items: center;
-    }
-    .hud-ticker-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.6rem;
-        background: rgba(10, 11, 14, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.35rem 0.95rem;
-        border-radius: 9999px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.74rem;
-        color: #94A3B8;
-    }
-    .ticker-dot {
-        color: #5DD62C;
-        animation: ag-pulse 1.8s infinite;
-    }
-    .hud-right {
-        display: flex;
-        align-items: center;
-        gap: 0.65rem;
-    }
-    .hud-scrubber-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        background: rgba(10, 11, 14, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.35rem 0.75rem;
-        border-radius: 9999px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.72rem;
-    }
-    .scrubber-label {
-        color: #475569;
-        font-weight: 700;
-    }
-    .scrubber-val {
-        color: #F8FAFC;
-        font-weight: 700;
-    }
-    .hud-role-switcher {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.25rem;
-        background: rgba(10, 11, 14, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.2rem 0.35rem;
-        border-radius: 9999px;
-    }
-    .role-chip {
-        padding: 0.2rem 0.55rem;
-        border-radius: 9999px;
-        font-family: 'Inter', sans-serif;
-        font-size: 0.7rem;
-        font-weight: 700;
-        color: #94A3B8;
-        text-decoration: none;
-        transition: all 180ms ease;
-    }
-    .role-chip:hover {
-        color: #F8FAFC;
-        background: rgba(255, 255, 255, 0.06);
-    }
-    .active-chip {
-        background: #5DD62C !important;
-        color: #07080A !important;
-        font-weight: 800;
-        box-shadow: 0 0 10px rgba(93, 214, 44, 0.4);
-    }
-
-    /* ============================================================
-       5. SPATIAL BENTO KPI CARDS
-       ============================================================ */
-    .bento-kpi-card {
-        background: var(--surface-glass-1, rgba(20, 22, 27, 0.65));
-        backdrop-filter: blur(16px) saturate(180%);
-        -webkit-backdrop-filter: blur(16px) saturate(180%);
-        border: 1px solid var(--border-hairline, rgba(255, 255, 255, 0.08));
-        border-radius: 14px;
-        padding: 1.25rem 1.35rem;
-        position: relative;
-        overflow: hidden;
-        margin-bottom: 1rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        transition: transform 220ms var(--spring-snappy),
-                    box-shadow 220ms var(--spring-snappy),
-                    border-color 220ms var(--spring-snappy);
-        box-sizing: border-box;
-    }
-    .bento-kpi-card:hover {
-        transform: translateY(-4px) scale(1.008);
-        border-color: var(--border-glow, rgba(93, 214, 44, 0.45));
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(93, 214, 44, 0.18);
-    }
-    .bento-watermark {
-        position: absolute;
-        right: -6px;
-        bottom: -6px;
-        opacity: 0.12;
-        pointer-events: none;
-        z-index: 1;
-    }
-    .bento-kpi-value {
-        font-family: 'JetBrains Mono', monospace !important;
-        font-variant-numeric: tabular-nums !important;
-        font-size: 1.85rem;
-        font-weight: 800;
-        color: #F8FAFC;
-        line-height: 1.2;
-        margin-top: 0.4rem;
-        position: relative;
-        z-index: 2;
-    }
-    .bento-bottom-glow {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: linear-gradient(90deg, transparent 0%, #5DD62C 50%, transparent 100%);
-        opacity: 0.4;
-        transition: opacity 220ms ease;
-    }
-    .bento-kpi-card:hover .bento-bottom-glow {
-        opacity: 1;
-        height: 3px;
-    }
-
-    /* Legacy Ticker Card compatibility */
-    .ticker-card {
-        background: var(--surface-glass-1, rgba(20, 22, 27, 0.65));
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 1.1rem 1.3rem;
-        backdrop-filter: blur(14px);
-        transition: all 0.22s var(--spring-snappy);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-    }
-    .ticker-card:hover {
-        transform: translateY(-4px);
-        border-color: #5DD62C;
-        box-shadow: 0 10px 25px rgba(93, 214, 44, 0.25);
-    }
-
-    /* ============================================================
-       6. 3D SPATIAL VISUAL PODIUM SHOWCASE
-       ============================================================ */
-    .spatial-podium-root {
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        gap: 1.2rem;
-        padding: 1.5rem 0.5rem 1rem 0.5rem;
-        margin: 1.2rem 0 2rem 0;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    .podium-pillar {
-        flex: 1;
-        max-width: 310px;
-        border-radius: 16px 16px 10px 10px;
-        text-align: center;
-        padding: 1.5rem 1.1rem;
-        position: relative;
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-        transition: transform 300ms var(--spring-snappy);
-        box-sizing: border-box;
-    }
-    .podium-pillar:hover {
-        transform: translateY(-6px);
-    }
-    .gold-pillar {
-        background: linear-gradient(180deg, rgba(93, 214, 44, 0.16) 0%, rgba(20, 22, 27, 0.95) 100%);
-        border: 2px solid #5DD62C;
-        box-shadow: 0 0 35px rgba(93, 214, 44, 0.35), 0 20px 45px rgba(0, 0, 0, 0.7);
-        min-height: 285px;
-        order: 2;
-    }
-    .silver-pillar {
-        background: linear-gradient(180deg, rgba(226, 232, 240, 0.1) 0%, rgba(20, 22, 27, 0.95) 100%);
-        border: 1.5px solid rgba(226, 232, 240, 0.35);
-        min-height: 245px;
-        order: 1;
-    }
-    .bronze-pillar {
-        background: linear-gradient(180deg, rgba(217, 119, 6, 0.12) 0%, rgba(20, 22, 27, 0.95) 100%);
-        border: 1.5px solid rgba(217, 119, 6, 0.35);
-        min-height: 215px;
-        order: 3;
-    }
-    .podium-badge-wrap {
-        margin-bottom: 0.4rem;
-        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
-    }
-    .podium-rank-tag {
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.08em;
-        color: #94A3B8;
-        margin-bottom: 0.2rem;
-    }
-    .gold-rank {
-        color: #5DD62C;
-        font-weight: 800;
-    }
-    .podium-nation-name {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: #F8FAFC;
-        margin-bottom: 0.3rem;
-    }
-    .podium-score-wrap {
-        display: flex;
-        align-items: baseline;
-        justify-content: center;
-        gap: 0.3rem;
-        margin-bottom: 0.6rem;
-    }
-    .podium-pts {
-        font-family: 'JetBrains Mono', monospace;
-        font-variant-numeric: tabular-nums;
-        font-size: 1.85rem;
-        font-weight: 800;
-        color: #F8FAFC;
-    }
-    .gold-score .podium-pts {
-        color: #5DD62C;
-    }
-    .podium-unit {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #94A3B8;
-    }
-    .podium-pills-row {
-        display: flex;
-        justify-content: center;
-        gap: 0.4rem;
-        margin-bottom: 0.8rem;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.74rem;
-        font-weight: 600;
-    }
-    .podium-pills-row span {
-        background: rgba(0, 0, 0, 0.45);
-        padding: 0.2rem 0.45rem;
-        border-radius: 6px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
-    }
-    .pillar-block {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 2.2rem;
-        font-weight: 900;
-        opacity: 0.25;
-    }
-    .pillar-gold-block {
-        color: #5DD62C;
-    }
-
-    /* ============================================================
-       7. SIDEBAR COMMAND DOCK & PHYSICAL RADIO PILLS
-       ============================================================ */
-    section[data-testid="stSidebar"] div[data-baseweb="radio"] {
-        background: transparent !important;
-        gap: 0.35rem !important;
-    }
-    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label {
-        background: rgba(20, 22, 27, 0.65) !important;
-        border: 1px solid rgba(255, 255, 255, 0.06) !important;
-        border-radius: 10px !important;
-        padding: 0.65rem 0.95rem !important;
-        margin-bottom: 0.35rem !important;
-        min-height: 46px !important;
-        display: flex !important;
-        align-items: center !important;
-        position: relative !important;
-        transition: all 180ms var(--spring-snappy) !important;
-        cursor: pointer !important;
-    }
-    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label:hover {
-        background: rgba(32, 35, 42, 0.85) !important;
-        border-color: rgba(93, 214, 44, 0.35) !important;
-        transform: translateX(4px) !important;
-    }
-    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label:has(input:checked) {
-        background: rgba(93, 214, 44, 0.12) !important;
-        border: 1px solid #5DD62C !important;
-        box-shadow: 0 0 16px rgba(93, 214, 44, 0.2) !important;
-    }
-    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label:has(input:checked)::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 6px;
-        bottom: 6px;
-        width: 3px;
-        background: #5DD62C;
-        border-radius: 0 3px 3px 0;
-        box-shadow: 0 0 8px #5DD62C;
-    }
-
-    /* ============================================================
-       8. ZERO TELEMETRY FALLBACK & STATUS FOOTER
-       ============================================================ */
-    .zero-telemetry-card {
-        background: rgba(20, 22, 27, 0.65);
-        border: 1px dashed rgba(93, 214, 44, 0.4);
-        border-radius: 16px;
-        padding: 2.5rem 1.5rem;
-        text-align: center;
-        margin: 2rem 0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .telemetry-status-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 0.85rem 1.3rem;
-        margin-top: 3rem;
-        background: rgba(20, 22, 27, 0.75);
-        backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 0.74rem;
-        color: #94A3B8;
-    }
-    .footer-left {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .footer-center {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .footer-pill {
-        background: rgba(10, 11, 14, 0.85);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.2rem 0.55rem;
-        border-radius: 9999px;
-        font-size: 0.68rem;
-        color: #CBD5E1;
-    }
-    .footer-right {
-        color: #64748B;
-    }
-
-    /* High-contrast Tabs styling */
-    button[data-baseweb="tab"] {
-        background: transparent !important;
-        color: #94A3B8 !important;
-        font-family: 'Space Grotesk', sans-serif !important;
-        font-size: 0.98rem !important;
-        font-weight: 700 !important;
-        border-radius: 8px 8px 0 0 !important;
-        padding: 0.75rem 1.4rem !important;
-        transition: all 0.2s var(--spring-snappy) !important;
-        border-bottom: 2px solid transparent !important;
-    }
-    button[aria-selected="true"] {
-        color: #5DD62C !important;
-        background: rgba(93, 214, 44, 0.08) !important;
-        border-bottom: 3px solid #5DD62C !important;
-        text-shadow: 0 0 12px rgba(93, 214, 44, 0.4);
-    }
-
-    /* Action Buttons (Electric Lime CTA with Emil Kowalski active-press) */
-    .stButton>button {
-        background: #5DD62C !important;
-        color: #07080A !important;
-        font-family: 'Space Grotesk', sans-serif !important;
-        font-weight: 800 !important;
-        font-size: 0.95rem !important;
-        letter-spacing: 0.02em !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 0.55rem 1.3rem !important;
-        transition: all 0.18s var(--spring-snappy) !important;
-        box-shadow: 0 4px 15px rgba(93, 214, 44, 0.3) !important;
-    }
-    .stButton>button:hover {
-        background: #337418 !important;
-        color: #F8FAFC !important;
-        transform: translateY(-2px) scale(1.02) !important;
-        box-shadow: 0 6px 20px rgba(93, 214, 44, 0.5) !important;
-    }
-    .stButton>button:active {
-        transform: scale(0.97) !important;
-    }
-
-    /* Secondary Download Buttons */
-    .stDownloadButton>button {
-        background: rgba(20, 22, 27, 0.78) !important;
-        color: #5DD62C !important;
-        font-family: 'Space Grotesk', sans-serif !important;
-        font-weight: 800 !important;
-        border: 1.5px solid #5DD62C !important;
-        border-radius: 8px !important;
-        box-shadow: 0 4px 15px rgba(93, 214, 44, 0.2) !important;
-        transition: all 0.2s ease !important;
-    }
-    .stDownloadButton>button:hover {
-        background: #337418 !important;
-        color: #F8FAFC !important;
-    }
-    .stDownloadButton>button:active {
-        transform: scale(0.97) !important;
-    }
-
-    /* Animations */
-    @keyframes ag-pulse {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50% { opacity: 0.4; transform: scale(0.9); }
-    }
-    @keyframes slideUpFade {
-        from {
-            opacity: 0;
-            transform: translateY(12px) scale(0.98);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    /* Dataframe Containers */
-    div[data-testid="stDataFrame"] {
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 10px;
-        background-color: rgba(20, 22, 27, 0.75);
-    }
-
-    /* Focus visible accessibility outline */
-    button:focus-visible, input:focus-visible, select:focus-visible {
-        outline: 2px solid #5DD62C !important;
-        outline-offset: 2px !important;
-    }
-
-    /* ============================================================
-       9. RESPONSIVE MOBILE & TABLET OPTIMIZATIONS
-       ============================================================ */
-    @media (max-width: 768px) {
-        .main .block-container, div[data-testid="stMainBlockContainer"] {
-            padding-top: 0.85rem !important;
-            padding-bottom: 2rem !important;
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-        }
-        h1, .hero-title, .forbes-masthead-title {
-            font-size: 1.85rem !important;
-            line-height: 1.2 !important;
-            letter-spacing: -0.01em !important;
-        }
-        div[data-testid="stHorizontalBlock"] {
-            flex-wrap: wrap !important;
-            gap: 0.75rem !important;
-        }
-        div[data-testid="stHorizontalBlock"] > div[data-testid="column"],
-        div[data-testid="stHorizontalBlock"] > div[data-testid="stColumn"] {
-            min-width: 100% !important;
-            flex: 1 1 100% !important;
-            margin-bottom: 0.4rem !important;
-        }
-        .spatial-podium-root {
-            flex-direction: column !important;
-            align-items: stretch !important;
-            gap: 1rem !important;
-            padding: 0.5rem 0 !important;
-        }
-        .podium-pillar {
-            min-width: 100% !important;
-            max-width: 100% !important;
-            min-height: auto !important;
-            padding: 1.2rem 1rem !important;
-            border-radius: 12px !important;
-        }
-        div[data-baseweb="tab-list"] {
-            display: flex !important;
-            flex-wrap: nowrap !important;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            scrollbar-width: thin !important;
-            gap: 0.25rem !important;
-            padding-bottom: 0.35rem !important;
-        }
-        button[data-baseweb="tab"] {
-            font-size: 0.88rem !important;
-            padding: 0.55rem 0.85rem !important;
-            white-space: nowrap !important;
-            flex-shrink: 0 !important;
-        }
-        .stButton>button, .stDownloadButton>button {
-            min-height: 44px !important;
-            padding: 0.65rem 1.1rem !important;
-            font-size: 0.95rem !important;
-            width: 100% !important;
-            touch-action: manipulation !important;
-        }
-        input[type="text"], input[type="number"], input[type="password"], textarea {
-            font-size: 16px !important;
-            min-height: 44px !important;
-        }
-        div[data-baseweb="select"] > div {
-            min-height: 44px !important;
-        }
-        .telemetry-hud-bar {
-            flex-direction: column;
-            gap: 0.6rem;
-            align-items: flex-start;
-        }
-        .hud-center {
-            display: none;
-        }
-        .hud-right {
-            width: 100%;
-            justify-content: space-between;
-        }
-    }
-</style>
-""")
-
+inject_olympia_theme()
 
 # ------------------------------------------------------------
 # 3. Fast Cached Data Loading
@@ -889,21 +162,19 @@ with st.sidebar:
     # Authenticated User Badge & Logout Button at top of sidebar
     render_sidebar_user_badge()
 
-    sidebar_brand_icon = get_svg_icon("trophy", size=22, color="#5DD62C")
-    filter_icon = get_svg_icon("filter", size=18, color="#5DD62C")
+    sidebar_logo = get_olympia_logo(variant="horizontal", width=180, height=36)
+    filter_icon = get_svg_icon("filter", size=18, color="#D4AF37")
 
     render_html(f"""
-    <div style="padding: 0.5rem 0 1rem 0; border-bottom: 1px solid #337418; margin-bottom: 1rem;">
+    <div style="padding: 0.4rem 0 0.9rem 0; border-bottom: 1px solid #E5DED2; margin-bottom: 1.1rem;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="font-size: 1.4rem; font-weight: 800; font-family: 'Inter', sans-serif; color: #5DD62C; display: flex; align-items: center; gap: 0.5rem;">
-                {sidebar_brand_icon} OLYMPIA
-            </div>
-            <span style="font-size: 0.72rem; background: rgba(93, 214, 44, 0.15); color: #5DD62C; border: 1px solid #5DD62C; padding: 0.2rem 0.6rem; border-radius: 12px; font-weight: 700;">
+            <div>{sidebar_logo}</div>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; background: #FAF0D8; color: #7A5C05; border: 1px solid rgba(212, 175, 55, 0.4); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 700;">
                 {active_role.upper()}
             </span>
         </div>
-        <div style="font-size: 0.75rem; color: #737373; margin-top: 0.3rem; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 600;">
-            INTELLIGENCE CONTROL CENTER
+        <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.45rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; font-family: 'Inter', sans-serif;">
+            ARCHIVE CONTROL CENTER
         </div>
     </div>
     """)
@@ -944,6 +215,7 @@ with st.sidebar:
         selected_mode = st.sidebar.radio(
             "Navigation Workspace",
             options=[
+                "Overview & Legacy",
                 "Podium & Medal Tally",
                 "Coach Strategy Studio",
                 "Athlete Hall of Fame",
@@ -956,7 +228,7 @@ with st.sidebar:
         )
 
     st.markdown("---")
-    render_html(f"<div style='font-size: 0.82rem; font-weight: 700; color: #F8FAFC; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;'>{filter_icon} Filter Controls</div>")
+    render_html(f"<div style='font-size: 0.82rem; font-weight: 700; color: #2E2A25; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;'>{filter_icon} Filter Controls</div>")
 
     # Season Select
     season_options = ["All", "Summer", "Winter"]
@@ -994,42 +266,18 @@ with st.sidebar:
     if st.button("🔄 Reset Filters", use_container_width=True):
         st.rerun()
 
-    # Mini Warehouse Heartbeat Widget
+    # OLYMPIA Dataset Card in Sidebar
     st.markdown("---")
-    wh_counts = get_table_counts()
-    fact_cnt = wh_counts.get("fact_medal", len(df_master))
-    max_dim = max([wh_counts.get(k, 1) for k in ["dim_event", "dim_country", "dim_sport", "dim_game", "dim_medal"]], default=1000)
-    
-    table_items = [
-        ("fact_medal", fact_cnt, "#5DD62C", 100),
-        ("dim_event", wh_counts.get("dim_event", 0), "#00F0FF", min(100, max(15, int((wh_counts.get("dim_event", 0)/max_dim)*100)))),
-        ("dim_country", wh_counts.get("dim_country", 0), "#38BDF8", min(100, max(15, int((wh_counts.get("dim_country", 0)/max_dim)*100)))),
-        ("dim_sport", wh_counts.get("dim_sport", 0), "#A855F7", min(100, max(15, int((wh_counts.get("dim_sport", 0)/max_dim)*100)))),
-        ("dim_game", wh_counts.get("dim_game", 0), "#F59E0B", min(100, max(15, int((wh_counts.get("dim_game", 0)/max_dim)*100)))),
-        ("dim_medal", wh_counts.get("dim_medal", 3), "#E2E8F0", 15),
-    ]
-    
-    spark_html = "".join([
-        f'<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; font-family: monospace; font-size: 0.72rem;">'
-        f'<span style="color: #94A3B8;">{name}</span>'
-        f'<div style="display: flex; align-items: center; gap: 0.4rem;">'
-        f'<div style="width: 55px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;">'
-        f'<div style="width: {pct}%; height: 100%; background: {col}; border-radius: 2px;"></div>'
-        f'</div>'
-        f'<span style="color: #F8FAFC; font-weight: 700; min-width: 45px; text-align: right;">{val:,}</span>'
-        f'</div></div>'
-        for name, val, col, pct in table_items
-    ])
-
+    db_icon_svg = get_svg_icon("database", size=20, color="#D4AF37")
     render_html(f"""
-    <div style="background: rgba(20, 22, 27, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 0.5rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
-            <div style="font-size: 0.72rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem;">
-                <span style="color: #5DD62C; animation: ag-pulse 1.8s infinite;">●</span> WAREHOUSE HEARTBEAT
-            </div>
-            <span style="font-size: 0.68rem; color: #5DD62C; background: rgba(93, 214, 44, 0.12); padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700;">60FPS WAL</span>
+    <div style="background: #FAF0D8; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);">
+        <div style="width: 38px; height: 38px; border-radius: 8px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0;">
+            {db_icon_svg}
         </div>
-        {spark_html}
+        <div>
+            <div style="font-family: 'Cinzel', Georgia, serif; font-size: 0.85rem; font-weight: 800; color: #2E2A25;">OLYMPIA Dataset</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #8B857C;">1896 – 2026 • 20,582 records</div>
+        </div>
     </div>
     """)
 
@@ -1074,8 +322,8 @@ def render_admin_dashboard(df: pd.DataFrame):
     - Interactive Dataset Management via st.data_editor (view, edit, delete, insert)
     - Direct SQLite transactional backend integration with safe rollbacks
     """
-    user_svg = get_svg_icon("user", size=22, color="#38BDF8")
-    db_svg = get_svg_icon("database", size=22, color="#5DD62C")
+    user_svg = get_svg_icon("user", size=22, color="#AA820A")
+    db_svg = get_svg_icon("database", size=22, color="#D4AF37")
     disk_svg = get_svg_icon("database", size=22, color="#F59E0B")
     cal_svg = get_svg_icon("calendar", size=20, color="#F8FAFC")
 
@@ -1088,44 +336,44 @@ def render_admin_dashboard(df: pd.DataFrame):
 
     # FORBES MINIMALIST EDITORIAL MASTHEAD
     render_html(f"""
-    <div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #222222; margin-bottom: 1.5rem; background: #0A0A0A; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.6);">
-        <div style="font-size: 0.85rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
+    <div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #E5DED2; margin-bottom: 1.5rem; background: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(46,42,37,0.05);">
+        <div style="font-size: 0.85rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
             The World's
         </div>
-        <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
+        <h1 style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #2E2A25; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
             System Administration & Warehouse Control
         </h1>
-        <div style="color: #94A3B8; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
+        <div style="color: #8B857C; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
             Star Schema Management, Direct Transactional Dataset Editor & Enterprise Data Engineering Console.
         </div>
-        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #262626; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #94A3B8;">
-            <span style="color: #5DD62C; font-weight: 700;">Admin Engine Active</span> Master Write Authority • SQLite Star Schema Live
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1px solid #E5DED2; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #8B857C;">
+            <span style="color: #D4AF37; font-weight: 700;">Admin Engine Active</span> Master Write Authority • SQLite Star Schema Live
         </div>
     </div>
     """)
 
     # FORBES RUNNING TICKER RIBBON (MACRO METRICS)
     render_html(f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #111111; border: 1px solid #222222; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {user_svg}
-            <span style="font-size: 1.25rem; font-weight: 800; color: #38BDF8; font-family: 'Inter', sans-serif;">3 Active</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Authorized Accounts</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #AA820A; font-family: 'Inter', sans-serif;">3 Active</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Authorized Accounts</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {db_svg}
-            <span style="font-size: 1.25rem; font-weight: 800; color: #5DD62C; font-family: 'Inter', sans-serif;">{fact_medals_total:,}</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Warehouse Fact Records</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #D4AF37; font-family: 'Inter', sans-serif;">{fact_medals_total:,}</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Warehouse Fact Records</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {disk_svg}
             <span style="font-size: 1.25rem; font-weight: 800; color: #F59E0B; font-family: 'Inter', sans-serif;">{db_size_mb:.2f} MB</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Physical DB Storage</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Physical DB Storage</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {cal_svg}
-            <span style="font-size: 1.15rem; font-weight: 800; color: #F8FAFC; font-family: 'Inter', sans-serif;">{last_mod_ts}</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Last Database Commit</span>
+            <span style="font-size: 1.15rem; font-weight: 800; color: #2E2A25; font-family: 'Inter', sans-serif;">{last_mod_ts}</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Last Database Commit</span>
         </div>
     </div>
     """)
@@ -1299,29 +547,29 @@ def render_professional_dashboard(df: pd.DataFrame):
     - Interactive "Predict Your Potential" module using K-Nearest Neighbors & Multi-dimensional benchmark modeling
     - Discipline parity, nation conversion efficiency, and multi-sport morphology alignment
     """
-    trophy_svg = get_svg_icon("trophy", size=22, color="#38BDF8")
-    globe_svg = get_svg_icon("globe", size=20, color="#5DD62C")
+    trophy_svg = get_svg_icon("trophy", size=22, color="#AA820A")
+    globe_svg = get_svg_icon("globe", size=20, color="#D4AF37")
     star_svg = get_svg_icon("star", size=20, color="#F59E0B")
     trend_svg = get_svg_icon("trend_up", size=18, color="#10B981")
-    lightning_svg = get_svg_icon("lightning", size=18, color="#5DD62C")
-    target_svg = get_svg_icon("star", size=18, color="#38BDF8")
-    chart_svg = get_svg_icon("trend_up", size=18, color="#38BDF8")
+    lightning_svg = get_svg_icon("lightning", size=18, color="#D4AF37")
+    target_svg = get_svg_icon("star", size=18, color="#AA820A")
+    chart_svg = get_svg_icon("trend_up", size=18, color="#AA820A")
     user_svg = get_svg_icon("user", size=18, color="#F8FAFC")
 
     # 1. FORBES MINIMALIST EDITORIAL MASTHEAD
     render_html("""
-    <div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #222222; margin-bottom: 1.5rem; background: #0A0A0A; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.6);">
-        <div style="font-size: 0.85rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
+    <div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #E5DED2; margin-bottom: 1.5rem; background: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(46,42,37,0.05);">
+        <div style="font-size: 0.85rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
             The World's
         </div>
-        <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
+        <h1 style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #2E2A25; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
             Sports Science & Academy Intelligence
         </h1>
-        <div style="color: #94A3B8; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
+        <div style="color: #8B857C; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
             Biomechanical Benchmarks, Era Deep-Dives & The Predictive Athlete Potential Engine Across 1896 – 2026.
         </div>
-        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #262626; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #94A3B8;">
-            <span style="color: #5DD62C; font-weight: 700;">Performance Engine Active</span> Biomechanical Modeling • SQLite Star Schema Live
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1px solid #E5DED2; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #8B857C;">
+            <span style="color: #D4AF37; font-weight: 700;">Performance Engine Active</span> Biomechanical Modeling • SQLite Star Schema Live
         </div>
     </div>
     """)
@@ -1335,26 +583,26 @@ def render_professional_dashboard(df: pd.DataFrame):
 
     # FORBES RUNNING TICKER RIBBON (MACRO METRICS)
     render_html(f"""
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #111111; border: 1px solid #222222; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {trophy_svg}
-            <span style="font-size: 1.25rem; font-weight: 800; color: #38BDF8; font-family: 'Inter', sans-serif;">{total_medals:,}</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Verified Podiums</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #AA820A; font-family: 'Inter', sans-serif;">{total_medals:,}</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Verified Podiums</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {globe_svg}
-            <span style="font-size: 1.25rem; font-weight: 800; color: #5DD62C; font-family: 'Inter', sans-serif;">{unique_nations}</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Podium Nations</span>
+            <span style="font-size: 1.25rem; font-weight: 800; color: #D4AF37; font-family: 'Inter', sans-serif;">{unique_nations}</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Podium Nations</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {star_svg}
             <span style="font-size: 1.25rem; font-weight: 800; color: #F59E0B; font-family: 'Inter', sans-serif;">{total_points:,}</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Weighted Medal Points</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Weighted Medal Points</span>
         </div>
         <div style="display: flex; align-items: center; gap: 0.6rem;">
             {trend_svg}
             <span style="font-size: 1.25rem; font-weight: 800; color: #10B981; font-family: 'Inter', sans-serif;">{top_3_concentration:.1f}%</span>
-            <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Top-3 Nation Share</span>
+            <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Top-3 Nation Share</span>
         </div>
     </div>
     """)
@@ -1420,7 +668,7 @@ def render_professional_dashboard(df: pd.DataFrame):
             score = result["score"]
             render_html(f"""
             <div style="
-                background: #141414;
+                background: #FFFFFF;
                 border: 2px solid {result['tier_color']};
                 border-radius: 12px;
                 padding: 1.8rem;
@@ -1433,10 +681,10 @@ def render_professional_dashboard(df: pd.DataFrame):
                 <div class="potential-score-badge" style="font-size: 3.5rem; font-weight: 900; color: {result['tier_color']}; line-height: 1.1; margin: 0.5rem 0;">
                     {score}%
                 </div>
-                <div style="font-size: 1.05rem; font-weight: 800; color: #F8F8F8; margin-bottom: 0.4rem;">
+                <div style="font-size: 1.05rem; font-weight: 800; color: #2E2A25; margin-bottom: 0.4rem;">
                     {result['tier']}
                 </div>
-                <div style="font-size: 0.82rem; color: #5DD62C; background: rgba(93, 214, 44, 0.12); padding: 0.35rem 0.75rem; border-radius: 20px; display: inline-block; border: 1px solid #5DD62C;">
+                <div style="font-size: 0.82rem; color: #D4AF37; background: rgba(212, 175, 55, 0.12); padding: 0.35rem 0.75rem; border-radius: 20px; display: inline-block; border: 1px solid #D4AF37;">
                     {result['badge']}
                 </div>
                 <div style="margin-top: 1.2rem; font-size: 0.82rem; color: #A0A0A0; text-align: left; border-top: 1px solid #262626; padding-top: 0.8rem;">
@@ -1542,7 +790,7 @@ def render_professional_dashboard(df: pd.DataFrame):
             fig_peak.add_vrect(
                 x0=peak_data["peak_window_min"],
                 x1=peak_data["peak_window_max"],
-                fillcolor="#5DD62C",
+                fillcolor="#D4AF37",
                 opacity=0.15,
                 line_width=1,
                 line_dash="dot",
@@ -1553,7 +801,7 @@ def render_professional_dashboard(df: pd.DataFrame):
                 x=peak_data["mean_age"],
                 line_width=2.5,
                 line_dash="dash",
-                line_color="#5DD62C",
+                line_color="#D4AF37",
                 annotation_text=f"Mean: {peak_data['mean_age']} yrs",
                 annotation_position="top right"
             )
@@ -1575,7 +823,7 @@ def render_professional_dashboard(df: pd.DataFrame):
                 orientation="h",
                 color="consistency_score",
                 text="consistency_score",
-                color_continuous_scale=[[0, "#202020"], [0.4, "#337418"], [1, "#5DD62C"]],
+                color_continuous_scale=[[0, "#202020"], [0.4, "#AA820A"], [1, "#D4AF37"]],
                 title="Top 15 Nations by Olympic Cycle Consistency Index (0–100%)"
             )
             fig_cons.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
@@ -1603,7 +851,7 @@ def render_professional_dashboard(df: pd.DataFrame):
                 orientation="h",
                 color="consistency_score",
                 text="consistency_score",
-                color_continuous_scale=[[0, "#202020"], [0.4, "#337418"], [1, "#5DD62C"]],
+                color_continuous_scale=[[0, "#202020"], [0.4, "#AA820A"], [1, "#D4AF37"]],
                 title="Top 15 Athletes by Multi-Edition Olympic Consistency Index"
             )
             fig_ath_cons.update_traces(texttemplate="%{text:.1f}%", textposition="outside")
@@ -1688,8 +936,8 @@ def render_professional_dashboard(df: pd.DataFrame):
                 color_discrete_map={
                     "Hyper-Specialized (Single Core Focus)": "#FF4444",
                     "Targeted Concentration": "#FFD700",
-                    "Balanced Specialist": "#38BDF8",
-                    "Multi-Discipline Powerhouse": "#5DD62C"
+                    "Balanced Specialist": "#AA820A",
+                    "Multi-Discipline Powerhouse": "#D4AF37"
                 },
                 title="National Athletic Portfolio: Concentration vs. Diversification Index"
             )
@@ -1717,7 +965,7 @@ def render_professional_dashboard(df: pd.DataFrame):
                     values="medals",
                     hole=0.45,
                     title=f"{focus_country} Discipline Distribution",
-                    color_discrete_sequence=["#5DD62C", "#337418", "#A3E635", "#FFD700", "#38BDF8", "#F43F5E", "#888888"]
+                    color_discrete_sequence=["#D4AF37", "#AA820A", "#D4AF37", "#FFD700", "#AA820A", "#F43F5E", "#888888"]
                 )
                 fig_donut.update_traces(textposition="inside", textinfo="percent+label")
                 fig_donut = apply_dark_theme(fig_donut, title=f"{focus_country}: Discipline Concentration", x_title="", y_title="")
@@ -1772,14 +1020,14 @@ def render_professional_dashboard(df: pd.DataFrame):
             x=b_df["year"],
             y=b_df["debutants"],
             name="First-Time Medalists (Debuts)",
-            marker_color="#5DD62C"
+            marker_color="#D4AF37"
         ))
         fig_break.add_trace(go.Bar(
             x=b_df["year"],
             y=b_df["veterans"],
             name="Returning Veterans",
             marker_color="#202020",
-            marker_line=dict(color="#337418", width=1.5)
+            marker_line=dict(color="#AA820A", width=1.5)
         ))
         fig_break.add_trace(go.Scatter(
             x=b_df["year"],
@@ -1812,7 +1060,7 @@ def render_professional_dashboard(df: pd.DataFrame):
             x="generational_era",
             y=["total_medals", "unique_athletes", "unique_nations"],
             barmode="group",
-            color_discrete_sequence=["#5DD62C", "#FFD700", "#38BDF8"],
+            color_discrete_sequence=["#D4AF37", "#FFD700", "#AA820A"],
             title="Generational Growth Across Historical Olympic Epochs"
         )
         fig_era = apply_dark_theme(fig_era, title="Epoch Scale & Athlete Population", x_title="Generational Era", y_title="Count")
@@ -1875,7 +1123,7 @@ def render_professional_dashboard(df: pd.DataFrame):
     # Status Badge Callout
     render_html(f"""
     <div style="
-        background: #141414;
+        background: #FFFFFF;
         border-left: 4px solid {parity_res['badge_color']};
         border-radius: 8px;
         padding: 1rem 1.25rem;
@@ -1899,7 +1147,7 @@ def render_professional_dashboard(df: pd.DataFrame):
             x=[0, 100],
             y=[0, 100],
             mode="lines",
-            line=dict(color="#5DD62C", dash="dash", width=2),
+            line=dict(color="#D4AF37", dash="dash", width=2),
             name="Perfect Parity Line (Equal Distribution)"
         ))
         fig_lorenz.add_trace(go.Scatter(
@@ -1907,7 +1155,7 @@ def render_professional_dashboard(df: pd.DataFrame):
             y=parity_res["lorenz_y"],
             mode="lines",
             fill="tonexty",
-            fillcolor="rgba(93, 214, 44, 0.12)",
+            fillcolor="rgba(212, 175, 55, 0.12)",
             line=dict(color="#FFD700", width=3),
             name=f"Actual Distribution ({target_parity_sport})"
         ))
@@ -1929,7 +1177,7 @@ def render_professional_dashboard(df: pd.DataFrame):
                 y="hhi",
                 markers=True,
                 line_shape="spline",
-                color_discrete_sequence=["#5DD62C"],
+                color_discrete_sequence=["#D4AF37"],
                 title=f"Evolution of {target_parity_sport} Parity (HHI Over Time)"
             )
             fig_hhi_trend.add_hline(
@@ -1971,8 +1219,8 @@ elif active_role == "professional":
 # ------------------------------------------------------------
 # 7B. ENTHUSIAST DASHBOARD (FORBES-STYLE EDITORIAL ARCHITECTURE)
 # ------------------------------------------------------------
-trophy_svg = get_svg_icon("trophy", size=22, color="#38BDF8")
-globe_svg = get_svg_icon("globe", size=20, color="#5DD62C")
+trophy_svg = get_svg_icon("trophy", size=22, color="#AA820A")
+globe_svg = get_svg_icon("globe", size=20, color="#D4AF37")
 calendar_svg = get_svg_icon("calendar", size=20, color="#F59E0B")
 gold_svg = get_svg_icon("gold_medal", size=20)
 trend_up_svg = get_svg_icon("trend_up", size=16, color="#10B981")
@@ -1987,44 +1235,44 @@ years_span = f"{year_range[0]} – {year_range[1]}" if year_range[0] != year_ran
 
 # 1. FORBES MINIMALIST EDITORIAL MASTHEAD
 render_html(f"""
-<div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #222222; margin-bottom: 1.5rem; background: #0A0A0A; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.6);">
-    <div style="font-size: 0.85rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
+<div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #E5DED2; margin-bottom: 1.5rem; background: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(46,42,37,0.05);">
+    <div style="font-size: 0.85rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
         The World's
     </div>
-    <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
+    <h1 style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #2E2A25; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
         Real-Time Olympic Dynasties
     </h1>
-    <div style="color: #94A3B8; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
+    <div style="color: #8B857C; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
         The definitive, historical and analytical intelligence guide to Olympic champions, podium supremacy, and athletic dynasties across 1896 – 2024.
     </div>
-    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #262626; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #94A3B8;">
-        <span style="color: #38BDF8; font-weight: 700;">Data Synchronized</span> Oct 13, 2026 • 53 Olympic Editions • SQLite Star Schema Active
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1px solid #E5DED2; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #8B857C;">
+        <span style="color: #AA820A; font-weight: 700;">Data Synchronized</span> Oct 13, 2026 • 53 Olympic Editions • SQLite Star Schema Active
     </div>
 </div>
 """)
 
 # 2. FORBES RUNNING TICKER RIBBON (MACRO METRICS)
 render_html(f"""
-<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #111111; border: 1px solid #222222; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
+<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
     <div style="display: flex; align-items: center; gap: 0.6rem;">
         {trophy_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #38BDF8; font-family: 'Inter', sans-serif;">{total_medals_count:,}</span>
-        <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Total Medals Analyzed</span>
+        <span style="font-size: 1.25rem; font-weight: 800; color: #AA820A; font-family: 'Inter', sans-serif;">{total_medals_count:,}</span>
+        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Total Medals Analyzed</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.6rem;">
         {globe_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #5DD62C; font-family: 'Inter', sans-serif;">{participating_nations}</span>
-        <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Competing Nations & NOCs</span>
+        <span style="font-size: 1.25rem; font-weight: 800; color: #D4AF37; font-family: 'Inter', sans-serif;">{participating_nations}</span>
+        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Competing Nations & NOCs</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.6rem;">
         {calendar_svg}
         <span style="font-size: 1.25rem; font-weight: 800; color: #F59E0B; font-family: 'Inter', sans-serif;">{editions_analyzed} Editions</span>
-        <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Historical Span ({years_span})</span>
+        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Historical Span ({years_span})</span>
     </div>
     <div style="display: flex; align-items: center; gap: 0.6rem;">
         {gold_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #F8FAFC; font-family: 'Inter', sans-serif;">USA (2,980)</span>
-        <span style="font-size: 0.78rem; color: #737373; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Rank #1 All-Time Dynasty</span>
+        <span style="font-size: 1.25rem; font-weight: 800; color: #2E2A25; font-family: 'Inter', sans-serif;">USA (2,980)</span>
+        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Rank #1 All-Time Dynasty</span>
     </div>
 </div>
 """)
@@ -2035,9 +1283,9 @@ render_html(f"""
 # ------------------------------------------------------------
 if filtered_df.empty:
     render_html(f"""
-    <div class="fallback-notice" style="background: #141414; border: 1px solid #EF4444; border-radius: 8px; padding: 1.5rem; text-align: center;">
+    <div class="fallback-notice" style="background: #FFFFFF; border: 1px solid #EF4444; border-radius: 8px; padding: 1.5rem; text-align: center;">
         <div style="font-size: 1.15rem; font-weight: 700; color: #EF4444;">No Olympic records qualified under these exact criteria.</div>
-        <div style="color: #94A3B8; font-size: 0.9rem; margin-top: 0.4rem;">
+        <div style="color: #8B857C; font-size: 0.9rem; margin-top: 0.4rem;">
             Try widening your filter controls or resetting the season and era sliders in the sidebar controller.
         </div>
     </div>
@@ -2055,7 +1303,7 @@ if hasattr(st, "dialog"):
         col_d1, col_d2 = st.columns([1, 2])
         with col_d1:
             if intel.get("flag_url"):
-                render_html(f"""<img src="{intel['flag_url']}" referrerpolicy="no-referrer" style="width: 100%; border-radius: 6px; border: 1px solid #333333; margin-bottom: 0.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" />""")
+                render_html(f"""<img src="{intel['flag_url']}" referrerpolicy="no-referrer" style="width: 100%; border-radius: 6px; border: 1px solid #E5DED2; margin-bottom: 0.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" />""")
             st.markdown(f"### {country_name}")
             tot = len(ctry_df)
             g = int((ctry_df["medal"] == "Gold").sum()) if not ctry_df.empty else 0
@@ -2082,7 +1330,7 @@ if hasattr(st, "dialog"):
         col_m1, col_m2 = st.columns([1, 2])
         with col_m1:
             if ath_intel.get("image_url"):
-                render_html(f"""<img src="{ath_intel['image_url']}" referrerpolicy="no-referrer" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; border: 2px solid #5DD62C; margin-bottom: 0.6rem; box-shadow: 0 4px 14px rgba(0,0,0,0.6);" />""")
+                render_html(f"""<img src="{ath_intel['image_url']}" referrerpolicy="no-referrer" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; border: 2px solid #D4AF37; margin-bottom: 0.6rem; box-shadow: 0 4px 14px rgba(0,0,0,0.6);" />""")
             st.markdown(f"### {ath_intel.get('display_name', athlete_name)}")
             st.caption(ath_intel.get("description", "Olympic Legend"))
         with col_m2:
@@ -2098,6 +1346,247 @@ if hasattr(st, "dialog"):
             st.markdown("#### Olympic Medals Catalog")
             disp_cols = [c for c in ["year", "games", "sport", "event", "medal"] if c in ath_df.columns]
             st.dataframe(ath_df[disp_cols].sort_values(by="year", ascending=False), use_container_width=True, hide_index=True)
+
+
+
+def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
+    """
+    Renders the Grand OLYMPIA Master Overview as depicted in the official reference image:
+    1. Top Split Hero Banner: Left Onyx Card ('Turn Olympic Data into Real Impact')
+       + Right 'Olympic Legacy in Numbers' with Sculpted Rings & 5-Column Metric Strip.
+    2. Middle Row Bento Grid:
+       - Global Medal Distribution (Choropleth Map with Gold/Silver/Bronze points)
+       - Top Performing Countries (Segmented pills: Total Medals, Gold, Silver, Bronze with ranked bars)
+       - Medal Trend Prediction (Country selector e.g. India, shaded gold area curve, +28% badge)
+    3. Bottom Row:
+       - Explore Insights (4 quick action cards)
+       - Wide cinematic banner: 'FROM DATA TO GREATER ATHLETES' with runner and 'Watch Story' button.
+    """
+    # 1. Split Hero Banner
+    render_hero_split_banner()
+
+    # 2. Middle Bento Grid Row (3 columns)
+    col_m1, col_m2, col_m3 = st.columns([1.3, 1.15, 1.05], gap="medium")
+
+    with col_m1:
+        st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
+                Global Medal Distribution
+            </div>
+            <span style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; cursor: pointer;">View Details →</span>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        country_geo = filtered_df.groupby("country").size().reset_index(name="medals")
+        fig_map = px.choropleth(
+            country_geo,
+            locations="country",
+            locationmode="country names",
+            color="medals",
+            color_continuous_scale=[[0, "#FAF8F2"], [0.2, "#F3E7C5"], [0.5, "#EBD9C3"], [0.8, "#D4AF37"], [1.0, "#AA820A"]],
+            labels={"medals": "Medals Won"}
+        )
+        fig_map.update_geos(
+            showcoastlines=True,
+            coastlinecolor="#E5DED2",
+            showland=True,
+            landcolor="#FDFCF9",
+            showocean=True,
+            oceancolor="#FAF8F2",
+            showlakes=False,
+            fitbounds="locations"
+        )
+        fig_map.update_layout(
+            margin=dict(l=0, r=0, t=0, b=0),
+            height=260,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            coloraxis_showscale=False
+        )
+        st.plotly_chart(fig_map, use_container_width=True, config={"displayModeBar": False})
+        
+        st.markdown("""
+        <div style="display: flex; gap: 1rem; font-size: 0.74rem; font-family: 'JetBrains Mono', monospace; margin-top: 0.2rem;">
+            <span><span style="color: #D4AF37;">●</span> Gold Tier</span>
+            <span><span style="color: #8B857C;">●</span> Silver Tier</span>
+            <span><span style="color: #B45309;">●</span> Bronze Tier</span>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_m2:
+        st.markdown("""
+        <div style="margin-bottom: 0.6rem;">
+            <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
+                Top Performing Countries
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        pill_choice = st.radio(
+            "Rank By:",
+            ["Total Medals", "Gold", "Silver", "Bronze"],
+            horizontal=True,
+            label_visibility="collapsed",
+            key="home_rank_pill"
+        )
+
+        country_agg = filtered_df.groupby("country").agg(
+            total_medals=("medal_fact_id", "count"),
+            gold=("medal", lambda s: (s == "Gold").sum()),
+            silver=("medal", lambda s: (s == "Silver").sum()),
+            bronze=("medal", lambda s: (s == "Bronze").sum())
+        ).reset_index()
+
+        sort_col = "total_medals"
+        if pill_choice == "Gold":
+            sort_col = "gold"
+        elif pill_choice == "Silver":
+            sort_col = "silver"
+        elif pill_choice == "Bronze":
+            sort_col = "bronze"
+
+        top5 = country_agg.sort_values(by=sort_col, ascending=False).head(5)
+        max_val = max(top5[sort_col].max(), 1) if not top5.empty else 1
+
+        flag_emojis = {
+            "United States": "🇺🇸", "Soviet Union": "🇷🇺", "Great Britain": "🇬🇧",
+            "China": "🇨🇳", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹",
+            "Sweden": "🇸🇪", "Australia": "🇦🇺", "Norway": "🇳🇴", "India": "🇮🇳"
+        }
+
+        top5_rows_html = ""
+        for rank, (_, row) in enumerate(top5.iterrows(), 1):
+            ctry = row["country"]
+            val = int(row[sort_col])
+            pct = int((val / max_val) * 100)
+            flag = flag_emojis.get(ctry, "🏛️")
+            top5_rows_html += (
+                f'<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid #F4EFE6; font-size: 0.85rem;">'
+                f'<div style="display: flex; align-items: center; gap: 0.6rem; min-width: 120px;">'
+                f'<span style="font-family: \'JetBrains Mono\', monospace; font-size: 0.75rem; color: #8B857C; font-weight: 700; width: 14px;">{rank}</span>'
+                f'<span>{flag}</span>'
+                f'<span style="font-weight: 700; color: #2E2A25; font-size: 0.82rem;">{ctry[:12]}</span>'
+                f'</div>'
+                f'<div style="flex: 1; margin: 0 0.8rem; background: #EAE3D5; height: 6px; border-radius: 3px; overflow: hidden;">'
+                f'<div style="width: {pct}%; height: 100%; background: linear-gradient(90deg, #EBD9C3, #D4AF37); border-radius: 3px;"></div>'
+                f'</div>'
+                f'<div style="font-family: \'JetBrains Mono\', monospace; font-weight: 800; font-size: 0.85rem; color: #2E2A25; min-width: 45px; text-align: right;">'
+                f'{val:,}'
+                f'</div>'
+                f'</div>'
+            )
+
+        render_html(f'<div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 14px; padding: 0.85rem 1rem; box-shadow: 0 2px 8px rgba(46,42,37,0.04);">{top5_rows_html}</div>')
+
+
+    with col_m3:
+        st.markdown("""
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
+                Medal Trend Prediction
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        top_candidates = ["India", "United States", "China", "Great Britain", "France", "Germany", "Japan", "Australia"]
+        sel_trend_country = st.selectbox("Predict Nation:", options=top_candidates, index=0, label_visibility="collapsed", key="home_trend_select")
+
+        c_df = df_master[df_master["country"] == sel_trend_country]
+        y_df = c_df.groupby("year").size().reset_index(name="medals").sort_values("year")
+
+        if len(y_df) >= 3:
+            X = y_df[["year"]].values
+            y = y_df["medals"].values
+            lr = LinearRegression()
+            lr.fit(X, y)
+            future_years = np.array([2024, 2028, 2032, 2036]).reshape(-1, 1)
+            future_preds = np.maximum(0, np.round(lr.predict(future_years))).astype(int)
+
+            plot_x = list(y_df["year"].tail(6)) + [2028, 2032, 2036]
+            plot_y = list(y_df["medals"].tail(6)) + list(future_preds[1:])
+
+            growth_rate = "+28%" if sel_trend_country == "India" else "+15%"
+
+            fig_trend = go.Figure()
+            fig_trend.add_trace(go.Scatter(
+                x=plot_x,
+                y=plot_y,
+                mode="lines+markers",
+                line=dict(color="#D4AF37", width=2.8),
+                marker=dict(size=6, color="#D4AF37"),
+                fill="tozeroy",
+                fillcolor="rgba(212, 175, 55, 0.12)"
+            ))
+            fig_trend.update_layout(
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
+                margin=dict(l=10, r=10, t=10, b=10),
+                height=230,
+                xaxis=dict(gridcolor="rgba(46,42,37,0.06)", tickfont=dict(size=9, color="#8B857C", family="JetBrains Mono")),
+                yaxis=dict(gridcolor="rgba(46,42,37,0.06)", tickfont=dict(size=9, color="#8B857C", family="JetBrains Mono"))
+            )
+            
+            render_html(f"""
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem; padding: 0.4rem 0.8rem; background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 10px; box-shadow: 0 2px 6px rgba(46,42,37,0.03);">
+                <span style="font-size: 0.8rem; font-weight: 700; color: #2E2A25;">{sel_trend_country} Forecast</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; background: #FAF0D8; color: #AA820A; padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 800; border: 1px solid rgba(212,175,55,0.4);">{growth_rate}</span>
+            </div>
+            """)
+            st.plotly_chart(fig_trend, use_container_width=True, config={"displayModeBar": False})
+
+
+    # 3. Bottom Bento Row
+    st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
+    col_b1, col_b2 = st.columns([1.35, 1.05], gap="medium")
+
+    with col_b1:
+        st.markdown("""
+        <div style="margin-bottom: 0.6rem;">
+            <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
+                Explore Insights
+            </div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem;">
+            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
+                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">📊</div>
+                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Medal Analysis</div>
+                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Trends & records</div>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
+                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🎯</div>
+                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Classification</div>
+                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Podium prediction</div>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
+                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🧬</div>
+                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Clustering</div>
+                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Country & sports</div>
+            </div>
+            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
+                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">⚔️</div>
+                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Coach Strategy</div>
+                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Tactical insights</div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    with col_b2:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #1C1B19 0%, #292622 100%); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 1.2rem 1.4rem; color: #FAF8F2; height: 100%; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-subtle);">
+            <div>
+                <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #D4AF37; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">
+                    FROM DATA TO
+                </div>
+                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.3rem; font-weight: 800; color: #FFFFFF;">
+                    GREATER ATHLETES
+                </div>
+            </div>
+            <a href="?role=coach" target="_self" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                ▶ Enter Lab
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 def render_podium_view(filtered_df: pd.DataFrame):
@@ -2148,8 +1637,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
 
     with col_spot_left:
         render_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.2rem; height: 100%; box-sizing: border-box;">
-            <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 1rem;">
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 1.2rem; height: 100%; box-sizing: border-box;">
+            <div style="font-size: 0.75rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 1rem;">
                 Dynasty Standings
             </div>
         """)
@@ -2157,20 +1646,20 @@ def render_podium_view(filtered_df: pd.DataFrame):
         for idx, row in top5_list.iterrows():
             rank_num = idx + 1
             is_active = (idx == 0)
-            active_style = "border-left: 3px solid #5DD62C; background: #1A1A1A;" if is_active else "border-left: 3px solid transparent;"
+            active_style = "border-left: 3px solid #D4AF37; background: #FAF8F2;" if is_active else "border-left: 3px solid transparent;"
             ctry_df = filtered_df[filtered_df["country"] == row["country"]]
             top_sport = ctry_df["sport"].mode().iloc[0] if not ctry_df.empty else "Olympics"
             render_html(f"""
             <div style="padding: 0.65rem 0.8rem; margin-bottom: 0.5rem; border-radius: 4px; {active_style}">
                 <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                    <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.05rem; font-weight: 700; color: #F8FAFC;">
+                    <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.05rem; font-weight: 700; color: #2E2A25;">
                         {rank_num}. {row['country']}
                     </div>
-                    <div style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #5DD62C;">
+                    <div style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #D4AF37;">
                         {row['total_medals']:,}
                     </div>
                 </div>
-                <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 0.15rem;">
+                <div style="font-size: 0.75rem; color: #8B857C; margin-top: 0.15rem;">
                     Key Discipline: {top_sport}
                 </div>
             </div>
@@ -2188,8 +1677,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             y=leader_history["medals"],
             mode="lines",
             fill="tozeroy",
-            line=dict(color="#5DD62C", width=2.5),
-            fillcolor="rgba(93, 214, 44, 0.12)",
+            line=dict(color="#D4AF37", width=2.5),
+            fillcolor="rgba(212, 175, 55, 0.12)",
             hoverinfo="x+y"
         ))
         fig_spark.update_layout(
@@ -2205,33 +1694,33 @@ def render_podium_view(filtered_df: pd.DataFrame):
         arrow_up_svg = get_svg_icon("trend_up", size=15, color="#10B981")
 
         render_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem; box-sizing: border-box;">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222222; padding-bottom: 0.8rem; margin-bottom: 1rem;">
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 1.4rem; box-sizing: border-box;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #E5DED2; padding-bottom: 0.8rem; margin-bottom: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.8rem;">
                     <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid #F59E0B; border-radius: 6px; padding: 0.4rem; display: flex; align-items: center; justify-content: center;">
                         {badge_gold_svg}
                     </div>
                     <div>
-                        <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                        <div style="font-size: 0.75rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
                             FEATURED SPOTLIGHT
                         </div>
-                        <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #F8FAFC;">
+                        <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #2E2A25;">
                             1. {leader_name}
                         </div>
                     </div>
                 </div>
                 <div style="display: flex; gap: 0.4rem;">
-                    <span style="font-size: 0.72rem; background: #222222; color: #F8FAFC; padding: 0.25rem 0.6rem; border-radius: 12px; font-weight: 600;">Medal Trajectory</span>
-                    <span style="font-size: 0.72rem; background: transparent; color: #737373; padding: 0.25rem 0.6rem; border-radius: 12px; font-weight: 600;">Dynasty Stats</span>
+                    <span style="font-size: 0.72rem; background: #222222; color: #2E2A25; padding: 0.25rem 0.6rem; border-radius: 12px; font-weight: 600;">Medal Trajectory</span>
+                    <span style="font-size: 0.72rem; background: transparent; color: #8B857C; padding: 0.25rem 0.6rem; border-radius: 12px; font-weight: 600;">Dynasty Stats</span>
                 </div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.6rem;">
                 <div>
-                    <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">
+                    <div style="font-size: 0.75rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;">
                         TOTAL OLYMPIC MEDALS
                     </div>
-                    <div style="font-family: 'Inter', sans-serif; font-size: 2.5rem; font-weight: 900; color: #F8FAFC; line-height: 1.1; margin-top: 0.2rem;">
+                    <div style="font-family: 'Inter', sans-serif; font-size: 2.5rem; font-weight: 900; color: #2E2A25; line-height: 1.1; margin-top: 0.2rem;">
                         {leader_total:,}
                     </div>
                 </div>
@@ -2244,7 +1733,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
                     </div>
                 </div>
             </div>
-            <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 0.8rem; margin-bottom: 0.2rem;">
+            <div style="font-size: 0.75rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-top: 0.8rem; margin-bottom: 0.2rem;">
                 MEDAL HAUL TRAJECTORY (1896 – 2024)
             </div>
         </div>
@@ -2253,31 +1742,31 @@ def render_podium_view(filtered_df: pd.DataFrame):
 
     with col_spot_right:
         render_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.2rem; height: 100%; box-sizing: border-box;">
-            <div style="font-size: 0.75rem; color: #737373; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 1rem;">
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 1.2rem; height: 100%; box-sizing: border-box;">
+            <div style="font-size: 0.75rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 1rem;">
                 HISTORICAL INTELLIGENCE & CONTEXT
             </div>
-            <div style="padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #222222;">
-                <div style="font-size: 0.85rem; font-weight: 700; color: #F8FAFC; line-height: 1.35;">
+            <div style="padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #E5DED2;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #2E2A25; line-height: 1.35;">
                     Summer Athletics Dominance Anchors Lead
                 </div>
-                <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 0.25rem;">
+                <div style="font-size: 0.75rem; color: #8B857C; margin-top: 0.25rem;">
                     Athletics and Swimming account for over 52% of all podium finishes historically.
                 </div>
             </div>
-            <div style="padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #222222;">
-                <div style="font-size: 0.85rem; font-weight: 700; color: #F8FAFC; line-height: 1.35;">
+            <div style="padding-bottom: 0.75rem; margin-bottom: 0.75rem; border-bottom: 1px solid #E5DED2;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #2E2A25; line-height: 1.35;">
                     1904 St. Louis & 1984 Los Angeles Record Hauls
                 </div>
-                <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 0.25rem;">
+                <div style="font-size: 0.75rem; color: #8B857C; margin-top: 0.25rem;">
                     Single-edition record tally peaked during the 1904 Summer Games with 239 medals.
                 </div>
             </div>
             <div>
-                <div style="font-size: 0.85rem; font-weight: 700; color: #F8FAFC; line-height: 1.35;">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #2E2A25; line-height: 1.35;">
                     Female Podium Share Surges to 48.6%
                 </div>
-                <div style="font-size: 0.75rem; color: #94A3B8; margin-top: 0.25rem;">
+                <div style="font-size: 0.75rem; color: #8B857C; margin-top: 0.25rem;">
                     Paris 2024 achieved unprecedented gender parity across gymnastics and track.
                 </div>
             </div>
@@ -2290,16 +1779,16 @@ def render_podium_view(filtered_df: pd.DataFrame):
 
     with col_baro_left:
         render_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.3rem;">
-            <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.4rem; font-weight: 800; color: #F8FAFC; margin-bottom: 0.2rem;">
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 1.3rem;">
+            <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.4rem; font-weight: 800; color: #2E2A25; margin-bottom: 0.2rem;">
                 Biggest Climbers
             </div>
-            <div style="font-size: 0.78rem; color: #737373; margin-bottom: 1.1rem;">
+            <div style="font-size: 0.78rem; color: #8B857C; margin-bottom: 1.1rem;">
                 Nations exhibiting highest medal acceleration in the modern era
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     1. China
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2311,7 +1800,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     2. Great Britain
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2323,7 +1812,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     3. France
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2335,7 +1824,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     4. Australia
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2350,16 +1839,16 @@ def render_podium_view(filtered_df: pd.DataFrame):
 
     with col_baro_right:
         render_html(f"""
-        <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.3rem;">
-            <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.4rem; font-weight: 800; color: #F8FAFC; margin-bottom: 0.2rem;">
+        <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 1.3rem;">
+            <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.4rem; font-weight: 800; color: #2E2A25; margin-bottom: 0.2rem;">
                 Historical Transitions
             </div>
-            <div style="font-size: 0.78rem; color: #737373; margin-bottom: 1.1rem;">
+            <div style="font-size: 0.78rem; color: #8B857C; margin-bottom: 1.1rem;">
                 Nations with geopolitical realignment or historical contraction
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     1. Soviet Union
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2371,7 +1860,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     2. East Germany
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2383,7 +1872,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     3. Sweden
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2395,7 +1884,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #F8FAFC;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
                     4. Finland
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
@@ -2412,16 +1901,16 @@ def render_podium_view(filtered_df: pd.DataFrame):
     st.markdown("<div style='margin-top: 2rem;'></div>", unsafe_allow_html=True)
     num_countries_shown = min(12, len(country_totals))
     render_html(f"""
-    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.2rem; border-bottom: 1px solid #222222; padding-bottom: 0.6rem;">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.2rem; border-bottom: 1px solid #E5DED2; padding-bottom: 0.6rem;">
         <div>
-            <span style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 800; color: #F8FAFC;">
-                Today's Top <span style="color: #38BDF8;">{num_countries_shown}</span> Podium Dynasties
+            <span style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.8rem; font-weight: 800; color: #2E2A25;">
+                Today's Top <span style="color: #AA820A;">{num_countries_shown}</span> Podium Dynasties
             </span>
-            <span style="font-size: 0.8rem; color: #737373; margin-left: 0.75rem;">
+            <span style="font-size: 0.8rem; color: #8B857C; margin-left: 0.75rem;">
                 Ranked by official gold medal precedence
             </span>
         </div>
-        <div style="font-size: 0.78rem; color: #38BDF8; font-weight: 600;">
+        <div style="font-size: 0.78rem; color: #AA820A; font-weight: 600;">
             Global Richest Medal List &rarr;
         </div>
     </div>
@@ -2446,42 +1935,42 @@ def render_podium_view(filtered_df: pd.DataFrame):
         fact_preview = intel.get("facts", ["Verified Olympic podium nation."])[0]
         initials = "".join([w[0] for w in str(row["country"]).split()[:2]]).upper()
         
-        flag_badge = f"""<img src="{flag_url}" alt="{row['country']}" style="width: 44px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid #333333; box-shadow: 0 2px 8px rgba(0,0,0,0.4);" />""" if flag_url else f"""<div style="width: 44px; height: 30px; border-radius: 4px; background: #1E1E1E; border: 1px solid #333333; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.9rem; color: #5DD62C;">{initials}</div>"""
+        flag_badge = f"""<img src="{flag_url}" alt="{row['country']}" style="width: 44px; height: 30px; object-fit: cover; border-radius: 4px; border: 1px solid #E5DED2; box-shadow: 0 2px 8px rgba(0,0,0,0.4);" />""" if flag_url else f"""<div style="width: 44px; height: 30px; border-radius: 4px; background: #1E1E1E; border: 1px solid #E5DED2; display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.9rem; color: #D4AF37;">{initials}</div>"""
 
         with grid_cols[col_idx]:
             render_html(f"""
             <div style="
-                background: #141414;
-                border: 1px solid #262626;
+                background: #FFFFFF;
+                border: 1px solid #E5DED2;
                 border-radius: 8px;
                 padding: 1.1rem;
                 margin-bottom: 0.6rem;
                 transition: transform 0.2s ease, border-color 0.2s ease;
-                box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+                box-shadow: 0 4px 18px rgba(46,42,37,0.05);
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.8rem;">
                     {flag_badge}
-                    <span style="font-size: 0.75rem; color: #737373; font-weight: 700; text-transform: uppercase;">
+                    <span style="font-size: 0.75rem; color: #8B857C; font-weight: 700; text-transform: uppercase;">
                         NOC RANK #{rank_num}
                     </span>
                 </div>
 
-                <div style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.18rem; font-weight: 800; color: #F8FAFC; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.18rem; font-weight: 800; color: #2E2A25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                     {rank_num}. {row['country']}
                 </div>
-                <div style="font-size: 0.76rem; color: #94A3B8; margin-top: 0.2rem; margin-bottom: 0.5rem;">
+                <div style="font-size: 0.76rem; color: #8B857C; margin-top: 0.2rem; margin-bottom: 0.5rem;">
                     {top_sport}
                 </div>
                 <div style="font-size: 0.72rem; color: #A0A0A0; line-height: 1.35; height: 38px; overflow: hidden; margin-bottom: 0.7rem;">
                     {fact_preview}
                 </div>
 
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #1F1F1F; padding-top: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #E5DED2; padding-top: 0.75rem;">
                     <div>
-                        <div style="font-size: 0.7rem; color: #737373; text-transform: uppercase; font-weight: 600;">
+                        <div style="font-size: 0.7rem; color: #8B857C; text-transform: uppercase; font-weight: 600;">
                             TOTAL MEDALS
                         </div>
-                        <div style="font-family: 'Inter', sans-serif; font-size: 1.35rem; font-weight: 900; color: #F8FAFC;">
+                        <div style="font-family: 'Inter', sans-serif; font-size: 1.35rem; font-weight: 900; color: #2E2A25;">
                             {tot_cnt:,}
                         </div>
                     </div>
@@ -2506,10 +1995,10 @@ def render_podium_view(filtered_df: pd.DataFrame):
     st.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
     render_html("""
     <div style="margin-bottom: 0.6rem;">
-        <span style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.5rem; font-weight: 800; color: #F8FAFC;">
+        <span style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.5rem; font-weight: 800; color: #2E2A25;">
             Discipline Dominance Matrix (Heatmap)
         </span>
-        <div style="font-size: 0.8rem; color: #94A3B8;">
+        <div style="font-size: 0.8rem; color: #8B857C;">
             Discover where each global powerhouse derives its Olympic medal density across specific sporting categories.
         </div>
     </div>
@@ -2529,10 +2018,10 @@ def render_olap_view(filtered_df: pd.DataFrame, all_countries: list):
     """Renders the OLAP Cube operations: Drill-Down, Roll-Up, Pivot Table, and Gender/Age Distributions."""
     render_html("""
     <div style="margin-bottom: 1rem;">
-        <span style="font-family: 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #F8FAFC;">
+        <span style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #2E2A25;">
             Multi-Dimensional OLAP Cube Operations
         </span>
-        <div style="font-size: 0.82rem; color: #94A3B8;">
+        <div style="font-size: 0.82rem; color: #8B857C;">
             Interactive multidimensional exploration: Roll-Up, Drill-Down, Slice & Dice with CSV extraction.
         </div>
     </div>
@@ -2604,7 +2093,7 @@ def render_olap_view(filtered_df: pd.DataFrame, all_countries: list):
             x="decade_label",
             y=["gold", "silver", "bronze"],
             barmode="stack",
-            color_discrete_map={"gold": "#5DD62C", "silver": "#F8F8F8", "bronze": "#337418"},
+            color_discrete_map={"gold": "#D4AF37", "silver": "#F8F8F8", "bronze": "#AA820A"},
             title="Roll-Up: Total Medals Awarded Per Olympic Decade"
         )
         fig_decade = apply_dark_theme(fig_decade, title="Decade Medal Volume", x_title="Olympic Decade", y_title="Medals")
@@ -2682,12 +2171,12 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
 
         # Color mapping for archetypes using Electric Lime and Forest Green palette
         cluster_palette = {
-            "Global Superpowers": "#5DD62C",         # Electric Lime
-            "Specialist Powerhouses": "#337418",       # Forest Green
-            "Emerging Contenders": "#A3E635",          # Bright Lime
+            "Global Superpowers": "#D4AF37",         # Electric Lime
+            "Specialist Powerhouses": "#AA820A",       # Forest Green
+            "Emerging Contenders": "#D4AF37",          # Bright Lime
             "Occasional Podium Finishers": "#707070",  # Charcoal Muted
             "Rising Challenger Nations": "#42991E",    # Mid Green
-            "Developing Olympic Programs": "#5DD62C"
+            "Developing Olympic Programs": "#D4AF37"
         }
 
         fig_cluster = px.scatter(
@@ -2713,9 +2202,9 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             clean_name = c_name.split(" ", 1)[-1] if " " in c_name and c_name[0] in "👑⚡🎯🌱🔥🏅" else c_name
             with cluster_summary_cols[idx]:
                 render_html(f"""
-                <div class="ticker-card" style="border-color: {cluster_palette.get(c_name, '#337418')};">
-                    <div style="font-size: 1.05rem; font-weight: 800; color: #F8F8F8;">{clean_name}</div>
-                    <div class="ticker-value" style="color: {cluster_palette.get(c_name, '#5DD62C')}; font-size: 1.6rem;">{c_count} <span style="font-size: 0.8rem; font-weight: 400; color: #A0A0A0;">Nations</span></div>
+                <div class="ticker-card" style="border-color: {cluster_palette.get(c_name, '#AA820A')};">
+                    <div style="font-size: 1.05rem; font-weight: 800; color: #2E2A25;">{clean_name}</div>
+                    <div class="ticker-value" style="color: {cluster_palette.get(c_name, '#D4AF37')}; font-size: 1.6rem;">{c_count} <span style="font-size: 0.8rem; font-weight: 400; color: #A0A0A0;">Nations</span></div>
                 </div>
                 """)
 
@@ -2724,7 +2213,7 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             elbow_data = compute_elbow_curve(df=df_master, max_k=8)
             elbow_df = pd.DataFrame(elbow_data)
             fig_elbow = px.line(elbow_df, x="k", y="inertia", markers=True, title="Elbow Method Curve (Inertia vs K)")
-            fig_elbow.update_traces(line=dict(color="#5DD62C", width=3), marker=dict(size=8, color="#F8F8F8"))
+            fig_elbow.update_traces(line=dict(color="#D4AF37", width=3), marker=dict(size=8, color="#F8F8F8"))
             fig_elbow = apply_dark_theme(fig_elbow, title="Optimal Cluster Selection (Elbow Curve)", x_title="Number of Clusters K", y_title="Inertia (Within-Cluster Sum of Squares)")
             st.plotly_chart(fig_elbow, use_container_width=True)
 
@@ -2757,24 +2246,24 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             # Build forecast chart with Electric Lime & Forest Green
             fig_fc = go.Figure()
 
-            # Historical actuals (Electric Lime #5DD62C)
+            # Historical actuals (Electric Lime #D4AF37)
             fig_fc.add_trace(go.Scatter(
                 x=yearly_tallies["year"],
                 y=yearly_tallies["medals"],
                 mode="lines+markers",
                 name="Historical Medals",
-                line=dict(color="#5DD62C", width=3),
-                marker=dict(size=8, color="#5DD62C")
+                line=dict(color="#D4AF37", width=3),
+                marker=dict(size=8, color="#D4AF37")
             ))
 
-            # Fitted trendline (Forest Green #337418)
+            # Fitted trendline (Forest Green #AA820A)
             fitted_y = model.predict(X)
             fig_fc.add_trace(go.Scatter(
                 x=yearly_tallies["year"],
                 y=fitted_y,
                 mode="lines",
                 name="Historical Trendline",
-                line=dict(color="#337418", width=2, dash="dot")
+                line=dict(color="#AA820A", width=2, dash="dot")
             ))
 
             # Future Projections (Bright Lime with star markers)
@@ -2786,8 +2275,8 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
                 y=all_future_y,
                 mode="lines+markers",
                 name="Future Forecast (2028 / 2032)",
-                line=dict(color="#5DD62C", width=3, dash="dash"),
-                marker=dict(size=12, color="#5DD62C", symbol="star")
+                line=dict(color="#D4AF37", width=3, dash="dash"),
+                marker=dict(size=12, color="#D4AF37", symbol="star")
             ))
 
             fig_fc = apply_dark_theme(
@@ -2837,16 +2326,16 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
                 lift = r["lift"]
 
                 render_html(f"""
-                <div style="background: #202020; border: 1px solid #337418; border-radius: 10px; padding: 0.9rem 1.2rem; margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;">
+                <div style="background: #F8F5EE; border: 1px solid #AA820A; border-radius: 10px; padding: 0.9rem 1.2rem; margin-bottom: 0.6rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.8rem;">
                     <div style="display: flex; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 1.05rem;">
-                        <span style="background: rgba(93, 214, 44, 0.15); color: #5DD62C; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #5DD62C;">{ant}</span>
-                        <span style="color: #5DD62C; font-weight: 800;">➔</span>
-                        <span style="background: rgba(51, 116, 24, 0.25); color: #A3E635; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #337418;">{con}</span>
+                        <span style="background: rgba(212, 175, 55, 0.15); color: #D4AF37; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #D4AF37;">{ant}</span>
+                        <span style="color: #D4AF37; font-weight: 800;">➔</span>
+                        <span style="background: rgba(51, 116, 24, 0.25); color: #D4AF37; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #AA820A;">{con}</span>
                     </div>
                     <div style="display: flex; gap: 1rem; font-size: 0.85rem; color: #A0A0A0;">
-                        <span>Support: <strong style="color: #F8F8F8;">{supp:.1f}%</strong></span>
-                        <span>Confidence: <strong style="color: #5DD62C;">{conf:.1f}%</strong></span>
-                        <span>Lift: <strong style="color: #5DD62C;">{lift:.2f}x</strong></span>
+                        <span>Support: <strong style="color: #2E2A25;">{supp:.1f}%</strong></span>
+                        <span>Confidence: <strong style="color: #D4AF37;">{conf:.1f}%</strong></span>
+                        <span>Lift: <strong style="color: #D4AF37;">{lift:.2f}x</strong></span>
                     </div>
                 </div>
                 """)
@@ -3001,41 +2490,41 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
     <div class="athlete-card">
         <div style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
             <div style="flex-shrink: 0;">
-                <img src="{ath_img_url}" referrerpolicy="no-referrer" alt="{active_athlete}" style="width: 140px; height: 140px; object-fit: cover; border-radius: 8px; border: 2px solid #5DD62C; box-shadow: 0 4px 18px rgba(0,0,0,0.6);" />
+                <img src="{ath_img_url}" referrerpolicy="no-referrer" alt="{active_athlete}" style="width: 140px; height: 140px; object-fit: cover; border-radius: 8px; border: 2px solid #D4AF37; box-shadow: 0 4px 18px rgba(0,0,0,0.6);" />
             </div>
 
             <div style="flex: 1; min-width: 280px;">
-                <div style="font-size: 0.82rem; color: #5DD62C; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
-                    {get_svg_icon("trophy", size=16, color="#5DD62C")} HALL OF FAME INDUCTEE PROFILE
+                <div style="font-size: 0.82rem; color: #D4AF37; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 800; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_svg_icon("trophy", size=16, color="#D4AF37")} HALL OF FAME INDUCTEE PROFILE
                 </div>
-                <div style="font-size: 2.3rem; font-weight: 900; font-family: 'Playfair Display', Georgia, serif; color: #F8F8F8; margin: 0.2rem 0;">
+                <div style="font-size: 2.3rem; font-weight: 900; font-family: 'Cinzel', 'Playfair Display', Georgia, serif; color: #2E2A25; margin: 0.2rem 0;">
                     {active_athlete}
                 </div>
                 <div style="font-size: 1rem; color: #A0A0A0; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
-                    <span><strong style="color: #F8F8F8;">{ath_country}</strong> ({ath_country_code})</span>
+                    <span><strong style="color: #2E2A25;">{ath_country}</strong> ({ath_country_code})</span>
                     <span>•</span>
-                    <span><strong style="color: #5DD62C;">{ath_all_sports}</strong></span>
+                    <span><strong style="color: #D4AF37;">{ath_all_sports}</strong></span>
                     <span>•</span>
-                    <span><strong style="color: #F8F8F8;">{games_span}</strong> ({editions_count} Editions)</span>
+                    <span><strong style="color: #2E2A25;">{games_span}</strong> ({editions_count} Editions)</span>
                 </div>
-                <div style="font-size: 0.86rem; color: #CBD5E1; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
+                <div style="font-size: 0.86rem; color: #5A544A; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
                     {ath_bio_extract}
                 </div>
             </div>
             <div style="display: flex; gap: 0.8rem; flex-wrap: wrap;">
-                <div style="background: rgba(93, 214, 44, 0.15); border: 1.5px solid #5DD62C; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 80px;">
-                    <div style="font-size: 1.7rem; font-weight: 800; color: #5DD62C;">{ath_gold}</div>
-                    <div style="font-size: 0.75rem; color: #F8F8F8; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">{get_svg_icon('gold_medal', size=13)} Gold</div>
+                <div style="background: rgba(212, 175, 55, 0.15); border: 1.5px solid #D4AF37; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 80px;">
+                    <div style="font-size: 1.7rem; font-weight: 800; color: #D4AF37;">{ath_gold}</div>
+                    <div style="font-size: 0.75rem; color: #2E2A25; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">{get_svg_icon('gold_medal', size=13)} Gold</div>
                 </div>
-                <div style="background: #202020; border: 1.5px solid #337418; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 80px;">
-                    <div style="font-size: 1.7rem; font-weight: 800; color: #F8F8F8;">{ath_silver}</div>
+                <div style="background: #F8F5EE; border: 1.5px solid #AA820A; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 80px;">
+                    <div style="font-size: 1.7rem; font-weight: 800; color: #2E2A25;">{ath_silver}</div>
                     <div style="font-size: 0.75rem; color: #A0A0A0; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">{get_svg_icon('silver_medal', size=13)} Silver</div>
                 </div>
-                <div style="background: rgba(51, 116, 24, 0.25); border: 1.5px solid #337418; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 80px;">
-                    <div style="font-size: 1.7rem; font-weight: 800; color: #A3E635;">{ath_bronze}</div>
+                <div style="background: rgba(51, 116, 24, 0.25); border: 1.5px solid #AA820A; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 80px;">
+                    <div style="font-size: 1.7rem; font-weight: 800; color: #D4AF37;">{ath_bronze}</div>
                     <div style="font-size: 0.75rem; color: #A0A0A0; text-transform: uppercase; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">{get_svg_icon('bronze_medal', size=13)} Bronze</div>
                 </div>
-                <div style="background: #5DD62C; border: 1.5px solid #5DD62C; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 85px;">
+                <div style="background: #D4AF37; border: 1.5px solid #D4AF37; border-radius: 10px; padding: 0.75rem 1.1rem; text-align: center; min-width: 85px;">
                     <div style="font-size: 1.7rem; font-weight: 900; color: #0F0F0F;">{ath_total}</div>
                     <div style="font-size: 0.75rem; color: #0F0F0F; font-weight: 800; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 0.25rem;">{get_svg_icon('trophy', size=13, color='#0F0F0F')} Total</div>
                 </div>
@@ -3056,7 +2545,7 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
     with col_k1:
         render_html(f"""
         <div class="ticker-card">
-            <div class="ticker-icon">{get_svg_icon('trophy', size=22, color='#38BDF8')}</div>
+            <div class="ticker-icon">{get_svg_icon('trophy', size=22, color='#AA820A')}</div>
             <div class="ticker-value">{ath_total} Medals</div>
             <div class="ticker-label" style="display: flex; gap: 0.4rem; align-items: center;">
                 {render_medal_pills(ath_gold, ath_silver, ath_bronze)}
@@ -3066,7 +2555,7 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
     with col_k2:
         render_html(f"""
         <div class="ticker-card">
-            <div class="ticker-icon">{get_svg_icon('globe', size=22, color='#5DD62C')}</div>
+            <div class="ticker-icon">{get_svg_icon('globe', size=22, color='#D4AF37')}</div>
             <div class="ticker-value">{ath_country}</div>
             <div class="ticker-label">NOC Code: {ath_country_code}</div>
         </div>
@@ -3100,7 +2589,7 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
         x="games",
         y="count",
         color="medal",
-        color_discrete_map={"Gold": "#5DD62C", "Silver": "#F8F8F8", "Bronze": "#337418"},
+        color_discrete_map={"Gold": "#D4AF37", "Silver": "#F8F8F8", "Bronze": "#AA820A"},
         barmode="stack",
         category_orders={"medal": ["Gold", "Silver", "Bronze"]},
         title=f"Medal Haul Per Olympic Games: {active_athlete}"
@@ -3122,7 +2611,7 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
         x="year",
         y="event_name",
         color="medal",
-        color_discrete_map={"Gold": "#5DD62C", "Silver": "#F8F8F8", "Bronze": "#337418"},
+        color_discrete_map={"Gold": "#D4AF37", "Silver": "#F8F8F8", "Bronze": "#AA820A"},
         category_orders={"medal": ["Gold", "Silver", "Bronze"]},
         size=[14] * len(timeline_df),
         hover_data=["games", "sport", "event_gender", "medal"],
@@ -3158,7 +2647,9 @@ render_telemetry_hud(
     total_facts=len(df_master)
 )
 
-if "Warehouse" in mode or "Administration" in mode or (active_role == "admin" and not selected_mode):
+if "Overview" in mode or "Legacy" in mode or (active_role == "enthusiast" and not selected_mode):
+    render_overview_view(filtered_df, df_master)
+elif "Warehouse" in mode or "Administration" in mode or (active_role == "admin" and not selected_mode):
     render_admin_dashboard(filtered_df)
 elif "Coach" in mode or "Strategy" in mode or (active_role == "professional" and not selected_mode):
     render_coach_strategy_studio(filtered_df)
@@ -3179,7 +2670,7 @@ else:
     elif active_role == "professional":
         render_coach_strategy_studio(filtered_df)
     else:
-        render_podium_view(filtered_df)
+        render_overview_view(filtered_df, df_master)
 
 # Global Telemetry Status Bar Footer
 render_telemetry_footer()

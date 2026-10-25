@@ -18,67 +18,68 @@ import plotly.express as px
 import plotly.graph_objects as go
 from typing import Optional, List, Dict, Any
 
-# High-Contrast Modern Dark-Themed Color Palette Constants
-THEME_BG = "#0F0F0F"        # Pitch Black / Canvas Background
-PAPER_BG = "#202020"        # Charcoal / Surface Container
-TEXT_COLOR = "#F8F8F8"      # Off-White / Primary Typography & Icons
-GRID_COLOR = "#2C2C2C"      # Subtle Charcoal Grid
+# OLYMPIA Marble White & Imperial Gold Palette Constants
+THEME_BG = "#FAF8F2"        # Marble White Canvas
+PAPER_BG = "#FFFFFF"        # Pure White Card Surface
+TEXT_COLOR = "#2E2A25"      # Charcoal Primary Typography
+GRID_COLOR = "#E5DED2"      # Border Stone Gridlines
 
-PRIMARY_ACCENT = "#5DD62C"   # Electric Lime / Primary Accent & CTA
-SECONDARY_ACCENT = "#337418" # Forest Green / Secondary Accent
+PRIMARY_ACCENT = "#D4AF37"   # Imperial Olympic Gold
+SECONDARY_ACCENT = "#C41E3A" # Victory Red Accent
 
 MEDAL_COLORS = {
-    "Gold": "#FFD700",      # Pure Olympic Gold
-    "Silver": "#C0C0C0",    # Crisp Silver
-    "Bronze": "#CD7F32",    # Rich Bronze Warm
+    "Gold": "#D4AF37",      # Olympic Gold
+    "Silver": "#94A3B8",    # Architectural Silver
+    "Bronze": "#B45309",    # Rich Classical Bronze
 }
 
 OLYMPIC_COLORS = [
-    "#5DD62C",  # Electric Lime
-    "#337418",  # Forest Green
-    "#FFD700",  # Olympic Gold
-    "#00E5FF",  # Olympic Cyan
-    "#F8F8F8",  # Off-White
-    "#C0C0C0",  # Silver Gray
-    "#CD7F32",  # Bronze Warm
-    "#A3E635",  # Lime Bright
+    "#D4AF37",  # Olympic Gold
+    "#2E2A25",  # Charcoal
+    "#EBD9C3",  # Sandstone
+    "#C41E3A",  # Victory Red
+    "#8B857C",  # Warm Grey
+    "#94A3B8",  # Silver Gray
+    "#B45309",  # Classical Bronze
+    "#AA820A",  # Deep Gold
 ]
 
 
 def apply_dark_theme(fig: go.Figure, title: str = "", x_title: str = "", y_title: str = "") -> go.Figure:
-    """Applies a consistent, polished dark telemetry theme to any Plotly figure."""
+    """Applies a consistent, polished architectural Olympic theme to any Plotly figure."""
     fig.update_layout(
         title={
             "text": f"<b>{title}</b>" if title else "",
-            "font": {"size": 15, "color": "#F8FAFC", "family": "Space Grotesk, Inter, sans-serif"},
+            "font": {"size": 15, "color": "#2E2A25", "family": "Cinzel, Cormorant Garamond, Georgia, serif"},
             "x": 0.02,
             "xanchor": "left"
         } if title else None,
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font={"color": "#F8FAFC", "family": "Inter, sans-serif"},
+        font={"color": "#2E2A25", "family": "Inter, sans-serif"},
         xaxis={
-            "title": dict(text=x_title, font=dict(color="#94A3B8", size=11, family="Inter, sans-serif")) if x_title else None,
-            "gridcolor": "rgba(255, 255, 255, 0.05)",
-            "zerolinecolor": "rgba(255, 255, 255, 0.12)",
-            "tickfont": {"color": "#94A3B8", "family": "JetBrains Mono, monospace", "size": 10},
+            "title": dict(text=x_title, font=dict(color="#8B857C", size=11, family="Inter, sans-serif")) if x_title else None,
+            "gridcolor": "rgba(46, 42, 37, 0.07)",
+            "zerolinecolor": "rgba(46, 42, 37, 0.15)",
+            "tickfont": {"color": "#8B857C", "family": "JetBrains Mono, monospace", "size": 10},
         },
         yaxis={
-            "title": dict(text=y_title, font=dict(color="#94A3B8", size=11, family="Inter, sans-serif")) if y_title else None,
-            "gridcolor": "rgba(255, 255, 255, 0.05)",
-            "zerolinecolor": "rgba(255, 255, 255, 0.12)",
-            "tickfont": {"color": "#94A3B8", "family": "JetBrains Mono, monospace", "size": 10},
+            "title": dict(text=y_title, font=dict(color="#8B857C", size=11, family="Inter, sans-serif")) if y_title else None,
+            "gridcolor": "rgba(46, 42, 37, 0.07)",
+            "zerolinecolor": "rgba(46, 42, 37, 0.15)",
+            "tickfont": {"color": "#8B857C", "family": "JetBrains Mono, monospace", "size": 10},
         },
         legend={
-            "bgcolor": "rgba(20, 22, 27, 0.75)",
-            "bordercolor": "rgba(255, 255, 255, 0.08)",
-            "font": {"color": "#F8FAFC", "family": "Inter, sans-serif", "size": 11},
+            "bgcolor": "rgba(250, 248, 242, 0.92)",
+            "bordercolor": "#E5DED2",
+            "font": {"color": "#2E2A25", "family": "Inter, sans-serif", "size": 11},
         },
         hoverlabel={
-            "bgcolor": "#14161B",
-            "font": {"color": "#F8FAFC", "family": "JetBrains Mono, monospace", "size": 12},
+            "bgcolor": "#FAF8F2",
+            "font": {"color": "#2E2A25", "family": "JetBrains Mono, monospace", "size": 12},
             "bordercolor": PRIMARY_ACCENT
         },
+        colorway=OLYMPIC_COLORS,
         margin={"l": 30, "r": 20, "t": 45 if title else 25, "b": 30},
         autosize=True
     )

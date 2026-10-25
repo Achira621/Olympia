@@ -6,16 +6,16 @@ modeled after Forbes' minimalist editorial design system.
 
 import re
 
-# Palette Constants
-COLOR_GOLD = "#F59E0B"
-COLOR_SILVER = "#E2E8F0"
-COLOR_BRONZE = "#D97706"
-COLOR_GREEN = "#10B981"
-COLOR_RED = "#EF4444"
-COLOR_BLUE = "#38BDF8"
-COLOR_MUTED = "#94A3B8"
-COLOR_WHITE = "#F8FAFC"
-COLOR_ACCENT = "#5DD62C"
+# Palette Constants - OLYMPIA Architectural Brand Identity
+COLOR_GOLD = "#D4AF37"
+COLOR_SILVER = "#94A3B8"
+COLOR_BRONZE = "#B45309"
+COLOR_GREEN = "#16A34A"
+COLOR_RED = "#C41E3A"
+COLOR_BLUE = "#2E2A25"
+COLOR_MUTED = "#8B857C"
+COLOR_WHITE = "#FAF8F2"
+COLOR_ACCENT = "#D4AF37"
 
 
 # Emoji to Icon Name Alias Dictionary for 100% Emoji Replacement
@@ -175,14 +175,45 @@ def render_medal_pills(gold: int, silver: int, bronze: int) -> str:
     return re.sub(r'\s+', ' ', pills).strip()
 
 
-def get_olympic_rings_svg(width: int = 46, height: int = 22) -> str:
-    """Returns a sleek, modern neon geometric Olympic rings SVG."""
+def get_olympic_rings_svg(width: int = 48, height: int = 24) -> str:
+    """Returns a refined, elegant metallic Olympic rings SVG motif."""
     return f"""<svg width="{width}" height="{height}" viewBox="0 0 100 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
-        <circle cx="20" cy="18" r="14" stroke="#00F0FF" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
-        <circle cx="50" cy="18" r="14" stroke="#F8FAFC" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
-        <circle cx="80" cy="18" r="14" stroke="#EF4444" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
-        <circle cx="35" cy="30" r="14" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
-        <circle cx="65" cy="30" r="14" stroke="#5DD62C" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+        <circle cx="20" cy="18" r="14" stroke="#2563EB" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>
+        <circle cx="50" cy="18" r="14" stroke="#2E2A25" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>
+        <circle cx="80" cy="18" r="14" stroke="#C41E3A" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>
+        <circle cx="35" cy="30" r="14" stroke="#D4AF37" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>
+        <circle cx="65" cy="30" r="14" stroke="#16A34A" stroke-width="2.6" stroke-linecap="round" opacity="0.9"/>
+    </svg>"""
+
+
+def get_olympic_sculpted_rings_svg(width: int = 340, height: int = 150) -> str:
+    """Returns the large sculpted metallic Olympic rings illustration seen in the hero panel."""
+    return f"""<svg width="{width}" height="{height}" viewBox="0 0 340 150" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: block; margin: 0 auto; filter: drop-shadow(0 8px 24px rgba(46,42,37,0.12));">
+        <defs>
+            <linearGradient id="ringGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#E5DED2"/>
+                <stop offset="30%" stop-color="#D4AF37"/>
+                <stop offset="70%" stop-color="#F3E7C5"/>
+                <stop offset="100%" stop-color="#AA820A"/>
+            </linearGradient>
+            <linearGradient id="ringBronzeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#D4AF37"/>
+                <stop offset="50%" stop-color="#AA820A"/>
+                <stop offset="100%" stop-color="#5A4005"/>
+            </linearGradient>
+            <linearGradient id="ringSilverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="50%" stop-color="#C5BEB3"/>
+                <stop offset="100%" stop-color="#8B857C"/>
+            </linearGradient>
+        </defs>
+        <!-- Top Three Interlocking Sculpted Rings -->
+        <circle cx="80" cy="55" r="46" stroke="url(#ringGoldGrad)" stroke-width="8" stroke-linecap="round"/>
+        <circle cx="170" cy="55" r="46" stroke="url(#ringBronzeGrad)" stroke-width="8.5" stroke-linecap="round"/>
+        <circle cx="260" cy="55" r="46" stroke="url(#ringSilverGrad)" stroke-width="8" stroke-linecap="round"/>
+        <!-- Bottom Two Interlocking Sculpted Rings -->
+        <circle cx="125" cy="95" r="46" stroke="url(#ringBronzeGrad)" stroke-width="8.2" stroke-linecap="round"/>
+        <circle cx="215" cy="95" r="46" stroke="url(#ringGoldGrad)" stroke-width="8.2" stroke-linecap="round"/>
     </svg>"""
 
 

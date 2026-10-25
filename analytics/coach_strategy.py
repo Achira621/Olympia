@@ -140,10 +140,19 @@ def compute_athlete_inclinations(athlete_name: str, sport: str, medals_won: int 
         "primary_trigger": archetype_info["primary_trigger"],
         "counter_strategy": archetype_info["counter_strategy"],
         "radar_scores": radar_scores,
+        "inclination_scores": radar_scores,
         "split_velocity_pct": split_velocity_pct,
         "error_chances": error_chances,
-        "clutch_index": round(clutch_composure * 0.95 + (gold_ratio * 5), 1)
+        "fatigue_drift": {
+            "split_velocity_pct": split_velocity_pct,
+            "technical_error_risk_pct": error_chances
+        },
+        "clutch_index": round(clutch_composure * 0.95 + (gold_ratio * 5), 1),
+        "career_podiums": medals_won,
+        "gold_conversion_pct": round(gold_ratio * 100.0, 1)
     }
+
+
 
 
 def simulate_tactical_matchup(player_a_profile: Dict[str, Any], opponent_b_profile: Dict[str, Any]) -> Dict[str, Any]:

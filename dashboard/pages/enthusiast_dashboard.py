@@ -51,11 +51,11 @@ def render_page(df: pd.DataFrame = None):
 
     # 2. "What Can I Explore?" Quick Jump Guide
     st.markdown("""
-    <div style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.1rem 1.3rem; margin: 1.2rem 0;">
-        <div style="font-weight: 700; color: #38BDF8; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.4rem;">
+    <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 14px; padding: 1.1rem 1.4rem; margin: 1.2rem 0; box-shadow: var(--shadow-subtle);">
+        <div style="font-weight: 800; color: #AA820A; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; font-family: 'Cinzel', serif;">
             Curated Historical Exploration Guide
         </div>
-        <div style="color: #94A3B8; font-size: 0.9rem; line-height: 1.6;">
+        <div style="color: #5A544A; font-size: 0.9rem; line-height: 1.6; font-family: 'Inter', sans-serif;">
             • <strong>Which countries rule the podium?</strong> Check out the All-Time Leaderboard below or visit <strong>Countries</strong> in the sidebar.<br>
             • <strong>How has India performed?</strong> See the dedicated India Spotlight below.<br>
             • <strong>Summer vs Winter Games?</strong> Compare both seasons side-by-side below.<br>
@@ -151,27 +151,27 @@ def render_page(df: pd.DataFrame = None):
     t1, t2, t3 = st.columns(3)
     with t1:
         st.markdown("""
-        <div style="background: #141414; border-radius: 8px; padding: 1.1rem; border: 1px solid #262626; height: 160px;">
-            <div style="font-weight: 700; color: #F59E0B; margin-bottom: 0.3rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.06em;">The Modern Revival</div>
-            <div style="font-size: 0.85rem; color: #94A3B8; line-height: 1.4;">
+        <div style="background: #FFFFFF; border-radius: 12px; padding: 1.1rem; border: 1px solid #E5DED2; height: 160px; box-shadow: var(--shadow-subtle);">
+            <div style="font-weight: 700; color: #D4AF37; margin-bottom: 0.3rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.08em; font-family: 'Cinzel', serif;">The Modern Revival</div>
+            <div style="font-size: 0.85rem; color: #5A544A; line-height: 1.5; font-family: 'Inter', sans-serif;">
                 The first modern Olympic Games were held in Athens, Greece, in 1896. Only 14 nations competed across 43 events. In Paris 2024, over 200 nations competed in 329 events.
             </div>
         </div>
         """, unsafe_allow_html=True)
     with t2:
         st.markdown("""
-        <div style="background: #141414; border-radius: 8px; padding: 1.1rem; border: 1px solid #262626; height: 160px;">
-            <div style="font-weight: 700; color: #38BDF8; margin-bottom: 0.3rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.06em;">Winter Games Debut</div>
-            <div style="font-size: 0.85rem; color: #94A3B8; line-height: 1.4;">
+        <div style="background: #FFFFFF; border-radius: 12px; padding: 1.1rem; border: 1px solid #E5DED2; height: 160px; box-shadow: var(--shadow-subtle);">
+            <div style="font-weight: 700; color: #2E2A25; margin-bottom: 0.3rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.08em; font-family: 'Cinzel', serif;">Winter Games Debut</div>
+            <div style="font-size: 0.85rem; color: #5A544A; line-height: 1.5; font-family: 'Inter', sans-serif;">
                 The first Olympic Winter Games took place in Chamonix, France, in 1924. Until 1992, Summer and Winter Games were held in the very same calendar year.
             </div>
         </div>
         """, unsafe_allow_html=True)
     with t3:
         st.markdown("""
-        <div style="background: #141414; border-radius: 8px; padding: 1.1rem; border: 1px solid #262626; height: 160px;">
-            <div style="font-weight: 700; color: #5DD62C; margin-bottom: 0.3rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.06em;">Gender Parity Milestone</div>
-            <div style="font-size: 0.85rem; color: #94A3B8; line-height: 1.4;">
+        <div style="background: #FFFFFF; border-radius: 12px; padding: 1.1rem; border: 1px solid #E5DED2; height: 160px; box-shadow: var(--shadow-subtle);">
+            <div style="font-weight: 700; color: #C41E3A; margin-bottom: 0.3rem; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.08em; font-family: 'Cinzel', serif;">Gender Parity Milestone</div>
+            <div style="font-size: 0.85rem; color: #5A544A; line-height: 1.5; font-family: 'Inter', sans-serif;">
                 Paris 2024 achieved full 50:50 athlete quota parity between men and women for the first time in Olympic history, representing a 128-year journey of expanding inclusion.
             </div>
         </div>
