@@ -76,6 +76,14 @@ from dashboard.auth import (
 from dashboard.components.icons import get_svg_icon, render_medal_pills
 from dashboard.components.knowledge_api import get_athlete_intel, get_country_intel
 from dashboard.components.coach_strategy_ui import render_coach_strategy_studio
+from dashboard.components.metrics import (
+    render_telemetry_hud,
+    render_kpi_card,
+    render_kpi_row,
+    render_podium_showcase,
+    render_empty_telemetry_card,
+    render_telemetry_footer
+)
 
 
 # ------------------------------------------------------------
@@ -103,59 +111,70 @@ def render_html(html_str: str):
 # ------------------------------------------------------------
 render_html("""
 <meta name="referrer" content="no-referrer" />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Cinzel:wght@700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Cinzel:wght@700;800&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Cinzel:wght@700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+    /* ============================================================
+       1. COLOR & SURFACE DESIGN TOKENS (KINETIC OLYMPIC TELEMETRY LAB)
+       ============================================================ */
+    :root {
+        --bg-void: #07080A;
+        --surface-glass-1: rgba(20, 22, 27, 0.65);
+        --surface-glass-2: rgba(32, 35, 42, 0.78);
+        --border-hairline: rgba(255, 255, 255, 0.08);
+        --border-glow: rgba(93, 214, 44, 0.45);
+        --accent-lime: #5DD62C;
+        --accent-cyan: #00F0FF;
+        --medal-gold: #FFD700;
+        --medal-silver: #E2E8F0;
+        --medal-bronze: #D97706;
+        --text-primary: #F8FAFC;
+        --text-muted: #94A3B8;
+        --text-dim: #475569;
+        --spring-snappy: cubic-bezier(0.22, 1, 0.36, 1);
+        --spring-float: cubic-bezier(0.16, 1, 0.3, 1);
+    }
 
     /* Hide default Streamlit multi-page sidebar navigation list */
-    [data-testid="stSidebarNav"] {
-        display: none !important;
-    }
-    
-    /* Alternative selector for multi-page nav links container */
+    [data-testid="stSidebarNav"],
     div[data-testid="stSidebarNavItems"],
     ul[data-testid="stSidebarNavItems"],
-    [data-testid="stSidebarNavSeparator"] {
-        display: none !important;
-    }
-
-    /* Target any multipage navigation block inside sidebar */
+    [data-testid="stSidebarNavSeparator"],
     section[data-testid="stSidebar"] div:has(> ul[data-testid="stSidebarNavItems"]),
     section[data-testid="stSidebar"] [data-testid="stSidebarNav"] {
         display: none !important;
     }
 
-    /* Global Typography System */
+    /* ============================================================
+       2. TYPOGRAPHY & SCANNABLE HIERARCHY
+       ============================================================ */
     html, body, [class*="css"], .stMarkdown {
-        font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
-    /* Headings & Big Text: Inter */
-    h1, h2, h3, .metric-container, [data-testid="stMetricValue"], .ticker-value, .hero-title, .admin-kpi-value, .potential-score-badge {
-        font-family: 'Inter', sans-serif !important;
+    /* Display / Headers: Space Grotesk / Outfit with tight tracking */
+    h1, h2, h3, .hero-title, .forbes-masthead-title {
+        font-family: 'Space Grotesk', 'Outfit', 'Inter', sans-serif !important;
         font-weight: 800 !important;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.03em !important;
     }
 
-    /* Sub-headings & Body Text: Segoe UI (Exclude Material Icons/Symbols to prevent ligature text fallbacks) */
-    h4, h5, h6, p, label, input, button, select, textarea, [data-testid="stMetricLabel"], .ticker-label, .hero-subtitle {
-        font-family: 'Segoe UI', sans-serif !important;
+    /* Telemetry / Numbers / KPIs: JetBrains Mono with tabular-nums */
+    .bento-kpi-value, .ticker-value, .podium-pts, [data-testid="stMetricValue"],
+    .hud-ticker-pill, .hud-scrubber-pill, .hud-breadcrumb, .metric-container {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-variant-numeric: tabular-nums !important;
     }
 
-    /* General spans and divs default to Segoe UI without breaking icon spans */
-    span:not([class*="material"]):not([data-testid*="Icon"]),
-    div:not([class*="material"]):not([data-testid*="Icon"]) {
-        font-family: 'Segoe UI', sans-serif;
+    h4, h5, h6, p, label, input, button, select, textarea, [data-testid="stMetricLabel"] {
+        font-family: 'Inter', sans-serif !important;
     }
 
-    /* Enforce Material Symbols / Icons on Streamlit sidebar collapse toggle and icon elements */
+    /* Material Symbols / Icons */
     .material-symbols-outlined,
     .material-symbols-rounded,
     .material-icons,
@@ -168,43 +187,64 @@ render_html("""
         font-weight: normal;
         font-style: normal;
         line-height: 1;
-        letter-spacing: normal;
-        text-transform: none;
         display: inline-block;
         white-space: nowrap;
-        word-wrap: normal;
-        direction: ltr;
-        -webkit-font-feature-settings: 'liga';
-        font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
     }
 
-    /* #0F0F0F: Pitch Black / Canvas Background */
+    /* ============================================================
+       3. OBSIDIAN VOID CANVAS & CUSTOM SCROLLBARS
+       ============================================================ */
     .stApp {
-        background-color: #0F0F0F !important;
-        color: #F8F8F8 !important;
+        background-color: var(--bg-void, #07080A) !important;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px) !important;
+        background-size: 24px 24px !important;
+        color: var(--text-primary, #F8FAFC) !important;
     }
 
-    /* Prevent content from sliding under sidebar (Layout Fix) */
+    /* 6px ultra-slim dark scrollbar with lime hover thumb */
+    ::-webkit-scrollbar {
+        width: 6px !important;
+        height: 6px !important;
+    }
+    ::-webkit-scrollbar-track {
+        background: #07080A !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-radius: 3px !important;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--accent-lime, #5DD62C) !important;
+        box-shadow: 0 0 10px rgba(93, 214, 44, 0.6) !important;
+    }
+
+    /* Custom Selection Highlight */
+    ::selection {
+        background: rgba(93, 214, 44, 0.25) !important;
+        color: #5DD62C !important;
+    }
+
+    /* Prevent content from sliding under sidebar */
     .stMain {
         position: relative !important;
         z-index: 1 !important;
     }
 
-    /* Sidebar Styling (#202020 Charcoal Surface) */
+    /* Sidebar Styling (Deep Obsidian Surface Dock) */
     section[data-testid="stSidebar"] {
-        background-color: #202020 !important;
-        border-right: 1px solid #337418 !important;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.7);
+        background-color: #0A0B0F !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.7);
         z-index: 99 !important;
     }
 
-    /* Main Content Container Padding & Boundaries */
+    /* Main Content Container Padding */
     .main .block-container, div[data-testid="stMainBlockContainer"] {
-        padding-top: 1.5rem !important;
+        padding-top: 1rem !important;
         padding-bottom: 3rem !important;
-        padding-left: 2.2rem !important;
-        padding-right: 2.2rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
         max-width: 100% !important;
         width: 100% !important;
         box-sizing: border-box !important;
@@ -212,203 +252,430 @@ render_html("""
 
     /* Top Header Bar */
     header[data-testid="stHeader"] {
-        background-color: rgba(15, 15, 15, 0.92) !important;
-        backdrop-filter: blur(12px) !important;
-        border-bottom: 1px solid #202020 !important;
+        background-color: rgba(7, 8, 10, 0.85) !important;
+        backdrop-filter: blur(16px) !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
     }
 
-    /* Color Palette Enforcements */
-    h1, h2, h3, h4, h5, h6 {
-        color: #F8F8F8 !important;
+    /* ============================================================
+       4. TOP TELEMETRY HUD BAR (GLOBAL HEADER)
+       ============================================================ */
+    .telemetry-hud-bar {
+        position: sticky;
+        top: 0.5rem;
+        z-index: 999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.65rem 1.25rem;
+        margin-bottom: 1.2rem;
+        background: rgba(20, 22, 27, 0.78);
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(93, 214, 44, 0.06);
+        transition: all 220ms var(--spring-snappy);
+    }
+    .telemetry-hud-bar:hover {
+        border-color: rgba(93, 214, 44, 0.35);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.7), 0 0 20px rgba(93, 214, 44, 0.16);
+    }
+    .hud-left {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    .hud-breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+    }
+    .hud-brand {
+        color: #F8FAFC;
+    }
+    .hud-sep {
+        color: #475569;
+    }
+    .hud-role {
+        font-weight: 800;
+    }
+    .hud-module {
+        color: #94A3B8;
+    }
+    .hud-center {
+        display: flex;
+        align-items: center;
+    }
+    .hud-ticker-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        background: rgba(10, 11, 14, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.35rem 0.95rem;
+        border-radius: 9999px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
+        color: #94A3B8;
+    }
+    .ticker-dot {
+        color: #5DD62C;
+        animation: ag-pulse 1.8s infinite;
+    }
+    .hud-right {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+    .hud-scrubber-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: rgba(10, 11, 14, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.35rem 0.75rem;
+        border-radius: 9999px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+    }
+    .scrubber-label {
+        color: #475569;
+        font-weight: 700;
+    }
+    .scrubber-val {
+        color: #F8FAFC;
+        font-weight: 700;
+    }
+    .hud-role-switcher {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: rgba(10, 11, 14, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.2rem 0.35rem;
+        border-radius: 9999px;
+    }
+    .role-chip {
+        padding: 0.2rem 0.55rem;
+        border-radius: 9999px;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #94A3B8;
+        text-decoration: none;
+        transition: all 180ms ease;
+    }
+    .role-chip:hover {
+        color: #F8FAFC;
+        background: rgba(255, 255, 255, 0.06);
+    }
+    .active-chip {
+        background: #5DD62C !important;
+        color: #07080A !important;
+        font-weight: 800;
+        box-shadow: 0 0 10px rgba(93, 214, 44, 0.4);
     }
 
-    p, span, label, div {
-        color: #F8F8F8;
-    }
-
-    /* Hero Banner Section (#202020 Surface Container with #5DD62C Accent) */
-    .hero-banner {
-        background: linear-gradient(135deg, #202020 0%, #151515 100%);
-        border: 1px solid #337418;
-        border-radius: 16px;
-        padding: 1.8rem 2.2rem;
-        margin-bottom: 1.5rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(93, 214, 44, 0.25);
+    /* ============================================================
+       5. SPATIAL BENTO KPI CARDS
+       ============================================================ */
+    .bento-kpi-card {
+        background: var(--surface-glass-1, rgba(20, 22, 27, 0.65));
+        backdrop-filter: blur(16px) saturate(180%);
+        -webkit-backdrop-filter: blur(16px) saturate(180%);
+        border: 1px solid var(--border-hairline, rgba(255, 255, 255, 0.08));
+        border-radius: 14px;
+        padding: 1.25rem 1.35rem;
         position: relative;
         overflow: hidden;
-        width: 100%;
+        margin-bottom: 1rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        transition: transform 220ms var(--spring-snappy),
+                    box-shadow 220ms var(--spring-snappy),
+                    border-color 220ms var(--spring-snappy);
         box-sizing: border-box;
     }
-    .hero-banner::before {
-        content: '';
+    .bento-kpi-card:hover {
+        transform: translateY(-4px) scale(1.008);
+        border-color: var(--border-glow, rgba(93, 214, 44, 0.45));
+        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 20px -5px rgba(93, 214, 44, 0.18);
+    }
+    .bento-watermark {
         position: absolute;
-        top: 0; left: 0; right: 0; height: 3px;
-        background: linear-gradient(90deg, #5DD62C 0%, #337418 50%, #5DD62C 100%);
+        right: -6px;
+        bottom: -6px;
+        opacity: 0.12;
+        pointer-events: none;
+        z-index: 1;
     }
-    .hero-title {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 2.3rem;
+    .bento-kpi-value {
+        font-family: 'JetBrains Mono', monospace !important;
+        font-variant-numeric: tabular-nums !important;
+        font-size: 1.85rem;
         font-weight: 800;
-        letter-spacing: -0.02em;
-        background: linear-gradient(90deg, #F8F8F8 0%, #5DD62C 65%, #A3E635 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin: 0;
+        color: #F8FAFC;
         line-height: 1.2;
-    }
-    .hero-subtitle {
-        color: #A0A0A0;
-        font-size: 1.05rem;
         margin-top: 0.4rem;
-        font-weight: 400;
-        letter-spacing: 0.01em;
+        position: relative;
+        z-index: 2;
+    }
+    .bento-bottom-glow {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, #5DD62C 50%, transparent 100%);
+        opacity: 0.4;
+        transition: opacity 220ms ease;
+    }
+    .bento-kpi-card:hover .bento-bottom-glow {
+        opacity: 1;
+        height: 3px;
     }
 
-    /* Quick Stat Ticker Cards (#202020 Charcoal Surface with #337418 Borders) */
+    /* Legacy Ticker Card compatibility */
     .ticker-card {
-        background: #202020;
-        border: 1px solid #337418;
+        background: var(--surface-glass-1, rgba(20, 22, 27, 0.65));
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         padding: 1.1rem 1.3rem;
-        text-align: left;
-        backdrop-filter: blur(10px);
-        transition: all 0.25s ease;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        box-sizing: border-box;
+        backdrop-filter: blur(14px);
+        transition: all 0.22s var(--spring-snappy);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
     }
     .ticker-card:hover {
         transform: translateY(-4px);
         border-color: #5DD62C;
-        box-shadow: 0 8px 25px rgba(93, 214, 44, 0.25);
-    }
-    .ticker-icon {
-        font-size: 1.6rem;
-        margin-bottom: 0.3rem;
-    }
-    .ticker-value {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 1.85rem;
-        font-weight: 800;
-        color: #F8F8F8;
-        line-height: 1.1;
-    }
-    .ticker-label {
-        font-size: 0.8rem;
-        color: #A0A0A0;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        font-weight: 600;
-        margin-top: 0.25rem;
+        box-shadow: 0 10px 25px rgba(93, 214, 44, 0.25);
     }
 
-    /* 3D Podium Cards Styling - Fully responsive with no overflow */
-    .podium-container {
+    /* ============================================================
+       6. 3D SPATIAL VISUAL PODIUM SHOWCASE
+       ============================================================ */
+    .spatial-podium-root {
         display: flex;
-        flex-direction: row;
         align-items: flex-end;
         justify-content: center;
         gap: 1.2rem;
         padding: 1.5rem 0.5rem 1rem 0.5rem;
         margin: 1.2rem 0 2rem 0;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        flex-wrap: wrap;
+        width: 100%;
+        box-sizing: border-box;
     }
-    .podium-step {
+    .podium-pillar {
         flex: 1;
-        min-width: 220px;
-        max-width: 290px;
+        max-width: 310px;
         border-radius: 16px 16px 10px 10px;
         text-align: center;
         padding: 1.5rem 1.1rem;
         position: relative;
-        backdrop-filter: blur(14px);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+        transition: transform 300ms var(--spring-snappy);
         box-sizing: border-box;
     }
-    .podium-step:hover {
+    .podium-pillar:hover {
         transform: translateY(-6px);
     }
-    /* 1st Place Champion: Electric Lime Glow (#5DD62C) */
-    .podium-step.gold {
-        background: linear-gradient(180deg, rgba(93, 214, 44, 0.18) 0%, #202020 100%);
+    .gold-pillar {
+        background: linear-gradient(180deg, rgba(93, 214, 44, 0.16) 0%, rgba(20, 22, 27, 0.95) 100%);
         border: 2px solid #5DD62C;
-        box-shadow: 0 0 28px rgba(93, 214, 44, 0.35), 0 15px 35px rgba(0, 0, 0, 0.6);
-        min-height: 275px;
+        box-shadow: 0 0 35px rgba(93, 214, 44, 0.35), 0 20px 45px rgba(0, 0, 0, 0.7);
+        min-height: 285px;
+        order: 2;
     }
-    /* 2nd Place: Off-White / Silver Accent on Charcoal Surface */
-    .podium-step.silver {
-        background: linear-gradient(180deg, rgba(248, 248, 248, 0.08) 0%, #202020 100%);
-        border: 2px solid #337418;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-        min-height: 235px;
+    .silver-pillar {
+        background: linear-gradient(180deg, rgba(226, 232, 240, 0.1) 0%, rgba(20, 22, 27, 0.95) 100%);
+        border: 1.5px solid rgba(226, 232, 240, 0.35);
+        min-height: 245px;
+        order: 1;
     }
-    /* 3rd Place: Forest Green Accent (#337418) */
-    .podium-step.bronze {
-        background: linear-gradient(180deg, rgba(51, 116, 24, 0.18) 0%, #202020 100%);
-        border: 2px solid #337418;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-        min-height: 205px;
+    .bronze-pillar {
+        background: linear-gradient(180deg, rgba(217, 119, 6, 0.12) 0%, rgba(20, 22, 27, 0.95) 100%);
+        border: 1.5px solid rgba(217, 119, 6, 0.35);
+        min-height: 215px;
+        order: 3;
     }
-    .podium-badge {
-        font-size: 2.4rem;
-        line-height: 1;
+    .podium-badge-wrap {
         margin-bottom: 0.4rem;
-        filter: drop-shadow(0 4px 10px rgba(0,0,0,0.6));
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
     }
-    .podium-country {
-        font-family: 'Outfit', sans-serif;
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: #F8F8F8;
+    .podium-rank-tag {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #94A3B8;
         margin-bottom: 0.2rem;
     }
-    .podium-medals {
+    .gold-rank {
+        color: #5DD62C;
+        font-weight: 800;
+    }
+    .podium-nation-name {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #F8FAFC;
+        margin-bottom: 0.3rem;
+    }
+    .podium-score-wrap {
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        gap: 0.3rem;
+        margin-bottom: 0.6rem;
+    }
+    .podium-pts {
+        font-family: 'JetBrains Mono', monospace;
+        font-variant-numeric: tabular-nums;
         font-size: 1.85rem;
         font-weight: 800;
-        font-family: 'Outfit', sans-serif;
+        color: #F8FAFC;
     }
-    .podium-step.gold .podium-medals { color: #5DD62C; }
-    .podium-step.silver .podium-medals { color: #F8F8F8; }
-    .podium-step.bronze .podium-medals { color: #A3E635; }
-
-    .podium-breakdown {
+    .gold-score .podium-pts {
+        color: #5DD62C;
+    }
+    .podium-unit {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #94A3B8;
+    }
+    .podium-pills-row {
         display: flex;
         justify-content: center;
         gap: 0.4rem;
-        margin-top: 0.8rem;
-        font-size: 0.8rem;
+        margin-bottom: 0.8rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
         font-weight: 600;
     }
-    .podium-chip {
-        padding: 0.25rem 0.5rem;
+    .podium-pills-row span {
+        background: rgba(0, 0, 0, 0.45);
+        padding: 0.2rem 0.45rem;
         border-radius: 6px;
-        background: #0F0F0F;
-        border: 1px solid #337418;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .pillar-block {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 2.2rem;
+        font-weight: 900;
+        opacity: 0.25;
+    }
+    .pillar-gold-block {
+        color: #5DD62C;
     }
 
-    /* Container Cards (#202020 Charcoal Surface) */
-    .glass-card {
-        background: #202020;
-        border: 1px solid #337418;
-        border-radius: 14px;
-        padding: 1.5rem;
-        margin-bottom: 1.4rem;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        box-sizing: border-box;
+    /* ============================================================
+       7. SIDEBAR COMMAND DOCK & PHYSICAL RADIO PILLS
+       ============================================================ */
+    section[data-testid="stSidebar"] div[data-baseweb="radio"] {
+        background: transparent !important;
+        gap: 0.35rem !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label {
+        background: rgba(20, 22, 27, 0.65) !important;
+        border: 1px solid rgba(255, 255, 255, 0.06) !important;
+        border-radius: 10px !important;
+        padding: 0.65rem 0.95rem !important;
+        margin-bottom: 0.35rem !important;
+        min-height: 46px !important;
+        display: flex !important;
+        align-items: center !important;
+        position: relative !important;
+        transition: all 180ms var(--spring-snappy) !important;
+        cursor: pointer !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label:hover {
+        background: rgba(32, 35, 42, 0.85) !important;
+        border-color: rgba(93, 214, 44, 0.35) !important;
+        transform: translateX(4px) !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label:has(input:checked) {
+        background: rgba(93, 214, 44, 0.12) !important;
+        border: 1px solid #5DD62C !important;
+        box-shadow: 0 0 16px rgba(93, 214, 44, 0.2) !important;
+    }
+    section[data-testid="stSidebar"] div[data-testid="stRadioButton"] label:has(input:checked)::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 6px;
+        bottom: 6px;
+        width: 3px;
+        background: #5DD62C;
+        border-radius: 0 3px 3px 0;
+        box-shadow: 0 0 8px #5DD62C;
+    }
+
+    /* ============================================================
+       8. ZERO TELEMETRY FALLBACK & STATUS FOOTER
+       ============================================================ */
+    .zero-telemetry-card {
+        background: rgba(20, 22, 27, 0.65);
+        border: 1px dashed rgba(93, 214, 44, 0.4);
+        border-radius: 16px;
+        padding: 2.5rem 1.5rem;
+        text-align: center;
+        margin: 2rem 0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .telemetry-status-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 0.85rem 1.3rem;
+        margin-top: 3rem;
+        background: rgba(20, 22, 27, 0.75);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
+        color: #94A3B8;
+    }
+    .footer-left {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .footer-center {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .footer-pill {
+        background: rgba(10, 11, 14, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        padding: 0.2rem 0.55rem;
+        border-radius: 9999px;
+        font-size: 0.68rem;
+        color: #CBD5E1;
+    }
+    .footer-right {
+        color: #64748B;
     }
 
     /* High-contrast Tabs styling */
     button[data-baseweb="tab"] {
         background: transparent !important;
-        color: #A0A0A0 !important;
-        font-family: 'Outfit', sans-serif !important;
-        font-size: 1.05rem !important;
+        color: #94A3B8 !important;
+        font-family: 'Space Grotesk', sans-serif !important;
+        font-size: 0.98rem !important;
         font-weight: 700 !important;
         border-radius: 8px 8px 0 0 !important;
         padding: 0.75rem 1.4rem !important;
-        transition: all 0.2s ease !important;
+        transition: all 0.2s var(--spring-snappy) !important;
         border-bottom: 2px solid transparent !important;
     }
     button[aria-selected="true"] {
@@ -418,32 +685,35 @@ render_html("""
         text-shadow: 0 0 12px rgba(93, 214, 44, 0.4);
     }
 
-    /* #5DD62C: Primary Action Buttons (Electric Lime CTA) */
+    /* Action Buttons (Electric Lime CTA with Emil Kowalski active-press) */
     .stButton>button {
         background: #5DD62C !important;
-        color: #0F0F0F !important;
-        font-family: 'Outfit', sans-serif !important;
+        color: #07080A !important;
+        font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 800 !important;
         font-size: 0.95rem !important;
         letter-spacing: 0.02em !important;
         border: none !important;
         border-radius: 8px !important;
         padding: 0.55rem 1.3rem !important;
-        transition: all 0.2s ease-in-out !important;
+        transition: all 0.18s var(--spring-snappy) !important;
         box-shadow: 0 4px 15px rgba(93, 214, 44, 0.3) !important;
     }
     .stButton>button:hover {
         background: #337418 !important;
-        color: #F8F8F8 !important;
+        color: #F8FAFC !important;
         transform: translateY(-2px) scale(1.02) !important;
         box-shadow: 0 6px 20px rgba(93, 214, 44, 0.5) !important;
+    }
+    .stButton>button:active {
+        transform: scale(0.97) !important;
     }
 
     /* Secondary Download Buttons */
     .stDownloadButton>button {
-        background: #202020 !important;
+        background: rgba(20, 22, 27, 0.78) !important;
         color: #5DD62C !important;
-        font-family: 'Outfit', sans-serif !important;
+        font-family: 'Space Grotesk', sans-serif !important;
         font-weight: 800 !important;
         border: 1.5px solid #5DD62C !important;
         border-radius: 8px !important;
@@ -452,74 +722,56 @@ render_html("""
     }
     .stDownloadButton>button:hover {
         background: #337418 !important;
-        color: #F8F8F8 !important;
+        color: #F8FAFC !important;
+    }
+    .stDownloadButton>button:active {
+        transform: scale(0.97) !important;
     }
 
-    /* Fallback Warning Box */
-    .fallback-notice {
-        background: rgba(51, 116, 24, 0.2);
-        border: 1px solid #5DD62C;
-        border-radius: 12px;
-        padding: 1.4rem 1.8rem;
-        color: #F8F8F8;
-        font-size: 1.05rem;
-        margin: 1.5rem 0;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+    /* Animations */
+    @keyframes ag-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.9); }
     }
-
-    /* Athlete Infographic Card */
-    .athlete-card {
-        background: #202020;
-        border: 2px solid #337418;
-        border-radius: 16px;
-        padding: 2rem;
-        margin: 1rem 0;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-        box-sizing: border-box;
+    @keyframes slideUpFade {
+        from {
+            opacity: 0;
+            transform: translateY(12px) scale(0.98);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
     /* Dataframe Containers */
     div[data-testid="stDataFrame"] {
-        border: 1px solid #337418;
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 10px;
-        background-color: #202020;
+        background-color: rgba(20, 22, 27, 0.75);
+    }
+
+    /* Focus visible accessibility outline */
+    button:focus-visible, input:focus-visible, select:focus-visible {
+        outline: 2px solid #5DD62C !important;
+        outline-offset: 2px !important;
     }
 
     /* ============================================================
-       RESPONSIVE MOBILE & TABLET OPTIMIZATIONS (Antigravity & Emil Kowalski)
+       9. RESPONSIVE MOBILE & TABLET OPTIMIZATIONS
        ============================================================ */
     @media (max-width: 768px) {
-        /* Container Spacing: Reclaim screen real estate on mobile devices */
         .main .block-container, div[data-testid="stMainBlockContainer"] {
             padding-top: 0.85rem !important;
             padding-bottom: 2rem !important;
             padding-left: 0.75rem !important;
             padding-right: 0.75rem !important;
         }
-
-        /* Fluid Typography Scaling */
         h1, .hero-title, .forbes-masthead-title {
             font-size: 1.85rem !important;
             line-height: 1.2 !important;
             letter-spacing: -0.01em !important;
         }
-        h2 {
-            font-size: 1.45rem !important;
-        }
-        h3 {
-            font-size: 1.2rem !important;
-        }
-        .hero-banner {
-            padding: 1.2rem 1.1rem !important;
-            border-radius: 12px !important;
-        }
-        .hero-subtitle {
-            font-size: 0.88rem !important;
-        }
-
-        /* Responsive Columns: Stacks horizontally crushed column blocks */
         div[data-testid="stHorizontalBlock"] {
             flex-wrap: wrap !important;
             gap: 0.75rem !important;
@@ -530,43 +782,19 @@ render_html("""
             flex: 1 1 100% !important;
             margin-bottom: 0.4rem !important;
         }
-
-        /* Metric Tickers & KPI Cards: Full-width fluid layout */
-        .ticker-card {
-            padding: 1rem 1.15rem !important;
-            margin-bottom: 0.65rem !important;
-            width: 100% !important;
-            border-radius: 10px !important;
-        }
-        .ticker-value {
-            font-size: 1.45rem !important;
-        }
-        .ticker-label {
-            font-size: 0.75rem !important;
-        }
-
-        /* 3D Podium Cards: Vertical Stack on Mobile */
-        .podium-container {
+        .spatial-podium-root {
             flex-direction: column !important;
             align-items: stretch !important;
             gap: 1rem !important;
             padding: 0.5rem 0 !important;
         }
-        .podium-step {
+        .podium-pillar {
             min-width: 100% !important;
             max-width: 100% !important;
             min-height: auto !important;
             padding: 1.2rem 1rem !important;
             border-radius: 12px !important;
         }
-        .podium-badge {
-            font-size: 2rem !important;
-        }
-        .podium-medals {
-            font-size: 1.6rem !important;
-        }
-
-        /* Touch-Friendly Tabs: Horizontal scroll bar */
         div[data-baseweb="tab-list"] {
             display: flex !important;
             flex-wrap: nowrap !important;
@@ -582,20 +810,13 @@ render_html("""
             white-space: nowrap !important;
             flex-shrink: 0 !important;
         }
-
-        /* Touch Targets: 44px Minimum for Accessibility & Apple HIG */
         .stButton>button, .stDownloadButton>button {
             min-height: 44px !important;
             padding: 0.65rem 1.1rem !important;
             font-size: 0.95rem !important;
             width: 100% !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
             touch-action: manipulation !important;
         }
-
-        /* Form Inputs & Selects: Prevent iOS Safari Auto-Zoom */
         input[type="text"], input[type="number"], input[type="password"], textarea {
             font-size: 16px !important;
             min-height: 44px !important;
@@ -603,58 +824,17 @@ render_html("""
         div[data-baseweb="select"] > div {
             min-height: 44px !important;
         }
-
-        /* DataTables & DataFrames: Fluid horizontal scroll with momentum */
-        div[data-testid="stDataFrame"], div[data-testid="stTable"] {
-            width: 100% !important;
-            max-width: 100% !important;
-            overflow-x: auto !important;
-            -webkit-overflow-scrolling: touch !important;
-            border-radius: 8px !important;
+        .telemetry-hud-bar {
+            flex-direction: column;
+            gap: 0.6rem;
+            align-items: flex-start;
         }
-
-        /* Plotly Visualizations: Ensure full container bounding without horizontal overflow */
-        .js-plotly-plot, .plot-container {
-            max-width: 100% !important;
-            width: 100% !important;
-            overflow-x: hidden !important;
+        .hud-center {
+            display: none;
         }
-
-        /* Athlete Cards */
-        .athlete-card {
-            padding: 1.2rem 1.1rem !important;
-            border-radius: 12px !important;
-        }
-
-        /* Mobile Sidebar adjustments */
-        section[data-testid="stSidebar"] {
-            width: 85vw !important;
-            max-width: 320px !important;
-        }
-        [data-testid="stSidebarCollapseButton"] button,
-        button[kind="header"] {
-            min-width: 44px !important;
-            min-height: 44px !important;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .main .block-container, div[data-testid="stMainBlockContainer"] {
-            padding-left: 0.5rem !important;
-            padding-right: 0.5rem !important;
-            padding-top: 0.65rem !important;
-        }
-        h1, .hero-title, .forbes-masthead-title {
-            font-size: 1.6rem !important;
-        }
-        .hero-banner {
-            padding: 1rem 0.85rem !important;
-        }
-        .ticker-card {
-            padding: 0.85rem 1rem !important;
-        }
-        .ticker-value {
-            font-size: 1.3rem !important;
+        .hud-right {
+            width: 100%;
+            justify-content: space-between;
         }
     }
 </style>
@@ -814,14 +994,42 @@ with st.sidebar:
     if st.button("🔄 Reset Filters", use_container_width=True):
         st.rerun()
 
-    # Controller Status Metrics
+    # Mini Warehouse Heartbeat Widget
     st.markdown("---")
+    wh_counts = get_table_counts()
+    fact_cnt = wh_counts.get("fact_medal", len(df_master))
+    max_dim = max([wh_counts.get(k, 1) for k in ["dim_event", "dim_country", "dim_sport", "dim_game", "dim_medal"]], default=1000)
+    
+    table_items = [
+        ("fact_medal", fact_cnt, "#5DD62C", 100),
+        ("dim_event", wh_counts.get("dim_event", 0), "#00F0FF", min(100, max(15, int((wh_counts.get("dim_event", 0)/max_dim)*100)))),
+        ("dim_country", wh_counts.get("dim_country", 0), "#38BDF8", min(100, max(15, int((wh_counts.get("dim_country", 0)/max_dim)*100)))),
+        ("dim_sport", wh_counts.get("dim_sport", 0), "#A855F7", min(100, max(15, int((wh_counts.get("dim_sport", 0)/max_dim)*100)))),
+        ("dim_game", wh_counts.get("dim_game", 0), "#F59E0B", min(100, max(15, int((wh_counts.get("dim_game", 0)/max_dim)*100)))),
+        ("dim_medal", wh_counts.get("dim_medal", 3), "#E2E8F0", 15),
+    ]
+    
+    spark_html = "".join([
+        f'<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; font-family: monospace; font-size: 0.72rem;">'
+        f'<span style="color: #94A3B8;">{name}</span>'
+        f'<div style="display: flex; align-items: center; gap: 0.4rem;">'
+        f'<div style="width: 55px; height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden;">'
+        f'<div style="width: {pct}%; height: 100%; background: {col}; border-radius: 2px;"></div>'
+        f'</div>'
+        f'<span style="color: #F8FAFC; font-weight: 700; min-width: 45px; text-align: right;">{val:,}</span>'
+        f'</div></div>'
+        for name, val, col, pct in table_items
+    ])
+
     render_html(f"""
-    <div style="font-size: 0.78rem; color: #A0A0A0; line-height: 1.5;">
-        <strong style="color: #F8F8F8;">Active Role:</strong> <span style="color: #5DD62C; font-weight: 700;">{active_role.capitalize()}</span><br>
-        <strong style="color: #F8F8F8;">Warehouse Engine:</strong> SQLite3 Star Schema<br>
-        <strong style="color: #F8F8F8;">Historical Span:</strong> 1896 – 2026 ({max_year_master - min_year_master} Years)<br>
-        <strong style="color: #F8F8F8;">Fact Medals:</strong> {len(df_master):,} verified records
+    <div style="background: rgba(20, 22, 27, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.85rem 1rem; margin-top: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.65rem;">
+            <div style="font-size: 0.72rem; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 0.4rem;">
+                <span style="color: #5DD62C; animation: ag-pulse 1.8s infinite;">●</span> WAREHOUSE HEARTBEAT
+            </div>
+            <span style="font-size: 0.68rem; color: #5DD62C; background: rgba(93, 214, 44, 0.12); padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700;">60FPS WAL</span>
+        </div>
+        {spark_html}
     </div>
     """)
 
@@ -843,6 +1051,17 @@ if selected_countries:
 
 if selected_sports:
     filtered_df = filtered_df[filtered_df["sport"].isin(selected_sports)]
+
+if filtered_df.empty:
+    render_telemetry_hud(
+        active_role=active_role,
+        active_module=selected_mode or active_role,
+        year_range=year_range,
+        total_facts=len(df_master)
+    )
+    render_empty_telemetry_card()
+    render_telemetry_footer()
+    st.stop()
 
 
 # ------------------------------------------------------------
@@ -1891,14 +2110,6 @@ def render_podium_view(filtered_df: pd.DataFrame):
     - 4-Column Editorial Profile Card Grid
     - Analytical Stacked Breakdown & Heatmap
     """
-    # 1. CATEGORY TABS (FORBES STYLE)
-    cat_tab1, cat_tab2, cat_tab3, cat_tab4 = st.tabs([
-        "All-Time Top 5",
-        "Summer Titans",
-        "Winter Powerhouses",
-        "Modern Era (2000–2024)"
-    ])
-
     # Precalculate aggregate country totals
     country_totals = filtered_df.groupby("country").agg(
         total_medals=("medal_fact_id", "count"),
@@ -1916,6 +2127,13 @@ def render_podium_view(filtered_df: pd.DataFrame):
     if country_totals.empty:
         st.info("No country records available for podium rendering.")
         return
+
+    # 1. 3D VISUAL OLYMPIC PODIUM SHOWCASE (Gold #1 Center, Silver #2 Left, Bronze #3 Right)
+    if len(country_totals) >= 3:
+        p_first = country_totals.iloc[0].to_dict()
+        p_second = country_totals.iloc[1].to_dict()
+        p_third = country_totals.iloc[2].to_dict()
+        render_podium_showcase(p_first, p_second, p_third)
 
     # Leader nation data
     leader = country_totals.iloc[0]
@@ -2932,6 +3150,14 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
 # ------------------------------------------------------------
 mode = str(selected_mode or "")
 
+# Global Floating Glass Command Header (Top Telemetry HUD Bar)
+render_telemetry_hud(
+    active_role=active_role,
+    active_module=mode or active_role,
+    year_range=year_range,
+    total_facts=len(df_master)
+)
+
 if "Warehouse" in mode or "Administration" in mode or (active_role == "admin" and not selected_mode):
     render_admin_dashboard(filtered_df)
 elif "Coach" in mode or "Strategy" in mode or (active_role == "professional" and not selected_mode):
@@ -2954,4 +3180,7 @@ else:
         render_coach_strategy_studio(filtered_df)
     else:
         render_podium_view(filtered_df)
+
+# Global Telemetry Status Bar Footer
+render_telemetry_footer()
 

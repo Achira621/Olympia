@@ -40,6 +40,19 @@ FEATURED_ATHLETES = [
 ]
 
 
+def get_ovr_tier_card(score: float) -> tuple:
+    """Returns Tier Name, Accent Hex Color, and Ambient Glow RGBA."""
+    s = int(round(score))
+    if s >= 90:
+        return "ICON", "#5DD62C", "rgba(93, 214, 44, 0.45)"
+    elif s >= 85:
+        return "ELITE", "#00F0FF", "rgba(0, 240, 255, 0.45)"
+    elif s >= 80:
+        return "PRO", "#F59E0B", "rgba(245, 158, 11, 0.45)"
+    else:
+        return "PROSPECT", "#E2E8F0", "rgba(226, 232, 240, 0.25)"
+
+
 def render_antigravity_styles():
     """Injects high-craft Antigravity Motion and Emil Kowalski CSS heuristics."""
     st.markdown("""
@@ -56,7 +69,7 @@ def render_antigravity_styles():
 
     /* Spatial Floating Glassmorphic Container */
     .ag-glass-panel {
-        background: rgba(22, 22, 22, 0.72) !important;
+        background: rgba(20, 22, 27, 0.72) !important;
         backdrop-filter: blur(20px) saturate(180%) !important;
         -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -82,6 +95,162 @@ def render_antigravity_styles():
             0 15px 35px -8px rgba(0, 0, 0, 0.8),
             0 30px 60px -15px rgba(93, 214, 44, 0.15),
             inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+    }
+
+    /* FIFA/2K Glowing Hexagonal OVR Card Badge */
+    .fifa-ovr-card {
+        width: 82px;
+        height: 94px;
+        background: linear-gradient(135deg, rgba(20, 22, 27, 0.95), rgba(32, 35, 42, 0.95));
+        border: 2px solid #5DD62C;
+        clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px rgba(93, 214, 44, 0.4);
+        transition: transform 220ms var(--spring-snappy);
+        flex-shrink: 0;
+    }
+    .fifa-ovr-card:hover {
+        transform: scale(1.06);
+    }
+    .fifa-ovr-num {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.85rem;
+        font-weight: 900;
+        line-height: 1;
+    }
+    .fifa-ovr-tier {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 0.62rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        margin-top: 0.15rem;
+    }
+
+    /* 6D Attribute Progress Bars */
+    .attr-row {
+        margin-bottom: 0.65rem;
+    }
+    .attr-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.78rem;
+        margin-bottom: 0.25rem;
+    }
+    .attr-title {
+        color: #CBD5E1;
+        font-weight: 600;
+        font-family: 'Inter', sans-serif;
+    }
+    .attr-val-delta {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+    }
+    .attr-score {
+        color: #F8FAFC;
+    }
+    .attr-bar-bg {
+        height: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+    .attr-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #337418 0%, #5DD62C 100%);
+        border-radius: 3px;
+        transition: width 400ms var(--spring-snappy);
+    }
+
+    /* VS Fight Header */
+    .vs-fight-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.2rem;
+        background: rgba(20, 22, 27, 0.75);
+        backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 1.4rem 1.6rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    .vs-fighter-card {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .vs-center-badge {
+        font-family: 'Space Grotesk', sans-serif;
+        font-size: 1.4rem;
+        font-weight: 900;
+        color: #F8FAFC;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 20px rgba(93, 214, 44, 0.25);
+        flex-shrink: 0;
+    }
+
+    /* Tactical Tug-of-War Bar */
+    .tug-of-war-container {
+        background: rgba(20, 22, 27, 0.75);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 1.4rem;
+        text-align: center;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+    .tug-bar-track {
+        display: flex;
+        height: 14px;
+        border-radius: 7px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.06);
+        margin: 1rem 0;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .tug-fill-a {
+        background: linear-gradient(90deg, #337418, #5DD62C);
+        box-shadow: 0 0 12px rgba(93, 214, 44, 0.5);
+        transition: width 400ms var(--spring-snappy);
+    }
+    .tug-fill-b {
+        background: linear-gradient(90deg, #0284C7, #00F0FF);
+        box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+        transition: width 400ms var(--spring-snappy);
+    }
+
+    /* Terminal Playbook Card */
+    .terminal-playbook-card {
+        background: #090A0D;
+        border: 1px solid rgba(93, 214, 44, 0.3);
+        border-radius: 12px;
+        padding: 1.4rem;
+        font-family: 'JetBrains Mono', monospace;
+        color: #E2E8F0;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(93, 214, 44, 0.03);
+    }
+    .terminal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 0.8rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 1rem;
     }
 
     /* Tactile Micro-interaction on buttons (Emil Kowalski feedback) */
@@ -147,13 +316,18 @@ def render_antigravity_styles():
         .ag-playbook-card {
             padding: 1.1rem 1.15rem !important;
         }
-        .ag-clipboard-grid {
-            grid-template-columns: 1fr !important;
+        .vs-fight-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
             gap: 1rem !important;
         }
-        .ag-archetype-grid {
-            grid-template-columns: 1fr !important;
-            gap: 0.5rem !important;
+        .vs-fighter-card {
+            width: 100% !important;
+            justify-content: flex-start !important;
+            text-align: left !important;
+        }
+        .vs-center-badge {
+            align-self: center !important;
         }
     }
     </style>
@@ -309,8 +483,55 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
 
         # Compute deterministic profile
         profile = compute_athlete_inclinations(target_athlete_name, sport_val, medals_won_val, gold_ratio_val)
+        tier_label, tier_col, tier_glow = get_ovr_tier_card(profile["composite_rating"])
 
-        # 3D Spatial Presentation Cards
+        # 1. Athlete Scouting Hero Bar with Glowing Hexagonal FIFA/2K Badge
+        st.markdown(f"""
+        <div style="background: rgba(20, 22, 27, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 1.4rem 1.6rem; margin: 1rem 0 1.5rem 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1.2rem;">
+                <div class="fifa-ovr-card" style="border-color: {tier_col}; box-shadow: 0 0 24px {tier_glow};">
+                    <span class="fifa-ovr-num" style="color: {tier_col};">{int(round(profile['composite_rating']))}</span>
+                    <span class="fifa-ovr-tier" style="color: {tier_col};">{tier_label}</span>
+                </div>
+                <div>
+                    <div style="font-size: 0.78rem; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
+                        {sport_val} // {ath_meta['country'] if ath_meta else 'Olympian'}
+                    </div>
+                    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.65rem; font-weight: 800; color: #F8FAFC;">
+                        {target_athlete_name}
+                    </div>
+                    <div style="display: flex; gap: 0.4rem; margin-top: 0.35rem; flex-wrap: wrap;">
+                        <span style="background: rgba(93, 214, 44, 0.15); border: 1px solid #5DD62C; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; color: #5DD62C; font-weight: 700;">
+                            {profile['archetype']}
+                        </span>
+                        <span style="background: rgba(0, 240, 255, 0.12); border: 1px solid #00F0FF; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; color: #00F0FF; font-weight: 700;">
+                            Clutch: {profile['clutch_index']}/100
+                        </span>
+                        <span style="background: rgba(245, 158, 11, 0.12); border: 1px solid #F59E0B; padding: 0.15rem 0.6rem; border-radius: 9999px; font-size: 0.72rem; color: #F59E0B; font-weight: 700;">
+                            Bias: {profile['pacing_bias']}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.72rem; color: #94A3B8; text-transform: uppercase; font-weight: 700;">Olympic Hardware</div>
+                <div style="font-size: 1.4rem; font-weight: 900; color: #FFD700; font-family: 'JetBrains Mono', monospace;">
+                    🥇 {ath_meta['golds'] if ath_meta else 1} <span style="font-size: 0.95rem; color: #94A3B8;">/ {medals_won_val} Medals</span>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 2. 6D Inclination Radar & Attribute Progress Bars
+        benchmarks = {
+            "Opening Aggressiveness": 75.0,
+            "Tactical Discipline": 72.0,
+            "Stamina Reserve": 74.0,
+            "Clutch Composure": 76.0,
+            "Technical Precision": 78.0,
+            "Fatigue Durability": 73.0,
+        }
+
         col_rad, col_archetype = st.columns([1, 1])
 
         with col_rad:
@@ -319,42 +540,41 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
             st.plotly_chart(fig_rad, use_container_width=True)
 
         with col_archetype:
-            st.markdown("##### Tactical Behavioral Archetype")
+            st.markdown("##### 6D Physical & Tactical Attributes (vs. Olympic Baseline)")
+            attr_html = ""
+            for dim, bench_val in benchmarks.items():
+                val = profile["radar_scores"].get(dim, 75.0)
+                delta = round(val - bench_val, 1)
+                delta_sign = "+" if delta >= 0 else ""
+                delta_arrow = "▲" if delta >= 0 else "▼"
+                delta_color = "#5DD62C" if delta >= 0 else "#EF4444"
+                bar_pct = min(100, max(10, int(val)))
+                attr_html += f"""
+                <div class="attr-row">
+                    <div class="attr-meta">
+                        <span class="attr-title">{dim}</span>
+                        <div class="attr-val-delta">
+                            <span class="attr-score">{val}</span>
+                            <span style="color: {delta_color}; font-size: 0.72rem; background: rgba(255,255,255,0.06); padding: 0.1rem 0.35rem; border-radius: 4px;">
+                                {delta_sign}{delta} {delta_arrow}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="attr-bar-bg">
+                        <div class="attr-bar-fill" style="width: {bar_pct}%;"></div>
+                    </div>
+                </div>
+                """
             st.markdown(f"""
-            <div style="background: rgba(28, 28, 28, 0.7); border: 1.5px solid #337418; border-radius: 14px; padding: 1.3rem 1.6rem; margin-bottom: 1rem;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
-                    <span style="font-size: 1.2rem; font-weight: 800; color: #5DD62C; font-family: 'Inter', sans-serif;">
-                        {profile['archetype']}
-                    </span>
-                    <span style="background: rgba(93, 214, 44, 0.15); border: 1px solid #5DD62C; padding: 0.2rem 0.65rem; border-radius: 12px; font-size: 0.75rem; color: #5DD62C; font-weight: 700;">
-                        Rating: {profile['composite_rating']}/100
-                    </span>
-                </div>
-                <div style="font-size: 0.9rem; color: #CBD5E1; line-height: 1.55; margin-bottom: 0.9rem;">
-                    {profile['archetype_desc']}
-                </div>
-                <div class="ag-archetype-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; font-size: 0.82rem;">
-                    <div style="background: #111; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid #222;">
-                        <strong style="color: #94A3B8;">Pacing Bias:</strong><br><span style="color: #38BDF8; font-weight: 700;">{profile['pacing_bias']}</span>
-                    </div>
-                    <div style="background: #111; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid #222;">
-                        <strong style="color: #94A3B8;">Primary Strike:</strong><br><span style="color: #F59E0B; font-weight: 700;">{profile['primary_trigger']}</span>
-                    </div>
-                    <div style="background: #111; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid #222;">
-                        <strong style="color: #94A3B8;">Clutch Score:</strong><br><span style="color: #10B981; font-weight: 700;">{profile['clutch_index']}/100</span>
-                    </div>
-                    <div style="background: #111; padding: 0.5rem 0.8rem; border-radius: 8px; border: 1px solid #222;">
-                        <strong style="color: #94A3B8;">Discipline:</strong><br><span style="color: #F8FAFC; font-weight: 700;">{profile['sport']}</span>
-                    </div>
-                </div>
+            <div style="background: rgba(20, 22, 27, 0.75); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 1.25rem 1.4rem;">
+                {attr_html}
             </div>
             """, unsafe_allow_html=True)
+            st.markdown("<div style='margin-top: 0.6rem;'></div>", unsafe_allow_html=True)
+            st.info(f"💡 **Counter-Tactical Exploit:** {profile['counter_strategy']}")
 
-            st.markdown("##### Counter-Tactical Vulnerability Note")
-            st.info(f"💡 **Opponent Counter-Play:** {profile['counter_strategy']}")
-
-        # Fatigue-Induced Behavioral Drift Across Splits
-        st.markdown("##### Fatigue-Induced Behavioral Drift Across Competition Splits")
+        # 3. Race-Quarter Fatigue Drift with Lactic Threshold Danger Zone
+        st.markdown("##### Race-Quarter Fatigue Drift & Lactic Danger Zone")
         splits_df = pd.DataFrame({
             "Split Phase": ["Split 1 (0-25%)", "Split 2 (25-50%)", "Split 3 (50-75%)", "Split 4 (75-100%)"],
             "Nominal Velocity (%)": profile["split_velocity_pct"],
@@ -362,29 +582,40 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
         })
 
         fig_drift = go.Figure()
-        fig_drift.add_trace(go.Bar(
+        fig_drift.add_trace(go.Scatter(
             x=splits_df["Split Phase"],
             y=splits_df["Nominal Velocity (%)"],
-            name="Pace / Velocity Index (%)",
-            marker_color='#5DD62C',
-            text=[f"{v:.1f}%" for v in splits_df["Nominal Velocity (%)"]],
-            textposition="auto"
+            mode="lines+markers",
+            name="Split Velocity (%)",
+            line=dict(color='#5DD62C', width=3.5, shape='spline'),
+            marker=dict(size=8, color='#5DD62C')
         ))
         fig_drift.add_trace(go.Scatter(
             x=splits_df["Split Phase"],
             y=splits_df["Execution Error Risk (%)"],
-            name="Tactical Error Probability (%)",
+            mode="lines+markers",
+            name="Technical Error Risk (%)",
             yaxis="y2",
-            line=dict(color='#F59E0B', width=3),
-            marker=dict(size=9, color='#F59E0B')
+            fill="tozeroy",
+            fillcolor="rgba(239, 68, 68, 0.12)",
+            line=dict(color='#EF4444', width=2.5),
+            marker=dict(size=7, color='#EF4444')
         ))
+        fig_drift.add_vrect(
+            x0="Split 3 (50-75%)", x1="Split 4 (75-100%)",
+            fillcolor="rgba(239, 68, 68, 0.08)", layer="below", line_width=1,
+            line_dash="dash", line_color="rgba(239, 68, 68, 0.35)",
+            annotation_text="🚨 Lactic Acid Threshold Zone", annotation_position="top left",
+            annotation_font=dict(color="#EF4444", size=10)
+        )
         fig_drift.update_layout(
-            yaxis=dict(title="Velocity Index (%)", range=[80, 110]),
-            yaxis2=dict(title="Error Risk (%)", overlaying="y", side="right", range=[0, 20]),
+            yaxis=dict(title="Velocity Index (%)", range=[80, 110], gridcolor="rgba(255,255,255,0.05)"),
+            yaxis2=dict(title="Error Risk (%)", overlaying="y", side="right", range=[0, 20], gridcolor="rgba(255,255,255,0.02)"),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             height=320,
-            legend=dict(orientation="h", y=1.15, x=0.2)
+            margin=dict(l=20, r=20, t=30, b=20),
+            legend=dict(orientation="h", y=1.12, x=0.2)
         )
         fig_drift = apply_dark_theme(fig_drift)
         st.plotly_chart(fig_drift, use_container_width=True)
@@ -398,49 +629,115 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
 
         col_m1, col_m2 = st.columns(2)
         with col_m1:
-            st.markdown("##### 🔵 Your Athlete")
+            st.markdown("##### 🔵 Your Athlete (Lime Corner)")
             p_a_name = st.selectbox("Select Your Athlete:", options=athlete_names, index=0, key="matchup_p_a")
             ath_a_meta = next(a for a in FEATURED_ATHLETES if a["name"] == p_a_name)
             p_a_profile = compute_athlete_inclinations(p_a_name, ath_a_meta["sport"], ath_a_meta["medals"], ath_a_meta["golds"]/ath_a_meta["medals"])
 
         with col_m2:
-            st.markdown("##### 🔴 Opponent Athlete")
+            st.markdown("##### 🔴 Opponent Athlete (Cyan Corner)")
             p_b_name = st.selectbox("Select Opponent Athlete:", options=[a for a in athlete_names if a != p_a_name], index=0, key="matchup_p_b")
             ath_b_meta = next(a for a in FEATURED_ATHLETES if a["name"] == p_b_name)
             p_b_profile = compute_athlete_inclinations(p_b_name, ath_b_meta["sport"], ath_b_meta["medals"], ath_b_meta["golds"]/ath_b_meta["medals"])
 
         matchup = simulate_tactical_matchup(p_a_profile, p_b_profile)
 
-        # Win Probability Meter
-        st.markdown("<div style='margin-top: 1rem;'></div>", unsafe_allow_html=True)
-        col_prob1, col_prob2 = st.columns([1, 1])
+        # Dual-Column "VS" Fight-Card Header
+        t_a_label, t_a_col, t_a_glow = get_ovr_tier_card(p_a_profile["composite_rating"])
+        t_b_label, t_b_col, t_b_glow = get_ovr_tier_card(p_b_profile["composite_rating"])
 
-        with col_prob1:
-            win_pct = matchup["win_probability"]
-            opp_pct = matchup["opponent_win_prob"]
+        st.markdown(f"""
+        <div class="vs-fight-header">
+            <!-- Athlete A (Electric Lime) -->
+            <div class="vs-fighter-card">
+                <div class="fifa-ovr-card" style="border-color: #5DD62C; box-shadow: 0 0 20px rgba(93, 214, 44, 0.45);">
+                    <span class="fifa-ovr-num" style="color: #5DD62C;">{int(round(p_a_profile['composite_rating']))}</span>
+                    <span class="fifa-ovr-tier" style="color: #5DD62C;">{t_a_label}</span>
+                </div>
+                <div>
+                    <div style="font-size: 0.72rem; color: #5DD62C; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">PRIMARY ATHLETE</div>
+                    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 800; color: #F8FAFC;">{p_a_name}</div>
+                    <div style="font-size: 0.78rem; color: #94A3B8; margin-top: 0.2rem;">
+                        {p_a_profile['archetype']} • Clutch: <strong style="color: #5DD62C;">{p_a_profile['clutch_index']}</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VS Center Emblem -->
+            <div class="vs-center-badge">VS</div>
+
+            <!-- Athlete B (Cyber Cyan) -->
+            <div class="vs-fighter-card" style="justify-content: flex-end; text-align: right;">
+                <div>
+                    <div style="font-size: 0.72rem; color: #00F0FF; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">SCOUTED OPPONENT</div>
+                    <div style="font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 800; color: #F8FAFC;">{p_b_name}</div>
+                    <div style="font-size: 0.78rem; color: #94A3B8; margin-top: 0.2rem;">
+                        {p_b_profile['archetype']} • Clutch: <strong style="color: #00F0FF;">{p_b_profile['clutch_index']}</strong>
+                    </div>
+                </div>
+                <div class="fifa-ovr-card" style="border-color: #00F0FF; box-shadow: 0 0 20px rgba(0, 240, 255, 0.45);">
+                    <span class="fifa-ovr-num" style="color: #00F0FF;">{int(round(p_b_profile['composite_rating']))}</span>
+                    <span class="fifa-ovr-tier" style="color: #00F0FF;">{t_b_label}</span>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Tactical Tug-of-War Win Probability Energy Bar
+        win_pct = matchup["win_probability"]
+        opp_pct = matchup["opponent_win_prob"]
+
+        st.markdown(f"""
+        <div class="tug-of-war-container">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-family: 'Space Grotesk', sans-serif;">
+                <div style="text-align: left;">
+                    <div style="font-size: 0.75rem; color: #5DD62C; font-weight: 700; text-transform: uppercase;">{p_a_name} WIN PROBABILITY</div>
+                    <div style="font-size: 2.2rem; font-weight: 900; color: #5DD62C; font-family: 'JetBrains Mono', monospace;">{win_pct}%</div>
+                </div>
+                <div style="font-size: 0.85rem; color: #94A3B8; font-weight: 700;">TACTICAL TUG-OF-WAR ENGINE</div>
+                <div style="text-align: right;">
+                    <div style="font-size: 0.75rem; color: #00F0FF; font-weight: 700; text-transform: uppercase;">{p_b_name} WIN PROBABILITY</div>
+                    <div style="font-size: 2.2rem; font-weight: 900; color: #00F0FF; font-family: 'JetBrains Mono', monospace;">{opp_pct}%</div>
+                </div>
+            </div>
+            <div class="tug-bar-track">
+                <div class="tug-fill-a" style="width: {win_pct}%;"></div>
+                <div class="tug-fill-b" style="width: {opp_pct}%;"></div>
+            </div>
+            <div style="font-size: 0.78rem; color: #94A3B8;">
+                Deterministic advantage vector integration across stamina, clutch composure, and pacing bias.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Automated Scouting Report Cards
+        st.markdown("<div style='margin-top: 1.2rem;'></div>", unsafe_allow_html=True)
+        col_sc1, col_sc2 = st.columns(2)
+        with col_sc1:
             st.markdown(f"""
-            <div style="background: rgba(24, 24, 24, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 1.4rem; text-align: center;">
-                <div style="font-size: 0.8rem; color: #94A3B8; text-transform: uppercase; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 0.4rem;">
-                    Simulated Win Probability
+            <div style="background: rgba(20, 22, 27, 0.75); border: 1px solid rgba(239, 68, 68, 0.35); border-radius: 12px; padding: 1.2rem; height: 100%; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; color: #EF4444; font-weight: 800; font-family: 'Space Grotesk', sans-serif;">
+                    ⚠️ Opponent Vulnerability Matrix ({p_b_name})
                 </div>
-                <div style="font-size: 3rem; font-weight: 900; color: {'#5DD62C' if win_pct >= 50 else '#F59E0B'}; font-family: 'Inter', sans-serif;">
-                    {win_pct}%
+                <div style="font-size: 0.88rem; color: #CBD5E1; line-height: 1.6;">
+                    {'<br>'.join(['• ' + w for w in matchup['opponent_weaknesses']])}
                 </div>
-                <div style="font-size: 0.88rem; color: #E2E8F0; margin-top: 0.2rem;">
-                    <strong>{p_a_name}</strong> vs <strong>{p_b_name}</strong> ({opp_pct}%)
+            </div>
+            """, unsafe_allow_html=True)
+        with col_sc2:
+            st.markdown(f"""
+            <div style="background: rgba(20, 22, 27, 0.75); border: 1px solid rgba(93, 214, 44, 0.35); border-radius: 12px; padding: 1.2rem; height: 100%; box-sizing: border-box;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; color: #5DD62C; font-weight: 800; font-family: 'Space Grotesk', sans-serif;">
+                    🎯 Recommended Counter-Tactical Execution
                 </div>
-                <div style="background: #333; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 1rem;">
-                    <div style="background: #5DD62C; height: 100%; width: {win_pct}%;"></div>
+                <div style="font-size: 0.88rem; color: #CBD5E1; line-height: 1.6;">
+                    {p_a_profile['counter_strategy']}
                 </div>
             </div>
             """, unsafe_allow_html=True)
 
-        with col_prob2:
-            st.markdown("##### Opponent Choke Points & Vulnerabilities")
-            for w in matchup["opponent_weaknesses"]:
-                st.markdown(f"⚠️ **Weakness:** {w}")
-
         # Advantage Deltas Bar Chart
+        st.markdown("<div style='margin-top: 1.2rem;'></div>", unsafe_allow_html=True)
         st.markdown("##### Head-to-Head Advantage Vectors")
         delta_df = pd.DataFrame({
             "Dimension": list(matchup["advantage_deltas"].keys()),
@@ -454,48 +751,64 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
             y="Dimension",
             orientation="h",
             color="Advantage",
-            color_discrete_map={p_a_name: "#5DD62C", p_b_name: "#EF4444"},
-            title=f"Inclination Edge: {p_a_name} (Green) vs {p_b_name} (Red)"
+            color_discrete_map={p_a_name: "#5DD62C", p_b_name: "#00F0FF"},
+            title=f"Head-to-Head Vector Edge: {p_a_name} (Lime) vs {p_b_name} (Cyan)"
         )
         fig_delta = apply_dark_theme(fig_delta)
         st.plotly_chart(fig_delta, use_container_width=True)
 
     # --------------------------------------------------------
-    # TAB 3: RACE PACING & WHAT-IF SIMULATOR
+    # TAB 3: WHAT-IF ENVIRONMENTAL & AERODYNAMIC LAB
     # --------------------------------------------------------
     with tab_pacing:
-        st.markdown("#### Tactical Pacing & Energy Expenditure Simulator")
-        st.caption("Adjust tactical parameters (Pacing, Slipstream Drafting, Energy Burn Rate, Altitude) to simulate lap-by-lap splits and predicted podium probability.")
+        st.markdown("#### What-If Environmental & Aerodynamic Lab")
+        st.caption("Simulate real-time environmental perturbations (altitude, ambient air density, drafting slipstream, and opening surge) on energy reserves and podium probability.")
 
         col_ctrl1, col_ctrl2, col_ctrl3, col_ctrl4 = st.columns(4)
         with col_ctrl1:
             pace_choice = st.selectbox(
-                "Pacing Strategy:",
+                "Pacing Protocol:",
                 ["Negative Split", "Even Split", "Early Breakaway Attack", "Controlled Drafting & Surge"],
                 index=0,
                 key="sim_pacing_strategy"
             )
         with col_ctrl2:
-            energy_burn = st.slider("Target Energy Output (%):", min_value=60.0, max_value=100.0, value=85.0, step=2.5, key="sim_energy_burn")
+            altitude_val = st.slider("Venue Altitude (m):", min_value=0, max_value=2500, value=800, step=100, key="sim_altitude")
         with col_ctrl3:
-            drafting_val = st.slider("Drafting / Slipstream (%):", min_value=0.0, max_value=60.0, value=30.0, step=5.0, key="sim_drafting")
+            drafting_val = st.slider("Drafting Slipstream (%):", min_value=0.0, max_value=60.0, value=30.0, step=5.0, key="sim_drafting")
         with col_ctrl4:
-            altitude_val = st.slider("Venue Altitude (m):", min_value=0, max_value=2500, value=600, step=100, key="sim_altitude")
+            temp_val = st.slider("Ambient Temperature (°C):", min_value=-15, max_value=35, value=12, step=1, key="sim_temp")
 
-        # Run Pacing Simulation
-        sim_res = simulate_pacing_strategy(profile, pace_choice, energy_burn, drafting_val, altitude_val)
+        surge_val = st.slider("Opening Sector Pace Surge (%):", min_value=-10.0, max_value=15.0, value=2.0, step=1.0, key="sim_surge")
 
-        # Simulation KPIs
+        # Run Pacing & Environmental Calculations
+        sim_res = simulate_pacing_strategy(profile, pace_choice, 85.0, drafting_val, altitude_val)
+
+        alt_impact = round((altitude_val / 1000.0) * 1.8, 1)
+        draft_savings = round(drafting_val * 0.42, 1)
+        temp_drift = round(abs(temp_val - 18) * 0.08, 1)
+        net_time_shift = round((-draft_savings * 0.09) + (alt_impact * 0.16) + (temp_drift * 0.12) - (surge_val * 0.04), 2)
+        vo2_drift = round((-alt_impact * 0.8) + (draft_savings * 0.35) - (temp_drift * 0.25), 1)
+        revised_podium = max(5, min(99, int(sim_res['podium_probability'] - (alt_impact * 1.2) + (draft_savings * 1.1) - (temp_drift * 0.8))))
+
+        # 4 Environmental Live Delta Cards
         k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Podium Conversion Chance", f"{sim_res['podium_probability']}%")
-        k2.metric("Remaining Energy at Finish", f"{sim_res['final_energy_reserve']}%")
-        k3.metric("Drafting Energy Saved", f"+{sim_res['drafting_savings_pct']}%")
-        k4.metric("Altitude Degradation", f"-{sim_res['altitude_impact_pct']}%")
+        with k1:
+            time_col = "#5DD62C" if net_time_shift <= 0 else "#EF4444"
+            time_sgn = "-" if net_time_shift <= 0 else "+"
+            st.metric("Finish Time Shift", f"{time_sgn}{abs(net_time_shift):.2f}s", delta="Aerodynamic Advantage" if net_time_shift <= 0 else "Atmospheric Degradation", delta_color="normal" if net_time_shift <= 0 else "inverse")
+        with k2:
+            st.metric("Aerobic VO2 Drift", f"{vo2_drift:+.1f}%", delta="Metabolic Economy", delta_color="normal" if vo2_drift >= 0 else "inverse")
+        with k3:
+            st.metric("Drafting Energy Saved", f"+{sim_res['drafting_savings_pct']}%", delta="Slipstream Buffer")
+        with k4:
+            podium_delta = int(round(revised_podium - sim_res['podium_probability']))
+            st.metric("Podium Conversion Prob", f"{revised_podium}%", delta=f"{podium_delta:+d}% vs Flat Baseline")
 
-        # Plot Energy Curve & Split Speed
+        # Plot Energy Curve & Split Velocity Profile
         col_p1, col_p2 = st.columns([1, 1])
         with col_p1:
-            st.markdown("##### Energy Reserve Depletion Curve")
+            st.markdown("##### Metabolic Energy Depletion Curve")
             fig_eng = go.Figure()
             fig_eng.add_trace(go.Scatter(
                 x=["Start", "25% Mark", "50% Mark", "75% Mark", "Finish Line"],
@@ -507,7 +820,7 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                 fillcolor="rgba(93, 214, 44, 0.15)"
             ))
             fig_eng.update_layout(
-                yaxis=dict(title="Metabolic Energy Reserve (%)", range=[0, 105]),
+                yaxis=dict(title="Energy Reserve (%)", range=[0, 105], gridcolor="rgba(255,255,255,0.05)"),
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(0,0,0,0)",
                 height=300
@@ -521,75 +834,83 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                 x=sim_res["phases"],
                 y=sim_res["split_speeds"],
                 labels={"x": "Race Phase", "y": "Velocity Index (km/h)"},
-                color_discrete_sequence=["#38BDF8"]
+                color_discrete_sequence=["#00F0FF"]
             )
             fig_spd.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=300)
             fig_spd = apply_dark_theme(fig_spd)
             st.plotly_chart(fig_spd, use_container_width=True)
 
     # --------------------------------------------------------
-    # TAB 4: COACH'S TACTICAL CLIPBOARD
+    # TAB 4: ONE-CLICK COACH PLAYBOOK EXPORT
     # --------------------------------------------------------
     with tab_playbook:
-        st.markdown("#### The Coach's Sideline Tactical Clipboard")
-        st.caption("A consolidated operational gameplan ready to be printed or exported directly to coaching staff tablets.")
+        st.markdown("#### Tactical Sideline Clipboard & One-Click Playbook Export")
+        st.caption("A consolidated operational gameplan ready to copy to clipboard or download directly to coaching staff tablets.")
 
-        st.markdown(f"""
-        <div class="ag-playbook-card">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.6rem; border-bottom: 1px solid #337418; padding-bottom: 0.8rem; margin-bottom: 1rem;">
-                <div style="font-size: 1.3rem; font-weight: 800; color: #5DD62C; font-family: 'Inter', sans-serif;">
-                    📋 Tactical Gameplan: {target_athlete_name}
+        playbook_text = f"""======================================================================
+OLYMPIA HIGH-PERFORMANCE COACHING SYSTEM // TACTICAL DOSSIER
+======================================================================
+ATHLETE PROFILE:
+  Name:               {target_athlete_name}
+  Sport Discipline:   {sport_val}
+  Tactical Archetype: {profile['archetype']}
+  Composite Rating:   {profile['composite_rating']}/100 [{tier_label}]
+  Pacing Bias:        {profile['pacing_bias']}
+  Primary Trigger:    {profile['primary_trigger']}
+  Clutch Composure:   {profile['clutch_index']}/100
+
+SIMULATION TELEMETRY (VENUE CONDITIONS):
+  Altitude:           {altitude_val} m
+  Drafting Target:    {drafting_val}%
+  Ambient Temp:       {temp_val} °C
+  Pacing Protocol:    {pace_choice}
+  Projected Podium:   {revised_podium}%
+
+OPERATIONAL GAMEPLAN & SPLIT TARGETS:
+  Split 1 (0-25%):    {sim_res['split_speeds'][0]} km/h  -- Regulate adrenaline, lock into drafting zone.
+  Split 2 (25-50%):   {sim_res['split_speeds'][1]} km/h  -- Settle into aerobic cadence, protect VO2 ceiling.
+  Split 3 (50-75%):   {sim_res['split_speeds'][2]} km/h  -- Initiate tempo surge at primary trigger point.
+  Split 4 (75-100%):  {sim_res['split_speeds'][3]} km/h  -- Maximum anaerobic kick into clutch zone.
+
+COUNTER-TACTICAL EXPLOIT:
+  {profile['counter_strategy']}
+======================================================================
+Generated by OLYMPIA Spatial Intelligence OS • 1896-2026 Archive
+"""
+
+        # Stylized Dark Terminal Preview Card
+        st.markdown("""
+        <div class="terminal-playbook-card">
+            <div class="terminal-header">
+                <div style="display: flex; align-items: center; gap: 0.4rem;">
+                    <span class="terminal-dot-red"></span>
+                    <span class="terminal-dot-yellow"></span>
+                    <span class="terminal-dot-green"></span>
+                    <span style="font-size: 0.75rem; color: #94A3B8; margin-left: 0.5rem; font-family: 'JetBrains Mono', monospace;">olympia_coach_dossier.sh</span>
                 </div>
-                <span class="ag-chip">
-                    Sport: {sport_val} • Protocol: {sim_res['pacing_strategy']}
-                </span>
-            </div>
-            <div class="ag-clipboard-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; margin-bottom: 1.2rem;">
-                <div>
-                    <h5 style="color: #38BDF8; margin-bottom: 0.4rem;">🎯 Operational Objectives</h5>
-                    <ul style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">
-                        <li>Execute a calibrated <strong>{sim_res['pacing_strategy']}</strong> profile.</li>
-                        <li>Maintain slipstream drafting at approximately <strong>{drafting_val}%</strong> during non-technical phases.</li>
-                        <li>Conserve minimum <strong>{sim_res['final_energy_reserve']}%</strong> energy reserve entering final 400m / closing sector.</li>
-                    </ul>
-                </div>
-                <div>
-                    <h5 style="color: #F59E0B; margin-bottom: 0.4rem;">⚡ Critical Trigger Checkpoints</h5>
-                    <ul style="color: #CBD5E1; font-size: 0.88rem; line-height: 1.6; margin: 0; padding-left: 1.2rem;">
-                        <li><strong>Split 1:</strong> Control early adrenaline; target speed: {sim_res['split_speeds'][0]} km/h.</li>
-                        <li><strong>Split 2:</strong> Settle into steady-state aerobic cadence; monitor heart rate zone 4.</li>
-                        <li><strong>Split 3:</strong> Exploit opponent fatigue; initiate decisive tempo surge at {profile['primary_trigger']}.</li>
-                        <li><strong>Split 4:</strong> Maximum anaerobic kick; leverage clutch index ({profile['clutch_index']}/100).</li>
-                    </ul>
-                </div>
-            </div>
-            <div style="background: rgba(0,0,0,0.4); border: 1px solid #222; border-radius: 8px; padding: 0.8rem 1.2rem; font-size: 0.85rem; color: #94A3B8;">
-                <strong style="color: #5DD62C;">Verified Prediction:</strong> Under current tactical simulation parameters, this strategy achieves a projected <strong style="color: #F8FAFC;">{sim_res['podium_probability']}% Olympic Podium Conversion Probability</strong>.
+                <span style="font-size: 0.68rem; color: #5DD62C; border: 1px solid #5DD62C; padding: 0.1rem 0.4rem; border-radius: 4px;">STANDBY // READY</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        col_dl, _ = st.columns([1, 3])
-        with col_dl:
-            playbook_text = f"""OLYMPIA OLYMPIC COACH TACTICAL DOSSIER
-Athlete: {target_athlete_name}
-Sport: {sport_val}
-Tactical Archetype: {profile['archetype']}
-Pacing Protocol: {sim_res['pacing_strategy']}
-Podium Probability: {sim_res['podium_probability']}%
-Remaining Energy Reserve: {sim_res['final_energy_reserve']}%
-Opening Aggressiveness: {profile['radar_scores']['Opening Aggressiveness']}/100
-Tactical Discipline: {profile['radar_scores']['Tactical Discipline']}/100
-Stamina Reserve: {profile['radar_scores']['Stamina Reserve']}/100
-Clutch Composure: {profile['radar_scores']['Clutch Composure']}/100
-Technical Precision: {profile['radar_scores']['Technical Precision']}/100
-Fatigue Durability: {profile['radar_scores']['Fatigue Durability']}/100
-Generated by OLYMPIA Intelligence System (2026 Edition)
-"""
+        st.code(playbook_text, language="markdown")
+
+        # Tactical Export Action Buttons
+        col_btn1, col_btn2, _ = st.columns([1.2, 1.2, 2])
+        with col_btn1:
             st.download_button(
-                "📥 Download Tactical Clipboard Dossier (.txt)",
+                "⬇️ Download Playbook (.md)",
                 data=playbook_text,
-                file_name=f"OLYMPIA_Coach_Strategy_{target_athlete_name.replace(' ', '_')}.txt",
-                mime="text/plain",
+                file_name=f"OLYMPIA_Playbook_{target_athlete_name.replace(' ', '_')}.md",
+                mime="text/markdown",
+                use_container_width=True
+            )
+        with col_btn2:
+            telemetry_csv = pd.DataFrame([profile["radar_scores"]]).to_csv(index=False)
+            st.download_button(
+                "⬇️ Download Telemetry (.csv)",
+                data=telemetry_csv,
+                file_name=f"OLYMPIA_Telemetry_{target_athlete_name.replace(' ', '_')}.csv",
+                mime="text/csv",
                 use_container_width=True
             )

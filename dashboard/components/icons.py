@@ -175,3 +175,15 @@ def render_medal_pills(gold: int, silver: int, bronze: int) -> str:
     return re.sub(r'\s+', ' ', pills).strip()
 
 
+def get_olympic_rings_svg(width: int = 46, height: int = 22) -> str:
+    """Returns a sleek, modern neon geometric Olympic rings SVG."""
+    return f"""<svg width="{width}" height="{height}" viewBox="0 0 100 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+        <circle cx="20" cy="18" r="14" stroke="#00F0FF" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+        <circle cx="50" cy="18" r="14" stroke="#F8FAFC" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+        <circle cx="80" cy="18" r="14" stroke="#EF4444" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+        <circle cx="35" cy="30" r="14" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+        <circle cx="65" cy="30" r="14" stroke="#5DD62C" stroke-width="3" stroke-linecap="round" opacity="0.95"/>
+    </svg>"""
+
+
+

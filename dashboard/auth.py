@@ -357,8 +357,9 @@ def render_login_scrolling_background():
 
 def render_landing_page():
     """
-    Renders the modern, 3-role high-contrast dark authentication portal.
-    Users must authenticate before accessing the main dashboard.
+    Renders the futuristic, 3-role spatial authentication portal.
+    Weightless 3D floating glass hero card over animated aurora backdrop
+    with 3 isometric persona accreditation cards and instant 1-click initialization.
     """
     init_auth()
 
@@ -366,102 +367,126 @@ def render_landing_page():
     if not st.session_state.get("logged_in", False):
         render_login_scrolling_background()
 
-    # Hero Banner
-    # Forbes-style Hero Banner
-    brand_trophy = get_svg_icon("trophy", size=36, color="#5DD62C")
+    # Hero Section: Weightless 3D Floating Glass Hero
+    rings_svg = get_olympic_rings_svg(width=64, height=30)
+    brand_trophy = get_svg_icon("trophy", size=32, color="#5DD62C")
+
     _safe_html(f"""
-    <div style="text-align: center; padding: 2.2rem 1.1rem 1.6rem 1.1rem; background: #0A0A0A; border: 1px solid #222222; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 8px 30px rgba(0,0,0,0.7);">
-        <div style="display: flex; justify-content: center; margin-bottom: 0.6rem;">{brand_trophy}</div>
-        <div style="font-size: 0.8rem; color: #94A3B8; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.3rem;">
-            The World's Olympic Intelligence Platform
+    <div class="auth-aurora-hero">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
+            {rings_svg}
         </div>
-        <h1 style="font-family: 'Playfair Display', Georgia, serif !important; font-size: clamp(2.1rem, 6vw, 3.2rem); font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.1; letter-spacing: -0.01em;">
-            OLYMPIA
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: #5DD62C; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.4rem;">
+            ENTER THE OLYMPIC INTELLIGENCE VAULT
+        </div>
+        <h1 class="auth-hero-title" style="font-family: 'Space Grotesk', 'Playfair Display', sans-serif !important; font-size: clamp(2.4rem, 6.5vw, 3.8rem); font-weight: 900; color: #F8FAFC; margin: 0; line-height: 1.05; letter-spacing: -0.03em;">
+            OLYMPIA <span style="color: #5DD62C; font-weight: 400;">OS</span>
         </h1>
-        <div style="font-size: clamp(0.82rem, 2.4vw, 1rem); color: #5DD62C; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 0.4rem;">
-            Olympic Performance Analytics & Intelligence System
+        <div style="font-size: clamp(0.85rem, 2.5vw, 1.05rem); color: #94A3B8; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 0.5rem; font-family: 'Inter', sans-serif;">
+            F1-Style Olympic Telemetry • Star Schema Warehouse • Predictive Modeling
         </div>
-        <p style="max-width: 680px; margin: 0.8rem auto 0 auto; color: #94A3B8; font-size: clamp(0.85rem, 2vw, 0.95rem); line-height: 1.5;">
-            Explore 130 years of Olympic history (1896 – 2026) powered by a verified Star Schema Data Warehouse,
-            predictive machine learning, and multi-dimensional OLAP analytics.
+        <p style="max-width: 720px; margin: 0.9rem auto 0 auto; color: #CBD5E1; font-size: clamp(0.88rem, 2vw, 0.98rem); line-height: 1.6; font-family: 'Inter', sans-serif;">
+            Explore 130 years of Olympic history (1896 – 2026) through an offline-first Star Schema warehouse,
+            real-time tactical coach intelligence, and multi-dimensional OLAP cubes.
         </p>
     </div>
     """)
 
-    st.markdown("<h3 style='text-align: center; color: #F8F8F8; font-family: Playfair Display, serif; font-size: clamp(1.2rem, 3.5vw, 1.5rem); margin-bottom: 1.5rem;'>Choose Your Portal Experience</h3>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align: center; color: #94A3B8; font-family: Space Grotesk, sans-serif; font-size: 0.85rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; margin-bottom: 1.2rem;'>Select Identity to Initialize Session</div>", unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3, gap="medium")
 
-    icon_db = get_svg_icon("database", size=24, color="#5DD62C")
-    icon_tr = get_svg_icon("trophy", size=24, color="#A3E635")
-    icon_lt = get_svg_icon("lightning", size=24, color="#5DD62C")
+    icon_db = get_svg_icon("database", size=26, color="#38BDF8")
+    icon_tr = get_svg_icon("trophy", size=26, color="#F59E0B")
+    icon_lt = get_svg_icon("lightning", size=26, color="#5DD62C")
 
-    # 1. ADMIN ROLE CARD
+    # 1. SPORT ENTHUSIAST ROLE CARD
     with col1:
         _safe_html(f"""
-        <div class="auth-role-card" style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem 1.25rem; min-height: 270px; height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">
-            <div>
-                <div style="margin-bottom: 0.6rem;">{icon_db}</div>
-                <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 800; color: #F8F8F8;">Administrator</div>
-                <div style="font-size: 0.75rem; color: #5DD62C; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem;">Full System Access</div>
-                <div style="font-size: 0.88rem; color: #94A3B8; line-height: 1.45;">
-                    Data Warehouse inspection, ETL health, data quality audits, OLAP cube laboratory, and machine learning models.
+        <div class="persona-isometric-card enthusiast-card">
+            <div class="persona-card-header">
+                <div class="persona-icon-circle" style="background: rgba(245, 158, 11, 0.12); border-color: #F59E0B;">
+                    {icon_tr}
                 </div>
+                <span class="persona-clearance-badge" style="color: #F59E0B; border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.1);">
+                    CLEARANCE: TIER 1
+                </span>
             </div>
-            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem; margin-top: 0.8rem;">
-                Default user: <code style="color: #5DD62C;">admin</code>
+            <div class="persona-title">Sport Enthusiast</div>
+            <div class="persona-tagline">Visual Storyboards & Dynasties</div>
+            <ul class="persona-feature-list">
+                <li>🏆 3D Visual Olympic Podium & medal tallies</li>
+                <li>🌍 Interactive nation dominance maps & milestones</li>
+                <li>⚡ Legend profiles & multi-edition trajectories</li>
+            </ul>
+            <div class="persona-card-footer">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94A3B8;">Auto-Profile: <code style="color: #F59E0B;">fan</code></span>
             </div>
         </div>
         """)
         st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-        if st.button("Enter as Administrator", key="btn_quick_admin", use_container_width=True):
-            login("admin", ROLE_ADMIN, "System Administrator")
-
-    # 2. SPORT ENTHUSIAST ROLE CARD
-    with col2:
-        _safe_html(f"""
-        <div class="auth-role-card" style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem 1.25rem; min-height: 270px; height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">
-            <div>
-                <div style="margin-bottom: 0.6rem;">{icon_tr}</div>
-                <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 800; color: #F8F8F8;">Sport Enthusiast</div>
-                <div style="font-size: 0.75rem; color: #A3E635; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem;">Visual & Intuitive</div>
-                <div style="font-size: 0.88rem; color: #94A3B8; line-height: 1.45;">
-                    Engaging Olympic storyboards, country highlights, sport milestones, head-to-head nation showdowns, and medal trends.
-                </div>
-            </div>
-            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem; margin-top: 0.8rem;">
-                Default user: <code style="color: #A3E635;">fan</code>
-            </div>
-        </div>
-        """)
-        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-        if st.button("Enter as Enthusiast", key="btn_quick_fan", use_container_width=True):
+        if st.button("⚡ Initialize as Enthusiast →", key="btn_quick_fan", use_container_width=True):
             login("fan", ROLE_ENTHUSIAST, "Olympic Fan")
 
-    # 3. PLAYER / ACADEMY ROLE CARD
-    with col3:
+    # 2. PRO COACH / ACADEMY ROLE CARD
+    with col2:
         _safe_html(f"""
-        <div class="auth-role-card" style="background: #141414; border: 1px solid #262626; border-radius: 8px; padding: 1.4rem 1.25rem; min-height: 270px; height: auto; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 20px rgba(0,0,0,0.5); margin-bottom: 0.5rem;">
-            <div>
-                <div style="margin-bottom: 0.6rem;">{icon_lt}</div>
-                <div style="font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 800; color: #F8F8F8;">Player / Academy</div>
-                <div style="font-size: 0.75rem; color: #5DD62C; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem;">Performance Analytics</div>
-                <div style="font-size: 0.88rem; color: #94A3B8; line-height: 1.45;">
-                    Discipline competitiveness, competitor nation depth, global performance tiers, and historical Olympic benchmark trajectories.
+        <div class="persona-isometric-card coach-card">
+            <div class="persona-card-header">
+                <div class="persona-icon-circle" style="background: rgba(93, 214, 44, 0.14); border-color: #5DD62C;">
+                    {icon_lt}
                 </div>
+                <span class="persona-clearance-badge" style="color: #5DD62C; border-color: rgba(93, 214, 44, 0.4); background: rgba(93, 214, 44, 0.1);">
+                    CLEARANCE: PRO TACTICAL
+                </span>
             </div>
-            <div style="font-size: 0.75rem; color: #737373; border-top: 1px solid #222222; padding-top: 0.5rem; margin-top: 0.8rem;">
-                Default user: <code style="color: #5DD62C;">coach</code>
+            <div class="persona-title" style="color: #5DD62C;">Performance Coach</div>
+            <div class="persona-tagline">Kinetic Telemetry & Matchups</div>
+            <ul class="persona-feature-list">
+                <li>🎯 6D Athlete inclination radar & archetypes</li>
+                <li>⚔️ Head-to-head opponent scouting & win prob</li>
+                <li>🏁 Race pacing & aerodynamic drafting simulator</li>
+            </ul>
+            <div class="persona-card-footer">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94A3B8;">Auto-Profile: <code style="color: #5DD62C;">coach</code></span>
             </div>
         </div>
         """)
         st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
-        if st.button("Enter as Player / Academy", key="btn_quick_coach", use_container_width=True):
+        if st.button("⚡ Initialize as Pro Coach →", key="btn_quick_coach", use_container_width=True):
             login("coach", ROLE_ACADEMY, "Elite Sports Academy")
+
+    # 3. ADMIN ROLE CARD
+    with col3:
+        _safe_html(f"""
+        <div class="persona-isometric-card admin-card">
+            <div class="persona-card-header">
+                <div class="persona-icon-circle" style="background: rgba(56, 189, 248, 0.12); border-color: #38BDF8;">
+                    {icon_db}
+                </div>
+                <span class="persona-clearance-badge" style="color: #38BDF8; border-color: rgba(56, 189, 248, 0.4); background: rgba(56, 189, 248, 0.1);">
+                    CLEARANCE: ROOT ADMIN
+                </span>
+            </div>
+            <div class="persona-title">Data Architect</div>
+            <div class="persona-tagline">Warehouse & Machine Learning</div>
+            <ul class="persona-feature-list">
+                <li>🏛️ SQLite Star Schema & live table telemetry</li>
+                <li>🤖 5-Stage Data Mining & Predictive models</li>
+                <li>🎲 5D Multidimensional OLAP Cube operations</li>
+            </ul>
+            <div class="persona-card-footer">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #94A3B8;">Auto-Profile: <code style="color: #38BDF8;">admin</code></span>
+            </div>
+        </div>
+        """)
+        st.markdown("<div style='height: 8px;'></div>", unsafe_allow_html=True)
+        if st.button("⚡ Initialize as Admin →", key="btn_quick_admin", use_container_width=True):
+            login("admin", ROLE_ADMIN, "System Administrator")
 
     # Custom Credential Login Option
     st.markdown("<div style='height: 20px;'></div>", unsafe_allow_html=True)
-    with st.expander("Sign In with Custom Credentials"):
+    with st.expander("🔑 Secure Credential Authentication (Advanced)"):
         c1, c2, c3 = st.columns([2, 2, 1])
         with c1:
             uname = st.text_input("Username", placeholder="e.g. admin, fan, coach", key="login_uname")
@@ -478,56 +503,60 @@ def render_landing_page():
                     st.error("Invalid credentials. Demo accounts: admin / olympia2024, fan / olympia, coach / olympia")
 
     # Footer Metadata
-    st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 24px;'></div>", unsafe_allow_html=True)
     _safe_html("""
-    <div style="text-align: center; font-size: 0.78rem; color: #737373; border-top: 1px solid #222222; padding-top: 1.5rem;">
-        OLYMPIA System Architecture: Python 3 • SQLite3 Star Schema • Scikit-Learn • Plotly • Streamlit<br>
-        20,240 Verified Podium Medal Records (1896 Athens – 2024 Paris)
+    <div style="text-align: center; font-size: 0.75rem; color: #64748B; font-family: 'JetBrains Mono', monospace; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1.2rem;">
+        OLYMPIA OS // KINETIC TELEMETRY LAB • 20,582 VERIFIED MEDAL FACTS (1896 – 2026)
     </div>
     """)
 
 
 def render_sidebar_user_badge():
-    """Renders user info and a logout button in the sidebar."""
+    """
+    Renders the official Olympic VIP Accreditation Hologram Pass
+    featuring glowing status dot (ONLINE // SQLITE WAL), role clearance badge,
+    session uptime counter, and tactile Switch Persona / Logout micro-button.
+    """
     if not is_authenticated():
         return
 
     user = get_current_user()
     role = user["role"]
     role_meta = ROLE_DISPLAY.get(role, ROLE_DISPLAY[ROLE_ENTHUSIAST])
+    role_color = role_meta["badge_color"]
 
     _safe_html(f"""
-    <div style="
-        background: #141414;
-        border: 1px solid #262626;
-        border-radius: 8px;
-        padding: 0.8rem 1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-    ">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div style="font-weight: 800; color: #F8F8F8; font-size: 0.95rem; display: flex; align-items: center; gap: 0.4rem;">
-                {role_meta['icon']} {user['fullname']}
+    <div class="vip-accreditation-pass">
+        <div class="pass-hologram-strip"></div>
+        <div class="pass-header">
+            <div class="pass-status-dot-wrap">
+                <span class="pass-pulse-dot"></span>
+                <span class="pass-status-text">ONLINE // SQLITE WAL</span>
             </div>
-            <span style="
-                background: {role_meta.get('badge_bg', 'rgba(93, 214, 44, 0.15)')};
-                color: {role_meta['badge_color']};
-                border: 1px solid {role_meta['badge_color']};
-                font-size: 0.65rem;
-                font-weight: 800;
-                padding: 0.15rem 0.5rem;
-                border-radius: 9999px;
-                text-transform: uppercase;
-                letter-spacing: 0.05em;
-            ">
+            <span class="pass-clearance-chip" style="color: {role_color}; border-color: {role_color};">
                 {role_meta['title']}
             </span>
         </div>
-        <div style="font-size: 0.75rem; color: #737373; margin-top: 0.3rem;">
-            User ID: <code style="color: #5DD62C;">{user['username']}</code>
+        <div class="pass-body">
+            <div class="pass-user-name">{user['fullname']}</div>
+            <div class="pass-details-row">
+                <span>ID: <code style="color: #5DD62C;">{user['username']}</code></span>
+                <span>CLEARANCE: <strong style="color: {role_color};">ACTIVE</strong></span>
+            </div>
+        </div>
+        <div class="pass-footer">
+            <span class="pass-session-clock">SESSION // ACTIVE</span>
+            <span style="color: #64748B;">•</span>
+            <span style="color: #94A3B8; font-size: 0.7rem;">OFFLINE ENGINE</span>
         </div>
     </div>
     """)
 
-    if st.sidebar.button("Log Out", key="sidebar_logout_btn", use_container_width=True):
-        logout()
+    col_btn1, col_btn2 = st.sidebar.columns(2)
+    with col_btn1:
+        if st.sidebar.button("🔄 Switch Persona", key="sidebar_switch_persona_btn", use_container_width=True):
+            logout()
+    with col_btn2:
+        if st.sidebar.button("🚪 Log Out", key="sidebar_logout_btn", use_container_width=True):
+            logout()
+

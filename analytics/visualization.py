@@ -46,40 +46,40 @@ OLYMPIC_COLORS = [
 
 
 def apply_dark_theme(fig: go.Figure, title: str = "", x_title: str = "", y_title: str = "") -> go.Figure:
-    """Applies a consistent, polished dark theme to any Plotly figure using the high-contrast palette."""
+    """Applies a consistent, polished dark telemetry theme to any Plotly figure."""
     fig.update_layout(
         title={
             "text": f"<b>{title}</b>" if title else "",
-            "font": {"size": 16, "color": TEXT_COLOR, "family": "Inter, Roboto, sans-serif"},
+            "font": {"size": 15, "color": "#F8FAFC", "family": "Space Grotesk, Inter, sans-serif"},
             "x": 0.02,
             "xanchor": "left"
-        },
-        paper_bgcolor=PAPER_BG,
-        plot_bgcolor=THEME_BG,
-        font={"color": TEXT_COLOR, "family": "Inter, Roboto, sans-serif"},
+        } if title else None,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font={"color": "#F8FAFC", "family": "Inter, sans-serif"},
         xaxis={
-            "title": x_title,
-            "gridcolor": GRID_COLOR,
-            "zerolinecolor": GRID_COLOR,
-            "tickfont": {"color": "#B0B0B0"},
+            "title": dict(text=x_title, font=dict(color="#94A3B8", size=11, family="Inter, sans-serif")) if x_title else None,
+            "gridcolor": "rgba(255, 255, 255, 0.05)",
+            "zerolinecolor": "rgba(255, 255, 255, 0.12)",
+            "tickfont": {"color": "#94A3B8", "family": "JetBrains Mono, monospace", "size": 10},
         },
         yaxis={
-            "title": y_title,
-            "gridcolor": GRID_COLOR,
-            "zerolinecolor": GRID_COLOR,
-            "tickfont": {"color": "#B0B0B0"},
+            "title": dict(text=y_title, font=dict(color="#94A3B8", size=11, family="Inter, sans-serif")) if y_title else None,
+            "gridcolor": "rgba(255, 255, 255, 0.05)",
+            "zerolinecolor": "rgba(255, 255, 255, 0.12)",
+            "tickfont": {"color": "#94A3B8", "family": "JetBrains Mono, monospace", "size": 10},
         },
         legend={
-            "bgcolor": "rgba(32, 32, 32, 0.85)",
-            "bordercolor": SECONDARY_ACCENT,
-            "font": {"color": TEXT_COLOR},
+            "bgcolor": "rgba(20, 22, 27, 0.75)",
+            "bordercolor": "rgba(255, 255, 255, 0.08)",
+            "font": {"color": "#F8FAFC", "family": "Inter, sans-serif", "size": 11},
         },
         hoverlabel={
-            "bgcolor": "#202020",
-            "font": {"color": "#F8F8F8", "family": "Inter, sans-serif"},
+            "bgcolor": "#14161B",
+            "font": {"color": "#F8FAFC", "family": "JetBrains Mono, monospace", "size": 12},
             "bordercolor": PRIMARY_ACCENT
         },
-        margin={"l": 50, "r": 30, "t": 60, "b": 50},
+        margin={"l": 30, "r": 20, "t": 45 if title else 25, "b": 30},
         autosize=True
     )
     return fig
