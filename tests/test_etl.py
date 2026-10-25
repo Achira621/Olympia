@@ -46,8 +46,8 @@ class TestETLPipeline(unittest.TestCase):
             subset = clean_df[clean_df["medal"] == medal_name]
             self.assertTrue((subset["medal_points"] == pts).all())
 
-        # Total clean records
-        self.assertEqual(len(clean_df), 20240)
+        # Total clean records (inclusive of 2026 Milano-Cortina Winter Olympics)
+        self.assertEqual(len(clean_df), 20582)
 
 
 if __name__ == "__main__":

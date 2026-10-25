@@ -1,6 +1,6 @@
 # 🏅 OLYMPIA: Olympic Performance Analytics & Intelligence System
 
-A comprehensive, offline-first Data Warehousing and Data Mining analytics platform built on the complete historical Olympic Games dataset (1896 – 2024).
+A comprehensive, offline-first Data Warehousing and Data Mining analytics platform built on the complete historical Olympic Games dataset (1896 – 2026).
 
 ---
 
@@ -15,7 +15,7 @@ For over a century, the Olympic Games have produced vast quantities of multidime
 - Lack of centralized dimensional modeling (Star Schema) for fast analytical processing.
 - Disconnected analytical scripts that fail to provide an integrated decision-support environment for OLAP, regression forecasting, classification, clustering, and association rule discovery.
 
-OLYMPIA solves this problem by integrating a Star Schema Data Warehouse, an automated ETL pipeline, and interactive Data Mining algorithms into a unified dark-themed analytical dashboard.
+OLYMPIA solves this problem by integrating a Star Schema Data Warehouse, an automated ETL pipeline, interactive Data Mining algorithms, and an enterprise-grade Coach Strategy & Player Inclination Studio into a unified dark-themed analytical dashboard.
 
 ---
 
@@ -24,25 +24,26 @@ To build an end-to-end, reproducible Data Warehousing and Data Mining system tha
 1. **Data Warehousing & Star Schema Modeling** (Centralized Fact table with 5 Dimension tables).
 2. **Automated ETL Pipeline** (Extract, Clean, Normalize, and Load into SQLite).
 3. **Multidimensional OLAP Operations** (Roll-Up, Drill-Down, Slice, Dice, and Pivot).
-4. **Data Visualization Laboratory** (Bar, Line, Scatter, Histogram, Box Plot).
+4. **Data Visualization Laboratory** (Bar, Line, Scatter, Histogram, Box Plot, Polar Radar).
 5. **Data Preprocessing & Quality Analysis** (Encoding, Scaling, PCA Dimensionality Reduction).
 6. **Supervised Regression Modeling** (Predicting national medal counts with zero future data leakage).
 7. **Supervised Classification Modeling** (Decision Tree vs. Naive Bayes for podium outcome prediction).
 8. **Unsupervised Clustering Modeling** (K-Means with Elbow Analysis & Agglomerative Hierarchical Clustering with Dendrograms).
 9. **Association Rule Mining** (Apriori market-basket analysis on multi-sport winning affinities).
-10. **Interactive Decision-Support Interface** (Streamlit dashboard with dynamic filtering and viva explanations).
+10. **Coach Strategy & Player Inclination Studio** (Behavioral archetypes, fatigue drift modeling, head-to-head opponent scouting, and what-if pacing simulation).
+11. **Interactive Decision-Support Interface** (Streamlit dashboard built with Antigravity Motion Design and Emil Kowalski interaction engineering).
 
 ---
 
 ## 4. Dataset Description
 - **Source File:** `all_olympic_medalists.csv`
-- **Total Raw Records:** 20,247 rows × 10 columns
-- **Temporal Span:** 1896 (Athens) to 2024 (Paris) across 53 Olympic editions.
+- **Total Raw Records:** 20,589 rows × 10 columns
+- **Temporal Span:** 1896 (Athens) to 2026 (Milano-Cortina) across 54 Olympic editions.
 - **Attributes:**
-  - `season`: Summer (16,747) or Winter (3,500).
-  - `year`: Competition year (1896 – 2024).
+  - `season`: Summer (16,747) or Winter (3,842).
+  - `year`: Competition year (1896 – 2026).
   - `medal`: Gold, Silver, Bronze.
-  - `country_code`: 3-letter National Olympic Committee (NOC) code (158 unique codes).
+  - `country_code`: 3-letter National Olympic Committee (NOC) code (169 unique codes).
   - `country`: Full country name (168 historical names).
   - `athletes`: Competing athlete names or team representation.
   - `games`: Host city edition (e.g., `1896 Athens`, `2024 Paris`).
@@ -362,9 +363,9 @@ olympia/
 ---
 
 ## 17. Expected Output
-- **Console / Terminal:** Clean extraction, transform, and load logs showing 20,240 fact records loaded with zero FK violations.
-- **Unit Tests:** `Ran 18 tests in ~2.5s ... OK`.
-- **Browser:** Dark-themed analytics dashboard accessible at `http://localhost:8501`, featuring 11 interactive pages, responsive cards, Plotly charts, and downloadable tables.
+- **Console / Terminal:** Clean extraction, transform, and load logs showing 20,582 fact records loaded with zero FK violations across 54 Olympic editions (1896 – 2026).
+- **Unit Tests:** `Ran 32 tests in ~6.8s ... OK`.
+- **Browser:** Dark-themed analytics dashboard accessible at `http://localhost:8501`, featuring Coach Strategy Studio, interactive 3D perspective cards, responsive radar charts, and downloadable tactical dossiers.
 
 ---
 

@@ -30,14 +30,14 @@ class TestDatabaseWarehouse(unittest.TestCase):
         self.assertTrue(expected_tables.issubset(tables))
 
     def test_table_row_counts(self):
-        """Verify exact row counts for dimensions and facts."""
+        """Verify exact row counts for dimensions and facts including 2026 Milano-Cortina."""
         counts = get_table_counts()
-        self.assertEqual(counts["dim_game"], 53)
-        self.assertEqual(counts["dim_country"], 168)
-        self.assertEqual(counts["dim_sport"], 77)
-        self.assertEqual(counts["dim_event"], 1006)
+        self.assertEqual(counts["dim_game"], 54)
+        self.assertEqual(counts["dim_country"], 169)
+        self.assertEqual(counts["dim_sport"], 78)
+        self.assertEqual(counts["dim_event"], 1093)
         self.assertEqual(counts["dim_medal"], 3)
-        self.assertEqual(counts["fact_medal"], 20240)
+        self.assertEqual(counts["fact_medal"], 20582)
 
     def test_foreign_key_integrity(self):
         """Verify no orphaned foreign keys in fact_medal."""
@@ -47,9 +47,9 @@ class TestDatabaseWarehouse(unittest.TestCase):
         self.assertEqual(len(violations), 0, f"Foreign key violations found: {violations}")
 
     def test_star_join_denormalization(self):
-        """Verify star join returns all 20,240 records with all dimension attributes."""
+        """Verify star join returns all records with all dimension attributes."""
         df = get_denormalized_medals()
-        self.assertEqual(len(df), 20240)
+        self.assertEqual(len(df), 20582)
         expected_columns = {
             "medal_fact_id", "year", "season", "games",
             "country_code", "country", "sport", "event_name",

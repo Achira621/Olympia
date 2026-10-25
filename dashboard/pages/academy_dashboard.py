@@ -13,6 +13,7 @@ import pandas as pd
 from warehouse.warehouse import get_denormalized_medals
 from dashboard.components.metrics import render_kpi_row, render_viva_note, render_forbes_masthead
 from dashboard.components.charts import display_chart
+from dashboard.components.coach_strategy_ui import render_coach_strategy_studio
 from analytics.visualization import (
     create_bar_chart,
     create_line_chart,
@@ -28,10 +29,25 @@ def render_page(df: pd.DataFrame = None):
     render_forbes_masthead(
         tag="The World's",
         title="High-Performance Academy Intelligence",
-        subtitle="Olympic competitive landscape, discipline depth, historical benchmarks, and national talent distribution across 1896 – 2024.",
+        subtitle="Olympic competitive landscape, discipline depth, historical benchmarks, and national talent distribution across 1896 – 2026.",
         badge_text="Biomechanical Benchmarks • SQLite Star Schema Live",
         badge_status="Performance Active"
     )
+
+    acad_mode = st.radio(
+        "Academy Workspace View:",
+        options=[
+            "🎯 Coach Strategy & Player Inclination Studio",
+            "📊 Discipline Depth & Parity Benchmarks"
+        ],
+        index=0,
+        horizontal=True,
+        key="acad_workspace_toggle"
+    )
+
+    if "Strategy" in acad_mode or "Coach" in acad_mode:
+        render_coach_strategy_studio(df)
+        return
 
     # 1. High Performance KPIs
     total_medals = len(df)

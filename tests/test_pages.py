@@ -27,6 +27,7 @@ from dashboard.pages import (
     clustering,
     association_rules,
     warehouse,
+    coach_strategy,
 )
 
 
@@ -93,6 +94,12 @@ class TestOlympiaPages(unittest.TestCase):
         # Apriori
         apr = mine_association_rules(df=self.df, min_support=0.08, min_confidence=0.4)
         self.assertIn("status", apr)
+
+    def test_coach_strategy_page_callable(self):
+        """Verify coach_strategy page module and functions are accessible."""
+        self.assertTrue(hasattr(coach_strategy, "render_page"))
+        from dashboard.components.coach_strategy_ui import FEATURED_ATHLETES
+        self.assertGreater(len(FEATURED_ATHLETES), 5)
 
 
 if __name__ == "__main__":

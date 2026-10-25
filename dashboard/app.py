@@ -75,6 +75,7 @@ from dashboard.auth import (
 )
 from dashboard.components.icons import get_svg_icon, render_medal_pills
 from dashboard.components.knowledge_api import get_athlete_intel, get_country_intel
+from dashboard.components.coach_strategy_ui import render_coach_strategy_studio
 
 
 # ------------------------------------------------------------
@@ -565,7 +566,8 @@ with st.sidebar:
                 "Podium & Medal Tally",
                 "OLAP Cube (Slice & Dice)",
                 "Data Mining Arena",
-                "Athlete Hall of Fame"
+                "Athlete Hall of Fame",
+                "Coach Strategy Studio"
             ],
             index=0,
             label_visibility="collapsed",
@@ -619,7 +621,7 @@ with st.sidebar:
     <div style="font-size: 0.78rem; color: #A0A0A0; line-height: 1.5;">
         <strong style="color: #F8F8F8;">Active Role:</strong> <span style="color: #5DD62C; font-weight: 700;">{active_role.capitalize()}</span><br>
         <strong style="color: #F8F8F8;">Warehouse Engine:</strong> SQLite3 Star Schema<br>
-        <strong style="color: #F8F8F8;">Historical Span:</strong> 1896 – 2024 ({max_year_master - min_year_master} Years)<br>
+        <strong style="color: #F8F8F8;">Historical Span:</strong> 1896 – 2026 ({max_year_master - min_year_master} Years)<br>
         <strong style="color: #F8F8F8;">Fact Medals:</strong> {len(df_master):,} verified records
     </div>
     """)
@@ -898,7 +900,7 @@ def render_professional_dashboard(df: pd.DataFrame):
             Sports Science & Academy Intelligence
         </h1>
         <div style="color: #94A3B8; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
-            Biomechanical Benchmarks, Era Deep-Dives & The Predictive Athlete Potential Engine Across 1896 – 2024.
+            Biomechanical Benchmarks, Era Deep-Dives & The Predictive Athlete Potential Engine Across 1896 – 2026.
         </div>
         <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #141414; border: 1px solid #262626; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #94A3B8;">
             <span style="color: #5DD62C; font-weight: 700;">Performance Engine Active</span> Biomechanical Modeling • SQLite Star Schema Live
@@ -938,6 +940,22 @@ def render_professional_dashboard(df: pd.DataFrame):
         </div>
     </div>
     """)
+
+    # WORKSPACE VIEW SELECTOR (Coach Strategy Studio vs Sports Science Biomechanics)
+    prof_workspace_mode = st.radio(
+        "Select Professional Workspace Module:",
+        options=[
+            "🎯 Coach Strategy & Player Inclination Studio",
+            "🧬 Sports Science, Potential Engine & Parity Analytics"
+        ],
+        index=0,
+        horizontal=True,
+        key="prof_workspace_view_toggle"
+    )
+
+    if "Strategy" in prof_workspace_mode or "Coach" in prof_workspace_mode:
+        render_coach_strategy_studio(df)
+        return
 
     # 2. CRUCIAL FEATURE: PREDICT YOUR POTENTIAL MODULE
     st.markdown("### The Predict Your Potential Biomechanical Module")
@@ -2721,6 +2739,8 @@ elif "Mining" in selected_mode or selected_mode == "🤖 Data Mining Arena":
     render_data_mining_view(filtered_df, df_master)
 elif "Athlete" in selected_mode or "Hall" in selected_mode or selected_mode == "⚡ Athlete Hall of Fame":
     render_hall_of_fame_view(df_master)
+elif "Coach" in selected_mode or "Strategy" in selected_mode:
+    render_coach_strategy_studio(filtered_df)
 else:
     render_podium_view(filtered_df)
 

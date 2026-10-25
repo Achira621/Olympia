@@ -62,7 +62,7 @@ class TestAnalyticsSuite(unittest.TestCase):
     def test_olap_pivot(self):
         pivot_df = olap_pivot(self.df, rows="country", columns="medal")
         self.assertEqual(pivot_df.iloc[0]["country"], "United States")
-        self.assertEqual(pivot_df.iloc[0]["Total"], 2975)
+        self.assertEqual(pivot_df.iloc[0]["Total"], 3008)
 
     # --- Machine Learning Tests ---
     def test_linear_regression(self):
