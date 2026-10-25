@@ -1,0 +1,177 @@
+"""
+Custom SVG Icon Library for OLYMPIA.
+Replaces all emojis with crisp, lightweight, resolution-independent SVG vector icons
+modeled after Forbes' minimalist editorial design system.
+"""
+
+import re
+
+# Palette Constants
+COLOR_GOLD = "#F59E0B"
+COLOR_SILVER = "#E2E8F0"
+COLOR_BRONZE = "#D97706"
+COLOR_GREEN = "#10B981"
+COLOR_RED = "#EF4444"
+COLOR_BLUE = "#38BDF8"
+COLOR_MUTED = "#94A3B8"
+COLOR_WHITE = "#F8FAFC"
+COLOR_ACCENT = "#5DD62C"
+
+
+# Emoji to Icon Name Alias Dictionary for 100% Emoji Replacement
+EMOJI_ALIASES = {
+    "🥇": "gold_medal",
+    "🥈": "silver_medal",
+    "🥉": "bronze_medal",
+    "🏅": "gold_medal",
+    "🏆": "trophy",
+    "⚡": "lightning",
+    "🌐": "globe",
+    "🌍": "globe",
+    "📅": "calendar",
+    "🔍": "search",
+    "🔎": "search",
+    "📊": "chart",
+    "📈": "trend_up",
+    "📉": "trend_down",
+    "🏛️": "database",
+    "🗄️": "database",
+    "💾": "database",
+    "👥": "user",
+    "👤": "user",
+    "⭐": "star",
+    "🎯": "star",
+    "🔥": "lightning",
+    "🕒": "calendar",
+    "🛡️": "trophy",
+    "🏃": "lightning",
+    "📜": "chart",
+    "🧊": "database",
+    "🤖": "chart",
+    "✏️": "chart",
+    "➕": "trend_up",
+    "🗑️": "trend_down",
+    "💡": "lightning",
+    "📌": "star",
+    "⚠️": "trend_down"
+}
+
+
+def get_svg_icon(name: str, size: int = 18, color: str = "currentColor", stroke_width: float = 1.8) -> str:
+    """
+    Returns an inline SVG string for the requested icon name or emoji alias.
+    """
+    if not name:
+        return ""
+    
+    # Check if name is an emoji alias
+    resolved_name = EMOJI_ALIASES.get(name.strip(), name.strip())
+
+    svg_map = {
+        "gold_medal": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <circle cx="12" cy="14" r="7" fill="{COLOR_GOLD}" fill-opacity="0.25" stroke="{COLOR_GOLD}" stroke-width="{stroke_width}"/>
+            <path d="M12 11V17M10 13H14" stroke="{COLOR_GOLD}" stroke-width="{stroke_width}" stroke-linecap="round"/>
+            <path d="M8 7L6 3H9L12 7M16 7L18 3H15L12 7" stroke="{COLOR_GOLD}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "silver_medal": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <circle cx="12" cy="14" r="7" fill="{COLOR_SILVER}" fill-opacity="0.2" stroke="{COLOR_SILVER}" stroke-width="{stroke_width}"/>
+            <path d="M12 11V17M10 13H14" stroke="{COLOR_SILVER}" stroke-width="{stroke_width}" stroke-linecap="round"/>
+            <path d="M8 7L6 3H9L12 7M16 7L18 3H15L12 7" stroke="{COLOR_SILVER}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "bronze_medal": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <circle cx="12" cy="14" r="7" fill="{COLOR_BRONZE}" fill-opacity="0.25" stroke="{COLOR_BRONZE}" stroke-width="{stroke_width}"/>
+            <path d="M12 11V17M10 13H14" stroke="{COLOR_BRONZE}" stroke-width="{stroke_width}" stroke-linecap="round"/>
+            <path d="M8 7L6 3H9L12 7M16 7L18 3H15L12 7" stroke="{COLOR_BRONZE}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "trophy": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M8 21H16M12 17V21M6 4H18V9C18 12.3137 15.3137 15 12 15C8.68629 15 6 12.3137 6 9V4ZM6 6H3V8C3 9.65685 4.34315 11 6 11V6ZM18 6H21V8C21 9.65685 19.6569 11 18 11V6Z" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "podium": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M3 20H21M4 20V12H9V20M9 20V8H15V20M15 20V14H20V20" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "search": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <circle cx="11" cy="11" r="7" stroke="{color}" stroke-width="{stroke_width}"/>
+            <path d="M20 20L16 16" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round"/>
+        </svg>
+        """,
+        "trend_up": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M7 17L17 7M17 7H9M17 7V15" stroke="{COLOR_GREEN}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "trend_down": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M7 7L17 17M17 17H9M17 17V9" stroke="{COLOR_RED}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "chevron_down": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M6 9L12 15L18 9" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "filter": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M3 4H21V6.5L14 13.5V19L10 21V13.5L3 6.5V4Z" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "globe": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <circle cx="12" cy="12" r="9" stroke="{color}" stroke-width="{stroke_width}"/>
+            <path d="M3 12H21M12 3C14.5 5.5 16 8.5 16 12C16 15.5 14.5 18.5 12 21C9.5 18.5 8 15.5 8 12C8 8.5 9.5 5.5 12 3Z" stroke="{color}" stroke-width="{stroke_width}"/>
+        </svg>
+        """,
+        "calendar": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <rect x="3" y="5" width="18" height="16" rx="2" stroke="{color}" stroke-width="{stroke_width}"/>
+            <path d="M3 10H21M8 3V7M16 3V7" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round"/>
+        </svg>
+        """,
+        "lightning": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="{COLOR_ACCENT}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "chart": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <path d="M4 20H20M6 16V14M11 16V9M16 16V5" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        """,
+        "database": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <ellipse cx="12" cy="5" rx="8" ry="3" stroke="{color}" stroke-width="{stroke_width}"/>
+            <path d="M4 5V12C4 13.6569 7.58172 15 12 15C16.4183 15 20 13.6569 20 12V5M4 12V19C4 20.6569 7.58172 22 12 22C16.4183 22 20 20.6569 20 19V12" stroke="{color}" stroke-width="{stroke_width}"/>
+        </svg>
+        """,
+        "user": f"""
+        <svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;">
+            <circle cx="12" cy="8" r="4" stroke="{color}" stroke-width="{stroke_width}"/>
+            <path d="M5 20C5 16.5 8 14 12 14C16 14 19 16.5 19 20" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round"/>
+        </svg>
+        """,
+        "star": f"""<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" stroke="{COLOR_GOLD}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round" fill="{COLOR_GOLD}" fill-opacity="0.2"/></svg>""",
+        "arrow_right": f"""<svg width="{size}" height="{size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; display: inline-block;"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="{color}" stroke-width="{stroke_width}" stroke-linecap="round" stroke-linejoin="round"/></svg>"""
+    }
+    raw_svg = svg_map.get(resolved_name, f"""<span style="font-size: {size}px; color: {color};">•</span>""")
+    return re.sub(r'\s+', ' ', raw_svg).strip()
+
+
+def render_medal_pills(gold: int, silver: int, bronze: int) -> str:
+    """Returns compact HTML badges with custom SVG icons for gold, silver, bronze."""
+    g_svg = get_svg_icon("gold_medal", size=15)
+    s_svg = get_svg_icon("silver_medal", size=15)
+    b_svg = get_svg_icon("bronze_medal", size=15)
+    pills = f"""<div style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; font-weight: 600;"><span style="display: inline-flex; align-items: center; gap: 0.25rem; color: {COLOR_GOLD};">{g_svg} {gold:,}</span><span style="display: inline-flex; align-items: center; gap: 0.25rem; color: {COLOR_SILVER};">{s_svg} {silver:,}</span><span style="display: inline-flex; align-items: center; gap: 0.25rem; color: {COLOR_BRONZE};">{b_svg} {bronze:,}</span></div>"""
+    return re.sub(r'\s+', ' ', pills).strip()
+
+

@@ -1,0 +1,27 @@
+{
+  "include": [
+    ".",
+    "dashboard",
+    "warehouse",
+    "analytics",
+    "tests"
+  ],
+  "executionEnvironments": [
+    {
+      "root": ".",
+      "extraPaths": [
+        ".",
+        "d:/Olympia-main/Olympia-main",
+        "d:/Olympia-main"
+      ]
+    }
+  ],
+  "extraPaths": [
+    ".",
+    "d:/Olympia-main/Olympia-main",
+    "d:/Olympia-main",
+    "C:/Users/varad/AppData/Local/Python/pythoncore-3.14-64/Lib/site-packages",
+    "C:/Users/varad/AppData/Local/Programs/Python/Python311/Lib/site-packages"
+  ],
+  "reportMissingImports": "none"
+}
