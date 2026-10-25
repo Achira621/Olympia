@@ -13,15 +13,27 @@ DEFAULT_DB_PATH = os.path.join("database", "olympics.db")
 
 
 def get_db_path() -> str:
-    """Finds the database file path."""
+    """Finds the database file path, auto-initializing via ETL if missing."""
     candidates = [
         DEFAULT_DB_PATH,
+        os.path.join(os.path.dirname(__file__), "..", "database", "olympics.db"),
         os.path.join("..", "database", "olympics.db"),
         os.path.join(".", "olympics.db")
     ]
     for c in candidates:
         if os.path.exists(c):
-            return c
+            return os.path.abspath(c)
+
+    # Auto-initialize database via ETL if not found (e.g. freshly deployed container)
+    try:
+        from etl.load import run_etl
+        print("[WAREHOUSE] olympics.db not found. Auto-running ETL pipeline to initialize warehouse...")
+        run_etl()
+        if os.path.exists(DEFAULT_DB_PATH):
+            return os.path.abspath(DEFAULT_DB_PATH)
+    except Exception as e:
+        print(f"[WAREHOUSE WARNING] Could not auto-initialize DB: {e}")
+
     return DEFAULT_DB_PATH
 
 
