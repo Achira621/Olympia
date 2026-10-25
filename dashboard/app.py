@@ -728,24 +728,52 @@ with st.sidebar:
     </div>
     """)
 
-    if active_role == "enthusiast":
+    if active_role == "professional":
+        st.markdown(f"**Coaching & Performance Navigation**")
+        selected_mode = st.sidebar.radio(
+            "Coaching & Performance Navigation",
+            options=[
+                "Coach Strategy Studio",
+                "Discipline Depth & Parity",
+                "Athlete Hall of Fame & Scouting",
+                "Podium & Medal Benchmarks",
+                "OLAP Cube (Slice & Dice)"
+            ],
+            index=0,
+            label_visibility="collapsed",
+            key="coach_mode_controller"
+        )
+    elif active_role == "admin":
+        st.markdown(f"**Administration Navigation**")
+        selected_mode = st.sidebar.radio(
+            "Administration Navigation",
+            options=[
+                "Warehouse Administration",
+                "Data Mining Arena",
+                "OLAP Cube (Slice & Dice)",
+                "Podium & Medal Tally",
+                "Coach Strategy Studio"
+            ],
+            index=0,
+            label_visibility="collapsed",
+            key="admin_mode_controller"
+        )
+    else:
         # Mode Toggle for Enthusiast without emojis
         st.markdown(f"**Navigation Workspace**")
         selected_mode = st.sidebar.radio(
             "Navigation Workspace",
             options=[
                 "Podium & Medal Tally",
-                "OLAP Cube (Slice & Dice)",
-                "Data Mining Arena",
+                "Coach Strategy Studio",
                 "Athlete Hall of Fame",
-                "Coach Strategy Studio"
+                "OLAP Cube (Slice & Dice)",
+                "Data Mining Arena"
             ],
             index=0,
             label_visibility="collapsed",
             key="quick_mode_controller"
         )
-    else:
-        selected_mode = None
 
     st.markdown("---")
     render_html(f"<div style='font-size: 0.82rem; font-weight: 700; color: #F8FAFC; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;'>{filter_icon} Filter Controls</div>")
@@ -2902,16 +2930,28 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
 # ------------------------------------------------------------
 # 10. CONDITIONAL PAGE ROUTING
 # ------------------------------------------------------------
-if "Podium" in selected_mode or selected_mode == "🏆 The Podium & Medal Tally":
-    render_podium_view(filtered_df)
-elif "OLAP" in selected_mode or selected_mode == "🔍 OLAP Cube (Slice & Dice)":
-    render_olap_view(filtered_df, all_countries)
-elif "Mining" in selected_mode or selected_mode == "🤖 Data Mining Arena":
-    render_data_mining_view(filtered_df, df_master)
-elif "Athlete" in selected_mode or "Hall" in selected_mode or selected_mode == "⚡ Athlete Hall of Fame":
-    render_hall_of_fame_view(df_master)
-elif "Coach" in selected_mode or "Strategy" in selected_mode:
+mode = str(selected_mode or "")
+
+if "Warehouse" in mode or "Administration" in mode or (active_role == "admin" and not selected_mode):
+    render_admin_dashboard(filtered_df)
+elif "Coach" in mode or "Strategy" in mode or (active_role == "professional" and not selected_mode):
     render_coach_strategy_studio(filtered_df)
-else:
+elif "Depth" in mode or "Parity" in mode:
+    from dashboard.pages.academy_dashboard import render_page as render_academy_page
+    render_academy_page(filtered_df)
+elif "OLAP" in mode:
+    render_olap_view(filtered_df, all_countries)
+elif "Mining" in mode:
+    render_data_mining_view(filtered_df, df_master)
+elif "Athlete" in mode or "Hall" in mode or "Scouting" in mode:
+    render_hall_of_fame_view(df_master)
+elif "Podium" in mode or "Benchmarks" in mode:
     render_podium_view(filtered_df)
+else:
+    if active_role == "admin":
+        render_admin_dashboard(filtered_df)
+    elif active_role == "professional":
+        render_coach_strategy_studio(filtered_df)
+    else:
+        render_podium_view(filtered_df)
 

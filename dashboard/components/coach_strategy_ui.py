@@ -213,8 +213,8 @@ def plot_inclination_radar(athlete_profile: dict) -> go.Figure:
             ),
             bgcolor='rgba(15, 15, 15, 0.6)'
         ),
-        paper_bgcolor='transparent',
-        plot_bgcolor='transparent',
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=25, r=25, t=25, b=25),
         legend=dict(
             orientation="h",
@@ -381,8 +381,8 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
         fig_drift.update_layout(
             yaxis=dict(title="Velocity Index (%)", range=[80, 110]),
             yaxis2=dict(title="Error Risk (%)", overlaying="y", side="right", range=[0, 20]),
-            paper_bgcolor="transparent",
-            plot_bgcolor="transparent",
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
             height=320,
             legend=dict(orientation="h", y=1.15, x=0.2)
         )
@@ -508,8 +508,8 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
             ))
             fig_eng.update_layout(
                 yaxis=dict(title="Metabolic Energy Reserve (%)", range=[0, 105]),
-                paper_bgcolor="transparent",
-                plot_bgcolor="transparent",
+                paper_bgcolor="rgba(0,0,0,0)",
+                plot_bgcolor="rgba(0,0,0,0)",
                 height=300
             )
             fig_eng = apply_dark_theme(fig_eng)
@@ -523,7 +523,7 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                 labels={"x": "Race Phase", "y": "Velocity Index (km/h)"},
                 color_discrete_sequence=["#38BDF8"]
             )
-            fig_spd.update_layout(paper_bgcolor="transparent", plot_bgcolor="transparent", height=300)
+            fig_spd.update_layout(paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", height=300)
             fig_spd = apply_dark_theme(fig_spd)
             st.plotly_chart(fig_spd, use_container_width=True)
 
