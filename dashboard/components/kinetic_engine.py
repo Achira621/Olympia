@@ -5,8 +5,10 @@ Injects a parent-document JavaScript physics engine, HTML5 canvas ember/vortex p
 and mechanical typography decoders directly onto the Streamlit root DOM.
 """
 
+import re
 import streamlit as st
 import streamlit.components.v1 as components
+
 
 KINETIC_PARENT_SCRIPT = """
 <script>
@@ -281,156 +283,249 @@ KINETIC_PARENT_SCRIPT = """
     }
 
     // ============================================================
-    // 3. HTML5 <canvas> GOLDEN EMBER & CONSTELLATION FIELD
+    // 3. HTML5 <canvas> OLYMPIC TORCH FLAME & CONVECTIVE FIRE TRAIL
     // ============================================================
-    let canvas = parentDoc.getElementById("olympia-ember-canvas");
-    if (!canvas) {
-        canvas = parentDoc.createElement("canvas");
-        canvas.id = "olympia-ember-canvas";
-        canvas.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999998; opacity: 0.85;";
-        parentDoc.body.appendChild(canvas);
+    // Clean up any prior canvas to ensure hot updates take effect immediately
+    const existingOldCanvas = parentDoc.getElementById("olympia-ember-canvas");
+    if (existingOldCanvas) existingOldCanvas.remove();
+    const existingFireCanvas = parentDoc.getElementById("olympia-fire-canvas");
+    if (existingFireCanvas) existingFireCanvas.remove();
+    if (parentWin.__olympiaFireAnimId) {
+        parentWin.cancelAnimationFrame(parentWin.__olympiaFireAnimId);
+    }
 
-        const ctx = canvas.getContext("2d");
-        let width = canvas.width = parentWin.innerWidth;
-        let height = canvas.height = parentWin.innerHeight;
+    const canvas = parentDoc.createElement("canvas");
+    canvas.id = "olympia-fire-canvas";
+    canvas.style.cssText = "position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 999998;";
+    parentDoc.body.appendChild(canvas);
 
-        const onResize = () => {
-            width = canvas.width = parentWin.innerWidth;
-            height = canvas.height = parentWin.innerHeight;
-        };
-        parentWin.addEventListener("resize", onResize);
+    const ctx = canvas.getContext("2d");
+    let width = canvas.width = parentWin.innerWidth;
+    let height = canvas.height = parentWin.innerHeight;
 
-        // Particle System State
-        const PARTICLE_COUNT = 48;
-        const particles = [];
-        const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, lastX: -9999, lastY: -9999 };
+    const onResize = () => {
+        width = canvas.width = parentWin.innerWidth;
+        height = canvas.height = parentWin.innerHeight;
+    };
+    if (parentWin.__olympiaFireResizeHandler) {
+        parentWin.removeEventListener("resize", parentWin.__olympiaFireResizeHandler);
+    }
+    parentWin.__olympiaFireResizeHandler = onResize;
+    parentWin.addEventListener("resize", onResize);
 
-        for (let i = 0; i < PARTICLE_COUNT; i++) {
-            particles.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                radius: 1.1 + Math.random() * 2.2,
-                baseVy: -(0.35 + Math.random() * 0.75),
-                vx: 0,
-                vy: 0,
-                seed: Math.random() * 100,
-                phase: Math.random() * Math.PI * 2,
-                color: Math.random() > 0.28 ? "#D4AF37" : (Math.random() > 0.5 ? "#C41E3A" : "#F3E7C5"),
-                alpha: 0.2 + Math.random() * 0.65
-            });
-        }
+    // Dynamic Olympic Fire Particle System
+    const flameTongues = [];
+    const flameSparks = [];
+    const ambientSparks = [];
+    const mouse = { x: -9999, y: -9999, vx: 0, vy: 0, lastX: -9999, lastY: -9999 };
 
-        // Temporary Cursor Sparks
-        const cursorSparks = [];
+    // 24 ambient rising golden embers in the atmosphere
+    for (let i = 0; i < 24; i++) {
+        ambientSparks.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: 0.9 + Math.random() * 1.5,
+            baseVy: -(0.3 + Math.random() * 0.6),
+            vx: 0,
+            vy: 0,
+            seed: Math.random() * 100,
+            phase: Math.random() * Math.PI * 2,
+            color: Math.random() > 0.3 ? "#D4AF37" : "#FF5722",
+            alpha: 0.2 + Math.random() * 0.5
+        });
+    }
 
-        parentWin.addEventListener("mousemove", (e) => {
-            mouse.vx = e.clientX - mouse.lastX;
-            mouse.vy = e.clientY - mouse.lastY;
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-            mouse.lastX = e.clientX;
-            mouse.lastY = e.clientY;
+    const onMouseMove = (e) => {
+        mouse.vx = e.clientX - mouse.lastX;
+        mouse.vy = e.clientY - mouse.lastY;
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        mouse.lastX = e.clientX;
+        mouse.lastY = e.clientY;
 
-            // Spawn 1-2 trail sparks on brisk movement
-            if (Math.hypot(mouse.vx, mouse.vy) > 4 && cursorSparks.length < 35) {
-                cursorSparks.push({
-                    x: e.clientX + (Math.random() - 0.5) * 12,
-                    y: e.clientY + (Math.random() - 0.5) * 12,
-                    vx: (Math.random() - 0.5) * 1.8 + mouse.vx * 0.08,
-                    vy: (Math.random() - 0.5) * 1.8 + mouse.vy * 0.08 - 0.4,
-                    radius: 1.4 + Math.random() * 2.0,
-                    alpha: 0.9,
+        const speed = Math.hypot(mouse.vx, mouse.vy);
+
+        // Spawn licking flame tongues along cursor path
+        const spawnCount = speed > 7 ? 3 : (speed > 1.8 ? 2 : 1);
+        for (let k = 0; k < spawnCount; k++) {
+            if (flameTongues.length < 55) {
+                const spread = (Math.random() - 0.5) * 8;
+                flameTongues.push({
+                    x: e.clientX + spread,
+                    y: e.clientY + spread,
+                    vx: (Math.random() - 0.5) * 1.4 - mouse.vx * 0.08,
+                    vy: -(1.8 + Math.random() * 2.8) - Math.abs(mouse.vy) * 0.06,
+                    baseWidth: 10 + Math.random() * 14,
+                    baseHeight: 20 + Math.random() * 28,
+                    angle: -mouse.vx * 0.025 + (Math.random() - 0.5) * 0.2,
+                    angularSpeed: (Math.random() - 0.5) * 0.04,
                     life: 1.0,
-                    decay: 0.035 + Math.random() * 0.03,
-                    color: Math.random() > 0.3 ? "#D4AF37" : "#C41E3A"
+                    decay: 0.038 + Math.random() * 0.025,
+                    seed: Math.random() * 100
                 });
             }
-        });
-
-        let lastTime = performance.now();
-
-        function renderEmberField(now) {
-            const dt = Math.min(32, now - lastTime);
-            lastTime = now;
-
-            ctx.clearRect(0, 0, width, height);
-
-            // 1. Update & Render Ambient Floating Embers
-            for (let i = 0; i < particles.length; i++) {
-                const p = particles[i];
-
-                // Natural upward buoyancy + Perlin-like sine drift
-                p.y += (p.baseVy + p.vy) * (dt / 16);
-                p.x += (Math.sin(now * 0.0018 + p.seed) * 0.55 + p.vx) * (dt / 16);
-
-                // Damping
-                p.vx *= 0.94;
-                p.vy *= 0.94;
-
-                // Mouse Repulsion & Vortex Swirl
-                const dx = p.x - mouse.x;
-                const dy = p.y - mouse.y;
-                const dist = Math.hypot(dx, dy);
-                const REPULSION_RADIUS = 135;
-
-                if (dist < REPULSION_RADIUS && dist > 1) {
-                    const force = (1 - dist / REPULSION_RADIUS) * 2.8;
-                    const angle = Math.atan2(dy, dx);
-                    // Radial push
-                    p.vx += Math.cos(angle) * force * 1.4;
-                    p.vy += Math.sin(angle) * force * 1.4;
-                    // Tangential swirl
-                    p.vx += -Math.sin(angle) * force * 0.9;
-                    p.vy += Math.cos(angle) * force * 0.9;
-                }
-
-                // Wrap-around bounds
-                if (p.y < -15) {
-                    p.y = height + 10;
-                    p.x = Math.random() * width;
-                }
-                if (p.x < -15) p.x = width + 10;
-                if (p.x > width + 15) p.x = -10;
-
-                // Render glowing particle
-                const pulsatingAlpha = Math.max(0.08, Math.min(0.9, p.alpha + Math.sin(now * 0.003 + p.phase) * 0.25));
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = pulsatingAlpha;
-                ctx.shadowColor = p.color;
-                ctx.shadowBlur = p.radius * 3.5;
-                ctx.fill();
-            }
-
-            // 2. Update & Render Cursor Sparks
-            for (let i = cursorSparks.length - 1; i >= 0; i--) {
-                const s = cursorSparks[i];
-                s.x += s.vx * (dt / 16);
-                s.y += s.vy * (dt / 16);
-                s.life -= s.decay;
-
-                if (s.life <= 0) {
-                    cursorSparks.splice(i, 1);
-                    continue;
-                }
-
-                ctx.beginPath();
-                ctx.arc(s.x, s.y, s.radius * s.life, 0, Math.PI * 2);
-                ctx.fillStyle = s.color;
-                ctx.globalAlpha = s.alpha * s.life;
-                ctx.shadowColor = s.color;
-                ctx.shadowBlur = 6;
-                ctx.fill();
-            }
-
-            ctx.shadowBlur = 0;
-            ctx.globalAlpha = 1.0;
-            parentWin.requestAnimationFrame(renderEmberField);
         }
 
-        parentWin.requestAnimationFrame(renderEmberField);
+        // Spawn flying flame sparks / cinders on faster moves
+        if (speed > 4 && flameSparks.length < 35) {
+            flameSparks.push({
+                x: e.clientX + (Math.random() - 0.5) * 10,
+                y: e.clientY + (Math.random() - 0.5) * 10,
+                vx: (Math.random() - 0.5) * 3.4 - mouse.vx * 0.1,
+                vy: -(2.4 + Math.random() * 4.2),
+                radius: 1.4 + Math.random() * 2.2,
+                life: 1.0,
+                decay: 0.04 + Math.random() * 0.03,
+                seed: Math.random() * 100
+            });
+        }
+    };
+
+    if (parentWin.__olympiaFireMouseHandler) {
+        parentWin.removeEventListener("mousemove", parentWin.__olympiaFireMouseHandler);
     }
+    parentWin.__olympiaFireMouseHandler = onMouseMove;
+    parentWin.addEventListener("mousemove", onMouseMove);
+
+    let lastTime = performance.now();
+
+    function renderFireSystem(now) {
+        const dt = Math.min(32, now - lastTime);
+        lastTime = now;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // 1. Ambient Golden Atmosphere Embers
+        ctx.globalCompositeOperation = "source-over";
+        for (let i = 0; i < ambientSparks.length; i++) {
+            const p = ambientSparks[i];
+            p.y += (p.baseVy + p.vy) * (dt / 16);
+            p.x += (Math.sin(now * 0.0018 + p.seed) * 0.45 + p.vx) * (dt / 16);
+            p.vx *= 0.94;
+            p.vy *= 0.94;
+
+            // Wrap bounds
+            if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
+            if (p.x < -10) p.x = width + 10;
+            if (p.x > width + 10) p.x = -10;
+
+            const pulsatingAlpha = Math.max(0.1, Math.min(0.85, p.alpha + Math.sin(now * 0.003 + p.phase) * 0.2));
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = pulsatingAlpha;
+            ctx.shadowColor = p.color;
+            ctx.shadowBlur = p.radius * 3;
+            ctx.fill();
+        }
+
+        // 2. Idle Olympic Torch Flame Flickering at Cursor
+        if (mouse.x > 0 && mouse.x < width && mouse.y > 0 && mouse.y < height) {
+            if (Math.random() > 0.4 && flameTongues.length < 55) {
+                flameTongues.push({
+                    x: mouse.x + (Math.random() - 0.5) * 6,
+                    y: mouse.y + (Math.random() - 0.5) * 6,
+                    vx: (Math.random() - 0.5) * 0.8,
+                    vy: -(1.6 + Math.random() * 2.2),
+                    baseWidth: 9 + Math.random() * 11,
+                    baseHeight: 18 + Math.random() * 22,
+                    angle: (Math.random() - 0.5) * 0.15,
+                    angularSpeed: (Math.random() - 0.5) * 0.04,
+                    life: 1.0,
+                    decay: 0.042 + Math.random() * 0.025,
+                    seed: Math.random() * 100
+                });
+            }
+        }
+
+        // 3. Render Flame Tongues with Additive Blending (Real Combustion Core!)
+        ctx.globalCompositeOperation = "lighter";
+        ctx.shadowBlur = 0;
+
+        for (let i = flameTongues.length - 1; i >= 0; i--) {
+            const p = flameTongues[i];
+            p.x += p.vx * (dt / 16);
+            p.y += p.vy * (dt / 16);
+            p.vy -= 0.11 * (dt / 16); // Upward convective thermal buoyancy
+            p.vx += Math.sin(now * 0.014 + p.seed) * 0.25 * (dt / 16); // Thermal turbulent vortex
+            p.angle += p.angularSpeed;
+            p.life -= p.decay * (dt / 16);
+
+            if (p.life <= 0) {
+                flameTongues.splice(i, 1);
+                continue;
+            }
+
+            const progress = 1 - p.life;
+            const curW = Math.max(0.8, p.baseWidth * Math.pow(p.life, 0.65));
+            const curH = Math.max(2, p.baseHeight * Math.pow(p.life, 0.45));
+
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.angle);
+
+            // Thermal color decay: White incandescent core -> Imperial Gold -> Fire Orange -> Crimson -> Smoke
+            const grad = ctx.createRadialGradient(0, curH * 0.2, 0, 0, 0, curH);
+            if (progress < 0.22) {
+                grad.addColorStop(0, "rgba(255, 255, 245, 0.95)");
+                grad.addColorStop(0.25, "rgba(255, 215, 0, 0.9)");
+                grad.addColorStop(0.65, "rgba(255, 69, 0, 0.75)");
+                grad.addColorStop(1, "rgba(196, 30, 58, 0)");
+            } else if (progress < 0.55) {
+                grad.addColorStop(0, "rgba(255, 215, 0, 0.85)");
+                grad.addColorStop(0.35, "rgba(255, 87, 34, 0.7)");
+                grad.addColorStop(0.8, "rgba(196, 30, 58, 0.4)");
+                grad.addColorStop(1, "rgba(46, 42, 37, 0)");
+            } else {
+                grad.addColorStop(0, "rgba(255, 69, 0, 0.55)");
+                grad.addColorStop(0.5, "rgba(196, 30, 58, 0.3)");
+                grad.addColorStop(0.9, "rgba(46, 42, 37, 0.12)");
+                grad.addColorStop(1, "rgba(0, 0, 0, 0)");
+            }
+
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.moveTo(0, curH * 0.35);
+            ctx.bezierCurveTo(-curW, curH * 0.15, -curW * 0.8, -curH * 0.45, 0, -curH);
+            ctx.bezierCurveTo(curW * 0.8, -curH * 0.45, curW, curH * 0.15, 0, curH * 0.35);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        // 4. Render Incendiary Flying Sparks / Cinders
+        for (let i = flameSparks.length - 1; i >= 0; i--) {
+            const s = flameSparks[i];
+            s.x += s.vx * (dt / 16);
+            s.y += s.vy * (dt / 16);
+            s.vy -= 0.16 * (dt / 16);
+            s.vx += Math.sin(now * 0.02 + s.seed) * 0.35 * (dt / 16);
+            s.life -= s.decay * (dt / 16);
+
+            if (s.life <= 0) {
+                flameSparks.splice(i, 1);
+                continue;
+            }
+
+            const progress = 1 - s.life;
+            const r = Math.max(0.6, s.radius * s.life);
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+            ctx.fillStyle = progress < 0.25 ? "#FFFFF0" : (progress < 0.6 ? "#FFD700" : (progress < 0.85 ? "#FF4500" : "#C41E3A"));
+            ctx.shadowColor = "#FF4500";
+            ctx.shadowBlur = 10;
+            ctx.globalAlpha = Math.max(0, s.life * 0.95);
+            ctx.fill();
+        }
+
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = 1.0;
+        ctx.globalCompositeOperation = "source-over";
+        parentWin.__olympiaFireAnimId = parentWin.requestAnimationFrame(renderFireSystem);
+    }
+
+    parentWin.__olympiaFireAnimId = parentWin.requestAnimationFrame(renderFireSystem);
 
     // ============================================================
     // 4. 3D MATRIX TILT CONTROLLER ON ALL BENTO CARDS
@@ -484,34 +579,24 @@ KINETIC_PARENT_SCRIPT = """
     // 5. MAGNETIC GRAVITY BUTTON PHYSICS
     // ============================================================
     function bindMagneticGravityButtons() {
-        const buttons = parentDoc.querySelectorAll(".stButton > button, .magnetic-btn, a[href*='?role='], .hud-nav-item");
+        const buttons = parentDoc.querySelectorAll(".magnetic-btn, .stButton > button");
 
         buttons.forEach(btn => {
             if (btn.__olympiaMagBound) return;
             btn.__olympiaMagBound = true;
 
-            const onMouseMove = (e) => {
+            btn.addEventListener("mousemove", (e) => {
                 const rect = btn.getBoundingClientRect();
                 const centerX = rect.left + rect.width / 2;
                 const centerY = rect.top + rect.height / 2;
-                const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-                const PULL_RADIUS = 70;
+                const dx = e.clientX - centerX;
+                const dy = e.clientY - centerY;
+                btn.style.transform = `translate3d(${dx * 0.22}px, ${dy * 0.22}px, 0)`;
+            });
 
-                if (dist < PULL_RADIUS) {
-                    const dx = e.clientX - centerX;
-                    const dy = e.clientY - centerY;
-                    btn.style.transform = `translate3d(${dx * 0.32}px, ${dy * 0.32}px, 0)`;
-                } else {
-                    btn.style.transform = "translate3d(0, 0, 0)";
-                }
-            };
-
-            const onMouseLeave = () => {
+            btn.addEventListener("mouseleave", () => {
                 btn.style.transform = "translate3d(0, 0, 0)";
-            };
-
-            parentWin.addEventListener("mousemove", onMouseMove);
-            btn.addEventListener("mouseleave", onMouseLeave);
+            });
         });
     }
 
@@ -585,13 +670,13 @@ def inject_kinetic_engine():
     components.html(KINETIC_PARENT_SCRIPT, height=0, width=0)
 
 
-def render_monument_accordion():
+def render_monument_accordion(role_param: str = "fan"):
     """
     Renders the Monumental Expanding Accordion Strip (5 architectural pillars)
     with smooth cubic-bezier flex expansion, vertical-to-horizontal text rotation,
     and unveiling telemetry on hover.
     """
-    accordion_html = """
+    accordion_html = f"""
     <div class="monument-accordion-strip">
         <!-- 1. ATHLETES -->
         <div class="monument-panel">
@@ -607,7 +692,7 @@ def render_monument_accordion():
                     Deep career trajectories across 12,000+ individual medalists. Trace career longevity from Michael Phelps to Nadia Comăneci.
                 </div>
                 <div style="margin-top: 0.8rem;">
-                    <a href="?nav=athletes" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Explore Athletes →</a>
+                    <a href="?role={role_param}&nav=athletes" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Explore Athletes →</a>
                 </div>
             </div>
         </div>
@@ -626,7 +711,7 @@ def render_monument_accordion():
                     Explore national rise, Cold-War rivalries, and modern Asian medal acceleration across 206 National Olympic Committees.
                 </div>
                 <div style="margin-top: 0.8rem;">
-                    <a href="?nav=country" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Country Deep-Dive →</a>
+                    <a href="?role={role_param}&nav=country" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Country Deep-Dive →</a>
                 </div>
             </div>
         </div>
@@ -645,7 +730,7 @@ def render_monument_accordion():
                     Analyze Shannon entropy diversification and event parity across 47 Olympic sports disciplines.
                 </div>
                 <div style="margin-top: 0.8rem;">
-                    <a href="?nav=sports" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Analyze Disciplines →</a>
+                    <a href="?role={role_param}&nav=sports" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Analyze Disciplines →</a>
                 </div>
             </div>
         </div>
@@ -664,7 +749,7 @@ def render_monument_accordion():
                     Immutable record of human achievement from Athens 1896 to Milano-Cortina 2026 loaded inside an offline Star Schema.
                 </div>
                 <div style="margin-top: 0.8rem;">
-                    <a href="?nav=medals" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">View Podiums →</a>
+                    <a href="?role={role_param}&nav=medals" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">View Podiums →</a>
                 </div>
             </div>
         </div>
@@ -683,13 +768,18 @@ def render_monument_accordion():
                     Biometric slipstream aerodynamic physics, tactical radar profiles, and opponent head-to-head scouting.
                 </div>
                 <div style="margin-top: 0.8rem;">
-                    <a href="?nav=coach" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Enter Studio →</a>
+                    <a href="?role={role_param}&nav=coach" target="_self" style="color: #D4AF37; font-weight: 700; text-decoration: none; font-size: 0.82rem;">Enter Studio →</a>
                 </div>
             </div>
         </div>
     </div>
     """
-    st.markdown(accordion_html, unsafe_allow_html=True)
+    cleaned = re.sub(r'\n\s*', ' ', accordion_html).strip()
+    if hasattr(st, "html"):
+        st.html(cleaned)
+    else:
+        st.markdown(cleaned, unsafe_allow_html=True)
+
 
 
 def get_3d_astrolabe_rings_html(width: int = 320, height: int = 140) -> str:

@@ -19,23 +19,26 @@ def render_telemetry_hud(active_role: str, active_module: str, year_range: tuple
     """
     role_normalized = str(active_role).upper()
     role_display = "COACH" if ("PROF" in role_normalized or "COACH" in role_normalized) else ("ADMIN" if "ADMIN" in role_normalized else "FAN")
+    role_param = "coach" if role_display == "COACH" else ("admin" if role_display == "ADMIN" else "fan")
     logo_svg = get_olympia_logo(variant="horizontal", width=165, height=32)
     mod_lower = str(active_module).lower()
 
     hud_html = f"""
     <div class="telemetry-hud-bar">
         <div class="hud-left">
-            <a href="?nav=home" target="_self" style="text-decoration: none; display: flex; align-items: center;">{logo_svg}</a>
+            <a href="?role={role_param}&nav=home" target="_self" style="text-decoration: none; display: flex; align-items: center;">{logo_svg}</a>
         </div>
         <div class="hud-nav-links" style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
-            <a href="?nav=home" target="_self" class="hud-nav-item {'active-nav' if 'home' in mod_lower or 'overview' in mod_lower else ''}">🏠 Home</a>
-            <a href="?nav=medals" target="_self" class="hud-nav-item {'active-nav' if 'medal' in mod_lower or 'podium' in mod_lower else ''}">🏆 Medal Analysis</a>
-            <a href="?nav=country" target="_self" class="hud-nav-item {'active-nav' if 'countr' in mod_lower else ''}">🌐 Countries</a>
-            <a href="?nav=sports" target="_self" class="hud-nav-item {'active-nav' if 'sport' in mod_lower else ''}">🏃 Sports</a>
-            <a href="?nav=athletes" target="_self" class="hud-nav-item {'active-nav' if 'athlet' in mod_lower else ''}">👤 Athletes</a>
-            <a href="?nav=predictions" target="_self" class="hud-nav-item {'active-nav' if 'predict' in mod_lower or 'regr' in mod_lower else ''}">📈 Predictions</a>
-            <a href="?nav=coach" target="_self" class="hud-nav-item {'active-nav' if 'coach' in mod_lower or 'strat' in mod_lower else ''}">⚡ Coach Strategy</a>
-            <a href="?nav=warehouse" target="_self" class="hud-nav-item {'active-nav' if 'wareh' in mod_lower or 'admin' in mod_lower else ''}">🗄️ Data Warehouse</a>
+            <a href="?role={role_param}&nav=home" target="_self" class="hud-nav-item {'active-nav' if 'home' in mod_lower or 'overview' in mod_lower else ''}">🏠 Home</a>
+            <a href="?role={role_param}&nav=medals" target="_self" class="hud-nav-item {'active-nav' if 'medal' in mod_lower or 'podium' in mod_lower else ''}">🏆 Medal Analysis</a>
+            <a href="?role={role_param}&nav=country" target="_self" class="hud-nav-item {'active-nav' if 'countr' in mod_lower else ''}">🌐 Countries</a>
+            <a href="?role={role_param}&nav=sports" target="_self" class="hud-nav-item {'active-nav' if 'sport' in mod_lower else ''}">🏃 Sports</a>
+            <a href="?role={role_param}&nav=athletes" target="_self" class="hud-nav-item {'active-nav' if 'athlet' in mod_lower else ''}">👤 Athletes</a>
+            <a href="?role={role_param}&nav=predictions" target="_self" class="hud-nav-item {'active-nav' if 'predict' in mod_lower or 'regr' in mod_lower else ''}">📈 Predictions</a>
+            <a href="?role={role_param}&nav=coach" target="_self" class="hud-nav-item {'active-nav' if 'coach' in mod_lower or 'strat' in mod_lower else ''}">⚡ Coach Strategy</a>
+            <a href="?role={role_param}&nav=olap" target="_self" class="hud-nav-item {'active-nav' if 'olap' in mod_lower or 'cube' in mod_lower else ''}">🧊 OLAP Cubes</a>
+            <a href="?role={role_param}&nav=mining" target="_self" class="hud-nav-item {'active-nav' if 'mining' in mod_lower or 'cluster' in mod_lower else ''}">⛏️ Data Mining</a>
+            <a href="?role={role_param}&nav=warehouse" target="_self" class="hud-nav-item {'active-nav' if 'wareh' in mod_lower or 'admin' in mod_lower else ''}">🗄️ Warehouse</a>
         </div>
         <div class="hud-right" style="display: flex; align-items: center; gap: 0.75rem;">
             <div class="hud-scrubber-pill">
@@ -83,7 +86,7 @@ def render_hero_split_banner():
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <a href="?role=fan" target="_self" class="magnetic-btn" style="background: linear-gradient(135deg, #F3E7C5 0%, #D4AF37 100%); color: #1F1F1F; padding: 0.55rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 14px rgba(212,175,55,0.3);">
+                    <a href="?role=fan&nav=medals" target="_self" class="magnetic-btn" style="background: linear-gradient(135deg, #F3E7C5 0%, #D4AF37 100%); color: #1F1F1F; padding: 0.55rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 14px rgba(212,175,55,0.3);">
                         Explore Analytics →
                     </a>
                     <span style="color: #94A3B8; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;">
@@ -93,6 +96,7 @@ def render_hero_split_banner():
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #8B857C; letter-spacing: 0.15em; text-transform: uppercase;">
                     ATHLETES • NATIONS • SPORTS • HISTORY
                 </div>
+
             </div>
         </div>
 

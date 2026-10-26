@@ -885,11 +885,12 @@ def render_coach_strategy_studio(df: pd.DataFrame | None = None):
         st.markdown("#### Tactical Sideline Clipboard & One-Click Playbook Export")
         st.caption("A consolidated operational gameplan ready to copy to clipboard or download directly to coaching staff tablets.")
 
+        target_name_str = str(target_athlete_name or "Athlete")
         profile_scores = profile.get("inclination_scores") or profile.get("radar_scores", {})
         playbook_text = f"""======================================================================
 
 OLYMPIA COACH INTELLIGENCE DOSSIER // MILANO-CORTINA 2026 PRE-RACE
-ATHLETE: {target_athlete_name.upper()}
+ATHLETE: {target_name_str.upper()}
 SPORT: {sport_val.upper()} | OVR TIER: {tier_label} ({int(round(profile['composite_rating']))})
 ======================================================================
 
@@ -933,7 +934,7 @@ GENERATED VIA OLYMPIA OFFLINE STAR SCHEMA INTELLIGENCE ENGINE
             st.download_button(
                 "⬇️ Download Briefing Dossier (.txt)",
                 data=playbook_text,
-                file_name=f"olympia_tactical_{target_athlete_name.replace(' ', '_').lower()}.txt",
+                file_name=f"olympia_tactical_{target_name_str.replace(' ', '_').lower()}.txt",
                 mime="text/plain",
                 use_container_width=True
             )
@@ -942,7 +943,7 @@ GENERATED VIA OLYMPIA OFFLINE STAR SCHEMA INTELLIGENCE ENGINE
             st.download_button(
                 "⬇️ Download Telemetry Matrix (.csv)",
                 data=scores_df.to_csv(index=False),
-                file_name=f"olympia_telemetry_{target_athlete_name.replace(' ', '_').lower()}.csv",
+                file_name=f"olympia_telemetry_{target_name_str.replace(' ', '_').lower()}.csv",
                 mime="text/csv",
                 use_container_width=True
             )

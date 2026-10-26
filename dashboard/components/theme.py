@@ -644,3 +644,13 @@ def inject_olympia_theme():
         st.html(css)
     else:
         st.markdown(css, unsafe_allow_html=True)
+
+
+def render_html(html_str: str):
+    """Renders HTML safely using Streamlit native st.html without Markdown code-block indentation interpretation."""
+    cleaned = re.sub(r'\n\s*', ' ', html_str).strip()
+    if hasattr(st, "html"):
+        st.html(cleaned)
+    else:
+        st.markdown(cleaned, unsafe_allow_html=True)
+

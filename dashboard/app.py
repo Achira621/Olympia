@@ -186,13 +186,18 @@ role_str = str(raw_role).lower()
 
 if "admin" in role_str:
     active_role = "admin"
+    role_param = "admin"
 elif "prof" in role_str or "academy" in role_str or "coach" in role_str:
     active_role = "professional"
+    role_param = "coach"
 else:
     active_role = "enthusiast"
+    role_param = "fan"
 
-# Persist normalized role in session state as requested
+# Persist normalized role in session state and keep query_params stable
 st.session_state["user_role"] = active_role
+if st.query_params.get("role") != role_param:
+    st.query_params["role"] = role_param
 
 # Sidebar Controller (The Control Center)
 with st.sidebar:
@@ -221,47 +226,89 @@ with st.sidebar:
         "🏃 Sport Analysis",
         "👤 Athlete Insights",
         "⚡ Coach Strategy",
-        "📈 Predictions"
+        "📈 Predictions",
+        "🧊 OLAP Analysis",
+        "⛏️ Data Mining"
     ]
     if active_role == "admin":
         MASTER_NAV_OPTIONS.append("🗄️ Data Warehouse")
 
-    # Sync default navigation index with URL query parameter (?nav=...)
-    nav_query = (st.query_params.get("nav") or "").lower()
-    default_nav_idx = 0
-    if "home" in nav_query:
-        default_nav_idx = 0
-    elif "medal" in nav_query or "podium" in nav_query:
-        default_nav_idx = 1
-    elif "countr" in nav_query:
-        default_nav_idx = 2
-    elif "sport" in nav_query:
-        default_nav_idx = 3
-    elif "athlet" in nav_query:
-        default_nav_idx = 4
-    elif "coach" in nav_query or "strat" in nav_query:
-        default_nav_idx = 5
-    elif "predict" in nav_query or "regr" in nav_query:
-        default_nav_idx = 6
-    elif ("wareh" in nav_query or "admin" in nav_query) and "🗄️ Data Warehouse" in MASTER_NAV_OPTIONS:
-        default_nav_idx = MASTER_NAV_OPTIONS.index("🗄️ Data Warehouse")
-    elif active_role == "professional" and not nav_query:
-        default_nav_idx = 5
-    elif active_role == "admin" and not nav_query and "🗄️ Data Warehouse" in MASTER_NAV_OPTIONS:
-        default_nav_idx = MASTER_NAV_OPTIONS.index("🗄️ Data Warehouse")
+    def get_nav_index_from_slug(slug: str) -> int:
+        s = slug.lower()
+        if "home" in s or "overv" in s or "legacy" in s:
+            return 0
+        elif "medal" in s or "podium" in s:
+            return 1
+        elif "countr" in s:
+            return 2
+        elif "sport" in s:
+            return 3
+        elif "athlet" in s or "scout" in s or "hall" in s:
+            return 4
+        elif "coach" in s or "strat" in s:
+            return 5
+        elif "predict" in s or "regr" in s or "classif" in s:
+            return 6
+        elif "olap" in s or "cube" in s:
+            return 7
+        elif "mining" in s or "cluster" in s or "assoc" in s:
+            return 8
+        elif ("wareh" in s or "admin" in s) and "🗄️ Data Warehouse" in MASTER_NAV_OPTIONS:
+            return MASTER_NAV_OPTIONS.index("🗄️ Data Warehouse")
+        return 0
 
-    target_nav_opt = MASTER_NAV_OPTIONS[default_nav_idx]
-    if "olympia_unified_navigation" not in st.session_state:
+    def get_slug_from_nav_label(label: str) -> str:
+        if "Medal" in label: return "medals"
+        if "Country" in label: return "country"
+        if "Sport" in label: return "sports"
+        if "Athlete" in label: return "athletes"
+        if "Coach" in label: return "coach"
+        if "Predict" in label: return "predictions"
+        if "OLAP" in label: return "olap"
+        if "Mining" in label: return "mining"
+        if "Warehouse" in label: return "warehouse"
+        return "home"
+
+    # Sync default navigation index with URL query parameter (?nav=...)
+    nav_query = (st.query_params.get("nav") or "").lower().strip()
+    last_handled_nav = st.session_state.get("_olympia_last_handled_nav_query", None)
+
+    # Determine default nav index for fresh load
+    if nav_query:
+        nav_idx = get_nav_index_from_slug(nav_query)
+        target_nav_opt = MASTER_NAV_OPTIONS[nav_idx]
+    elif active_role == "professional":
+        target_nav_opt = "⚡ Coach Strategy"
+    elif active_role == "admin" and "🗄️ Data Warehouse" in MASTER_NAV_OPTIONS:
+        target_nav_opt = "🗄️ Data Warehouse"
+    else:
+        target_nav_opt = MASTER_NAV_OPTIONS[0]
+
+    # Only sync target_nav_opt into session_state if a BRAND NEW nav_query arrived from URL
+    if nav_query and nav_query != last_handled_nav:
         st.session_state["olympia_unified_navigation"] = target_nav_opt
-    elif nav_query and st.session_state.get("olympia_unified_navigation") != target_nav_opt:
+        st.session_state["_olympia_last_handled_nav_query"] = nav_query
+    elif "olympia_unified_navigation" not in st.session_state:
         st.session_state["olympia_unified_navigation"] = target_nav_opt
+        st.session_state["_olympia_last_handled_nav_query"] = nav_query or get_slug_from_nav_label(target_nav_opt)
+    elif st.session_state.get("olympia_unified_navigation") not in MASTER_NAV_OPTIONS:
+        st.session_state["olympia_unified_navigation"] = target_nav_opt
+        st.session_state["_olympia_last_handled_nav_query"] = nav_query or get_slug_from_nav_label(target_nav_opt)
+
+    def _on_unified_nav_change():
+        chosen = st.session_state.get("olympia_unified_navigation", "")
+        slug = get_slug_from_nav_label(chosen)
+        st.session_state["_olympia_last_handled_nav_query"] = slug
+        st.query_params["nav"] = slug
+        st.query_params["role"] = role_param
 
     st.markdown("**Navigation Workspace**")
     selected_mode = st.radio(
         "Navigation Workspace",
         options=MASTER_NAV_OPTIONS,
         label_visibility="collapsed",
-        key="olympia_unified_navigation"
+        key="olympia_unified_navigation",
+        on_change=_on_unified_nav_change
     )
 
     st.markdown("---")
@@ -1236,21 +1283,23 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
        - Wide cinematic banner: 'FROM DATA TO GREATER ATHLETES' with runner and 'Watch Story' button.
     """
     # 1. Split Hero Banner & 5-Panel Monument Accordion Gallery
+    role_param = "fan" if active_role == "enthusiast" else ("coach" if active_role == "professional" else "admin")
     render_hero_split_banner()
-    render_monument_accordion()
+    render_monument_accordion(role_param=role_param)
 
     # 2. Middle Bento Grid Row (3 columns)
     col_m1, col_m2, col_m3 = st.columns([1.35, 1.15, 1.05], gap="medium")
 
     with col_m1:
-        st.markdown("""
+        st.markdown(f"""
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
             <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
                 Global Medal Distribution (3D Globe)
             </div>
-            <a href="?nav=country" target="_self" style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; text-decoration: none;">Country Deep-Dive →</a>
+            <a href="?role={role_param}&nav=country" target="_self" style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; text-decoration: none;">Country Deep-Dive →</a>
         </div>
         """, unsafe_allow_html=True)
+
 
         # Region quick-spin perspective buttons
         col_g1, col_g2, col_g3, col_g4 = st.columns([1, 1, 1, 1])
@@ -1419,12 +1468,12 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
 
     # 2B. Featured Olympic Legends Spotlight with Real Verified Photos
     st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
-    st.markdown("""
+    st.markdown(f"""
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
         <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
             Featured Olympic Legends & All-Time Champions
         </div>
-        <a href="?nav=athletes" target="_self" style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; text-decoration: none;">Explore All Athletes →</a>
+        <a href="?role={role_param}&nav=athletes" target="_self" style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; text-decoration: none;">Explore All Athletes →</a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -1456,35 +1505,35 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
     col_b1, col_b2 = st.columns([1.35, 1.05], gap="medium")
 
     with col_b1:
-        st.markdown("""
+        st.markdown(f"""
         <div style="margin-bottom: 0.6rem;">
             <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
                 Explore Insights
             </div>
         </div>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem;">
-            <a href="?nav=medals" target="_self" style="text-decoration: none;">
+            <a href="?role={role_param}&nav=medals" target="_self" style="text-decoration: none;">
                 <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">📊</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Medal Analysis</div>
                     <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Trends & records</div>
                 </div>
             </a>
-            <a href="?nav=predictions" target="_self" style="text-decoration: none;">
+            <a href="?role={role_param}&nav=predictions" target="_self" style="text-decoration: none;">
                 <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🎯</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Classification</div>
                     <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Podium prediction</div>
                 </div>
             </a>
-            <a href="?nav=olap" target="_self" style="text-decoration: none;">
+            <a href="?role={role_param}&nav=olap" target="_self" style="text-decoration: none;">
                 <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🧬</div>
-                    <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Clustering</div>
-                    <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Country & sports</div>
+                    <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">OLAP Cubes</div>
+                    <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Multidimensional slice</div>
                 </div>
             </a>
-            <a href="?nav=coach" target="_self" style="text-decoration: none;">
+            <a href="?role={role_param}&nav=coach" target="_self" style="text-decoration: none;">
                 <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">⚔️</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Coach Strategy</div>
@@ -1495,7 +1544,7 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
         """, unsafe_allow_html=True)
 
     with col_b2:
-        st.markdown("""
+        st.markdown(f"""
         <div class="olympia-card" style="background: linear-gradient(135deg, #1C1B19 0%, #292622 100%); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 1.2rem 1.4rem; color: #FAF8F2; height: 100%; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-subtle);">
             <div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #D4AF37; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">
@@ -1505,11 +1554,12 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
                     GREATER ATHLETES
                 </div>
             </div>
-            <a href="?nav=coach" target="_self" class="magnetic-btn" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <a href="?role={role_param}&nav=coach" target="_self" class="magnetic-btn" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
                 ▶ Enter Lab
             </a>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 

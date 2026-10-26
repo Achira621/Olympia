@@ -14,6 +14,7 @@ from typing import Dict, Any, List, Tuple
 from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import linkage, dendrogram
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import plotly.express as px
 import plotly.graph_objects as go
 from analytics.kmeans import prepare_clustering_dataset, CLUSTERING_FEATURES
@@ -54,7 +55,7 @@ def generate_dendrogram_figure(
     df: pd.DataFrame = None,
     top_n: int = 30,
     linkage_method: str = "ward"
-) -> plt.Figure:
+) -> Figure:
     """
     Generates a Matplotlib dendrogram figure for top N countries by medal points.
     Using dark analytics color aesthetics.

@@ -360,11 +360,12 @@ def render_sidebar_user_badge():
 
     col_btn1, col_btn2 = st.sidebar.columns(2)
     with col_btn1:
-        if st.sidebar.button("🔄 Switch Persona", key="sidebar_switch_persona_btn", use_container_width=True):
+        if col_btn1.button("🔄 Switch", key="sidebar_switch_persona_btn", use_container_width=True):
             logout()
     with col_btn2:
-        if st.sidebar.button("🚪 Log Out", key="sidebar_logout_btn", use_container_width=True):
+        if col_btn2.button("🚪 Log Out", key="sidebar_logout_btn", use_container_width=True):
             logout()
+
 
 
 def render_login_scrolling_background():
