@@ -91,11 +91,13 @@ def run_kmeans(
         else:
             mapping[raw_c] = f"Tier {rank+1} Nations"
 
-    result_df["cluster"] = result_df["raw_cluster"].map(mapping)
-    result_df["cluster_label"] = result_df["cluster"]
+    mapped_clusters = [mapping.get(c, c) for c in raw_clusters]
+    result_df["cluster"] = mapped_clusters
+    result_df["cluster_label"] = mapped_clusters
 
     # Cluster summary
     summary = result_df.groupby("cluster")[CLUSTERING_FEATURES].agg(["count", "mean", "min", "max"])
+    cluster_sizes = pd.Series(mapped_clusters).value_counts().to_dict()
 
     return {
         "model": kmeans,
@@ -103,7 +105,7 @@ def run_kmeans(
         "inertia": float(kmeans.inertia_),
         "result_df": result_df,
         "summary": summary,
-        "cluster_sizes": result_df["cluster"].value_counts().to_dict()
+        "cluster_sizes": cluster_sizes
     }
 
 
