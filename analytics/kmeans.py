@@ -11,7 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 import pandas as pd
 import numpy as np
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 import plotly.express as px
@@ -29,7 +29,7 @@ CLUSTERING_FEATURES = [
 ]
 
 
-def prepare_clustering_dataset(df: pd.DataFrame = None) -> Tuple[pd.DataFrame, np.ndarray, StandardScaler]:
+def prepare_clustering_dataset(df: Optional[pd.DataFrame] = None) -> Tuple[pd.DataFrame, np.ndarray, StandardScaler]:
     """
     Aggregates medals at country level and scales numerical features.
     """
@@ -51,7 +51,7 @@ def prepare_clustering_dataset(df: pd.DataFrame = None) -> Tuple[pd.DataFrame, n
 
 
 def run_kmeans(
-    df: pd.DataFrame = None,
+    df: Optional[pd.DataFrame] = None,
     n_clusters: int = 3,
     random_state: int = 42
 ) -> Dict[str, Any]:
@@ -108,7 +108,7 @@ def run_kmeans(
 
 
 def compute_elbow_curve(
-    df: pd.DataFrame = None,
+    df: Optional[pd.DataFrame] = None,
     max_k: int = 8,
     random_state: int = 42
 ) -> List[Dict[str, Any]]:

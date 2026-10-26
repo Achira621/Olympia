@@ -507,7 +507,7 @@ def render_coach_strategy_studio(df: pd.DataFrame | None = None):
         with col_sel2:
             custom_input = st.text_input("Or Enter Custom Player Name:", placeholder="e.g. Marcus HELLNER", key="coach_ath_custom")
 
-        target_athlete_name = str(custom_input.strip() if custom_input.strip() else selected_ath_name)
+        target_athlete_name = custom_input.strip() if custom_input.strip() else selected_ath_name
 
         ath_meta: Optional[AthleteMeta] = next((a for a in FEATURED_ATHLETES if a["name"] == target_athlete_name), None)
         sport_val: str = ath_meta["sport"] if ath_meta else "Cross Country Skiing"
@@ -658,13 +658,13 @@ def render_coach_strategy_studio(df: pd.DataFrame | None = None):
         col_m1, col_m2 = st.columns(2)
         with col_m1:
             st.markdown("##### 🟡 Primary Athlete (Gold)")
-            p_a_name = str(st.selectbox("Select Your Athlete:", options=athlete_names, index=0, key="matchup_p_a"))
+            p_a_name = st.selectbox("Select Your Athlete:", options=athlete_names, index=0, key="matchup_p_a")
             ath_a_meta: AthleteMeta = next(a for a in FEATURED_ATHLETES if a["name"] == p_a_name)
             p_a_profile = compute_athlete_inclinations(p_a_name, ath_a_meta["sport"], ath_a_meta["medals"], ath_a_meta["golds"]/max(ath_a_meta["medals"], 1))
 
         with col_m2:
             st.markdown("##### ⚫ Scouted Opponent (Charcoal)")
-            p_b_name = str(st.selectbox("Select Opponent Athlete:", options=[a for a in athlete_names if a != p_a_name], index=0, key="matchup_p_b"))
+            p_b_name = st.selectbox("Select Opponent Athlete:", options=[a for a in athlete_names if a != p_a_name], index=0, key="matchup_p_b")
             ath_b_meta: AthleteMeta = next(a for a in FEATURED_ATHLETES if a["name"] == p_b_name)
             p_b_profile = compute_athlete_inclinations(p_b_name, ath_b_meta["sport"], ath_b_meta["medals"], ath_b_meta["golds"]/max(ath_b_meta["medals"], 1))
 
@@ -894,7 +894,7 @@ def render_coach_strategy_studio(df: pd.DataFrame | None = None):
         st.markdown("#### Tactical Sideline Clipboard & One-Click Playbook Export")
         st.caption("A consolidated operational gameplan ready to copy to clipboard or download directly to coaching staff tablets.")
 
-        target_name_str = str(target_athlete_name or "Athlete")
+        target_name_str = target_athlete_name or "Athlete"
         profile_scores = profile.get("inclination_scores") or profile.get("radar_scores", {})
         playbook_text = f"""======================================================================
 
