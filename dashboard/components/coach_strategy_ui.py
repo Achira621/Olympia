@@ -3,6 +3,7 @@ Coach Strategy Studio & Athlete Inclination UI Component for OLYMPIA.
 Implements the Legendary Olympic Intelligence Archive architectural marble & gold design system.
 """
 
+from typing import List, Dict, Any, TypedDict, Optional
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -22,8 +23,16 @@ from dashboard.components.athlete_photos import get_athlete_avatar_html
 from dashboard.components.flags import get_country_flag_html
 
 
+class AthleteMeta(TypedDict):
+    name: str
+    sport: str
+    country: str
+    medals: int
+    golds: int
+
+
 # Top Marquee Athletes across Summer and Winter Olympics
-FEATURED_ATHLETES = [
+FEATURED_ATHLETES: List[AthleteMeta] = [
     {"name": "Johannes Høsflot Klæbo", "sport": "Cross Country Skiing", "country": "Norway", "medals": 11, "golds": 9},
     {"name": "Jordan Stolz", "sport": "Speed skating", "country": "United States", "medals": 4, "golds": 3},
     {"name": "Mikaela Shiffrin", "sport": "Alpine Skiing", "country": "United States", "medals": 5, "golds": 3},
@@ -44,7 +53,7 @@ FEATURED_ATHLETES = [
 
 def get_ovr_tier_card(score: float) -> tuple:
     """Returns Tier Name, Accent Hex Color, and Ambient Glow RGBA."""
-    s = int(round(score))
+    s = round(score)
     if s >= 90:
         return "ICON", COLOR_GOLD, "rgba(212, 175, 55, 0.35)"
     elif s >= 85:
@@ -498,12 +507,12 @@ def render_coach_strategy_studio(df: pd.DataFrame | None = None):
         with col_sel2:
             custom_input = st.text_input("Or Enter Custom Player Name:", placeholder="e.g. Marcus HELLNER", key="coach_ath_custom")
 
-        target_athlete_name = custom_input.strip() if custom_input.strip() else selected_ath_name
+        target_athlete_name = str(custom_input.strip() if custom_input.strip() else selected_ath_name)
 
-        ath_meta = next((a for a in FEATURED_ATHLETES if a["name"] == target_athlete_name), None)
-        sport_val = ath_meta["sport"] if ath_meta else "Cross Country Skiing"
-        medals_won_val = ath_meta["medals"] if ath_meta else 3
-        gold_ratio_val = (ath_meta["golds"] / max(ath_meta["medals"], 1)) if ath_meta else 0.5
+        ath_meta: Optional[AthleteMeta] = next((a for a in FEATURED_ATHLETES if a["name"] == target_athlete_name), None)
+        sport_val: str = ath_meta["sport"] if ath_meta else "Cross Country Skiing"
+        medals_won_val: int = ath_meta["medals"] if ath_meta else 3
+        gold_ratio_val: float = (ath_meta["golds"] / max(ath_meta["medals"], 1)) if ath_meta else 0.5
 
         profile = compute_athlete_inclinations(target_athlete_name, sport_val, medals_won_val, gold_ratio_val)
         tier_label, tier_col, tier_glow = get_ovr_tier_card(profile["composite_rating"])
@@ -649,14 +658,14 @@ def render_coach_strategy_studio(df: pd.DataFrame | None = None):
         col_m1, col_m2 = st.columns(2)
         with col_m1:
             st.markdown("##### 🟡 Primary Athlete (Gold)")
-            p_a_name = st.selectbox("Select Your Athlete:", options=athlete_names, index=0, key="matchup_p_a")
-            ath_a_meta = next(a for a in FEATURED_ATHLETES if a["name"] == p_a_name)
+            p_a_name = str(st.selectbox("Select Your Athlete:", options=athlete_names, index=0, key="matchup_p_a"))
+            ath_a_meta: AthleteMeta = next(a for a in FEATURED_ATHLETES if a["name"] == p_a_name)
             p_a_profile = compute_athlete_inclinations(p_a_name, ath_a_meta["sport"], ath_a_meta["medals"], ath_a_meta["golds"]/max(ath_a_meta["medals"], 1))
 
         with col_m2:
             st.markdown("##### ⚫ Scouted Opponent (Charcoal)")
-            p_b_name = st.selectbox("Select Opponent Athlete:", options=[a for a in athlete_names if a != p_a_name], index=0, key="matchup_p_b")
-            ath_b_meta = next(a for a in FEATURED_ATHLETES if a["name"] == p_b_name)
+            p_b_name = str(st.selectbox("Select Opponent Athlete:", options=[a for a in athlete_names if a != p_a_name], index=0, key="matchup_p_b"))
+            ath_b_meta: AthleteMeta = next(a for a in FEATURED_ATHLETES if a["name"] == p_b_name)
             p_b_profile = compute_athlete_inclinations(p_b_name, ath_b_meta["sport"], ath_b_meta["medals"], ath_b_meta["golds"]/max(ath_b_meta["medals"], 1))
 
         matchup = simulate_tactical_matchup(p_a_profile, p_b_profile)

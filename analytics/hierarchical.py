@@ -10,9 +10,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 import pandas as pd
 import numpy as np
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Literal, Optional
 from sklearn.cluster import AgglomerativeClustering
-from scipy.cluster.hierarchy import linkage, dendrogram
+from scipy.cluster.hierarchy import linkage, dendrogram  # type: ignore
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import plotly.express as px
@@ -20,11 +20,13 @@ import plotly.graph_objects as go
 from analytics.kmeans import prepare_clustering_dataset, CLUSTERING_FEATURES
 from analytics.visualization import apply_dark_theme, OLYMPIC_COLORS
 
+LinkageType = Literal["ward", "complete", "average", "single"]
+
 
 def run_hierarchical_clustering(
-    df: pd.DataFrame = None,
+    df: Optional[pd.DataFrame] = None,
     n_clusters: int = 3,
-    linkage_method: str = "ward"
+    linkage_method: LinkageType = "ward"
 ) -> Dict[str, Any]:
     """
     Performs Agglomerative Hierarchical Clustering on standardized country performance metrics.
@@ -38,21 +40,23 @@ def run_hierarchical_clustering(
     labels = model.fit_predict(X_scaled)
 
     result_df = country_df.copy()
-    result_df["hierarchical_cluster"] = [f"Cluster {i+1}" for i in labels]
+    cluster_labels = [f"Cluster {i+1}" for i in labels]
+    result_df["hierarchical_cluster"] = cluster_labels
+    cluster_counts = pd.Series(cluster_labels).value_counts().to_dict()
 
     return {
         "model": model,
         "n_clusters": n_clusters,
         "linkage_method": linkage_method,
         "result_df": result_df,
-        "cluster_sizes": result_df["hierarchical_cluster"].value_counts().to_dict(),
+        "cluster_sizes": cluster_counts,
         "X_scaled": X_scaled,
         "countries": country_df["country"].tolist()
     }
 
 
 def generate_dendrogram_figure(
-    df: pd.DataFrame = None,
+    df: Optional[pd.DataFrame] = None,
     top_n: int = 30,
     linkage_method: str = "ward"
 ) -> Figure:

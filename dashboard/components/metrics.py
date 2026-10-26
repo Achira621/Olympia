@@ -17,11 +17,11 @@ def render_telemetry_hud(active_role: str, active_module: str, year_range: tuple
     Renders the Floating Architectural Command Header (Top Telemetry HUD Bar).
     Sticky, light marble backdrop with subtle blur, dataset fact ticker, and role switcher quick-chips.
     """
-    role_normalized = str(active_role).upper()
+    role_normalized = (active_role or "").upper()
     role_display = "COACH" if ("PROF" in role_normalized or "COACH" in role_normalized) else ("ADMIN" if "ADMIN" in role_normalized else "FAN")
     role_param = "coach" if role_display == "COACH" else ("admin" if role_display == "ADMIN" else "fan")
     logo_svg = get_olympia_logo(variant="horizontal", width=165, height=32)
-    mod_lower = str(active_module).lower()
+    mod_lower = (active_module or "").lower()
 
     hud_html = f"""
     <div class="telemetry-hud-bar">
