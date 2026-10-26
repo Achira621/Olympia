@@ -16,6 +16,7 @@ from analytics.coach_strategy import (
     TACTICAL_ARCHETYPES
 )
 from analytics.knn_potential import predict_athlete_potential, SPORT_PROFILES
+from analytics.visualization import apply_dark_theme
 from dashboard.components.icons import get_svg_icon
 from dashboard.components.theme import COLOR_GOLD, COLOR_CHARCOAL, COLOR_RED, COLOR_SANDSTONE, COLOR_BORDER
 from dashboard.components.athlete_photos import get_athlete_avatar_html
