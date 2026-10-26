@@ -2615,7 +2615,8 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
     st.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
     st.markdown(f"#### Olympic Medal Breakdown by Edition: {active_athlete}")
 
-    edition_medals = athlete_records.groupby(["games", "year", "medal"]).size().rename("count").reset_index()
+    edition_medals = athlete_records.groupby(["games", "year", "medal"]).size().reset_index()
+    edition_medals.columns = ["games", "year", "medal", "count"]
     edition_medals = edition_medals.sort_values(by="year")
 
     fig_bar = px.bar(
