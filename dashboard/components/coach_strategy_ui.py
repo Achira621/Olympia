@@ -15,6 +15,7 @@ from analytics.coach_strategy import (
     simulate_pacing_strategy,
     TACTICAL_ARCHETYPES
 )
+from analytics.knn_potential import predict_athlete_potential, SPORT_PROFILES
 from dashboard.components.icons import get_svg_icon
 from dashboard.components.theme import COLOR_GOLD, COLOR_CHARCOAL, COLOR_RED, COLOR_SANDSTONE, COLOR_BORDER
 from dashboard.components.athlete_photos import get_athlete_avatar_html
@@ -349,11 +350,12 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
     """, unsafe_allow_html=True)
 
     # 2. STUDIO WORKSPACE TABS
-    tab_profile, tab_matchup, tab_pacing, tab_playbook = st.tabs([
+    tab_profile, tab_matchup, tab_pacing, tab_playbook, tab_potential = st.tabs([
         "🧬 Athlete Inclination Profiler",
         "⚔️ Head-to-Head Opponent Scouting",
         "🏁 Race Pacing & What-If Simulator",
-        "📋 Coach's Tactical Clipboard"
+        "📋 Coach's Tactical Clipboard",
+        "🎯 Biomechanical Potential Predictor"
     ])
 
     # --------------------------------------------------------
@@ -807,3 +809,83 @@ GENERATED VIA OLYMPIA OFFLINE STAR SCHEMA INTELLIGENCE ENGINE
                 mime="text/csv",
                 use_container_width=True
             )
+
+    # --------------------------------------------------------
+    # TAB 5: BIOMECHANICAL POTENTIAL PREDICTOR
+    # --------------------------------------------------------
+    with tab_potential:
+        st.markdown("#### Biomechanical Potential & Morphology Engine")
+        st.caption("Benchmark physical attributes against historical Olympic medalists using K-Nearest Neighbors and multi-dimensional Mahalanobis distance scoring.")
+
+        with st.form("coach_predict_potential_form"):
+            p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
+            with p_col1:
+                input_age = st.number_input("Age (Years):", min_value=12, max_value=75, value=22, step=1, key="c_pot_age")
+            with p_col2:
+                input_gender = st.selectbox("Biological Category:", ["Men", "Women"], index=0, key="c_pot_gender")
+            with p_col3:
+                input_height = st.number_input("Height (cm):", min_value=130, max_value=230, value=182, step=1, key="c_pot_height")
+            with p_col4:
+                input_weight = st.number_input("Weight (kg):", min_value=35, max_value=180, value=76, step=1, key="c_pot_weight")
+            with p_col5:
+                sport_keys = list(SPORT_PROFILES.keys())
+                input_sport = st.selectbox("Target Olympic Sport:", sport_keys, index=0, key="c_pot_sport")
+
+            btn_predict = st.form_submit_button("Run Biomechanical Potential Analysis", type="primary", use_container_width=True)
+
+        if btn_predict or "coach_last_potential_result" in st.session_state:
+            if btn_predict:
+                result = predict_athlete_potential(
+                    age=float(input_age),
+                    height_cm=float(input_height),
+                    weight_kg=float(input_weight),
+                    gender=input_gender,
+                    sport=input_sport
+                )
+                st.session_state["coach_last_potential_result"] = result
+            else:
+                result = st.session_state["coach_last_potential_result"]
+
+            st.markdown("<div style='margin-top: 1.2rem;'></div>", unsafe_allow_html=True)
+            res_col1, res_col2 = st.columns([1, 2])
+            with res_col1:
+                score = result["score"]
+                st.markdown(f"""
+                <div style="background: #FFFFFF; border: 2px solid {result['tier_color']}; border-radius: 14px; padding: 1.6rem; text-align: center; box-shadow: var(--shadow-subtle);">
+                    <div style="font-size: 0.8rem; color: #8B857C; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace;">
+                        Podium Compatibility Score
+                    </div>
+                    <div style="font-size: 3.5rem; font-weight: 900; color: {result['tier_color']}; line-height: 1.1; margin: 0.4rem 0; font-family: 'JetBrains Mono', monospace;">
+                        {score}%
+                    </div>
+                    <div style="font-size: 1.1rem; font-weight: 800; color: #2E2A25; margin-bottom: 0.35rem;">
+                        {result['tier']}
+                    </div>
+                    <div style="font-size: 0.8rem; color: #AA820A; background: #FAF0D8; padding: 0.3rem 0.75rem; border-radius: 20px; display: inline-block; border: 1px solid rgba(212, 175, 55, 0.4); font-weight: 700;">
+                        {result['badge']}
+                    </div>
+                    <div style="margin-top: 1rem; font-size: 0.82rem; color: #8B857C; text-align: left; border-top: 1px solid #E5DED2; padding-top: 0.75rem;">
+                        <strong style="color: #2E2A25;">Biomechanical Archetype:</strong><br>
+                        {result['benchmarks']['archetype']}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with res_col2:
+                st.markdown("##### Physiological Comparison vs Historical Medalists")
+                bench = result["benchmarks"]
+                user = result["user_inputs"]
+                deltas = result["deltas"]
+
+                comparison_data = [
+                    {"Attribute": "Age", "Your Value": f"{user['age']} yrs", "Olympic Medalist Benchmark": f"{bench['age_mean']} yrs", "Variance Delta": f"{'+' if deltas['age_delta'] > 0 else ''}{deltas['age_delta']} yrs"},
+                    {"Attribute": "Height", "Your Value": f"{user['height_cm']} cm", "Olympic Medalist Benchmark": f"{bench['height_mean']} cm", "Variance Delta": f"{'+' if deltas['height_delta'] > 0 else ''}{deltas['height_delta']} cm"},
+                    {"Attribute": "Weight", "Your Value": f"{user['weight_kg']} kg", "Olympic Medalist Benchmark": f"{bench['weight_mean']} kg", "Variance Delta": f"{'+' if deltas['weight_delta'] > 0 else ''}{deltas['weight_delta']} kg"},
+                    {"Attribute": "Body Mass Index (BMI)", "Your Value": f"{user['bmi']} kg/m²", "Olympic Medalist Benchmark": f"{bench['bmi_mean']} kg/m²", "Variance Delta": f"{'+' if deltas['bmi_delta'] > 0 else ''}{deltas['bmi_delta']} kg/m²"},
+                ]
+                st.dataframe(pd.DataFrame(comparison_data), use_container_width=True, hide_index=True)
+
+                st.markdown("##### Nearest Olympic Sport Affinities")
+                top_aff_df = result["top_affinities"].copy()
+                top_aff_df.columns = ["Sport Discipline", "Compatibility Score (%)", "Biomechanical Target Archetype"]
+                st.dataframe(top_aff_df, use_container_width=True, hide_index=True)

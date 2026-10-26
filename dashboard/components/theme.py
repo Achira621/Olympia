@@ -600,6 +600,29 @@ def get_olympia_theme_css() -> str:
         font-size: 0.76rem;
         color: var(--olympia-warm-grey);
         font-family: 'Inter', sans-serif;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+    }}
+
+    /* Responsive Spacing & Mobile Text Adaptation */
+    @media (max-width: 900px) {{
+        .telemetry-hud-bar {{
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.65rem !important;
+            padding: 0.75rem 1rem !important;
+        }}
+        .hud-nav-links {{
+            overflow-x: auto !important;
+            max-width: 100% !important;
+            padding-bottom: 4px !important;
+        }}
+        .hero-onyx-card {{
+            padding: 1.4rem 1.2rem !important;
+        }}
+        .bento-marble-card {{
+            padding: 1.1rem !important;
+        }}
     }}
 
     /* Accessibility: prefers-reduced-motion */

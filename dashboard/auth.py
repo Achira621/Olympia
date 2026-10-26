@@ -98,9 +98,8 @@ def init_auth():
 def is_authenticated() -> bool:
     """Checks if the current session has an authenticated user."""
     init_auth()
-    # Support query parameter login convenience (e.g., ?role=admin, ?role=fan, ?role=coach)
     role_param = st.query_params.get("role")
-    if role_param and not st.session_state.get("authenticated", False):
+    if role_param:
         role_map = {
             "admin": ("admin", ROLE_ADMIN, "System Administrator"),
             "fan": ("fan", ROLE_ENTHUSIAST, "Olympic Fan"),
@@ -111,11 +110,12 @@ def is_authenticated() -> bool:
         }
         if role_param.lower() in role_map:
             u, r, f = role_map[role_param.lower()]
-            st.session_state["authenticated"] = True
-            st.session_state["logged_in"] = True
-            st.session_state["user_role"] = r
-            st.session_state["username"] = u
-            st.session_state["user_fullname"] = f
+            if not st.session_state.get("authenticated", False) or st.session_state.get("user_role") != r:
+                st.session_state["authenticated"] = True
+                st.session_state["logged_in"] = True
+                st.session_state["user_role"] = r
+                st.session_state["username"] = u
+                st.session_state["user_fullname"] = f
 
     return st.session_state.get("authenticated", False)
 

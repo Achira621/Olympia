@@ -245,11 +245,16 @@ with st.sidebar:
     elif active_role == "admin" and not nav_query:
         default_nav_idx = 9
 
+    target_nav_opt = MASTER_NAV_OPTIONS[default_nav_idx]
+    if "olympia_unified_navigation" not in st.session_state:
+        st.session_state["olympia_unified_navigation"] = target_nav_opt
+    elif nav_query and st.session_state.get("olympia_unified_navigation") != target_nav_opt:
+        st.session_state["olympia_unified_navigation"] = target_nav_opt
+
     st.markdown("**Navigation Workspace**")
     selected_mode = st.radio(
         "Navigation Workspace",
         options=MASTER_NAV_OPTIONS,
-        index=default_nav_idx,
         label_visibility="collapsed",
         key="olympia_unified_navigation"
     )
@@ -1235,82 +1240,6 @@ def render_professional_dashboard(df: pd.DataFrame):
 
 
 # ------------------------------------------------------------
-# 7. ROLE-BASED DASHBOARD ROUTING
-# ------------------------------------------------------------
-if active_role == "admin":
-    render_admin_dashboard(df_master)
-    st.stop()
-
-elif active_role == "professional":
-    render_professional_dashboard(filtered_df)
-    st.stop()
-
-# ------------------------------------------------------------
-# 7B. ENTHUSIAST DASHBOARD (CORE HISTORICAL EXPLORATION)
-# ------------------------------------------------------------
-# ------------------------------------------------------------
-# 7B. ENTHUSIAST DASHBOARD (FORBES-STYLE EDITORIAL ARCHITECTURE)
-# ------------------------------------------------------------
-trophy_svg = get_svg_icon("trophy", size=22, color="#AA820A")
-globe_svg = get_svg_icon("globe", size=20, color="#D4AF37")
-calendar_svg = get_svg_icon("calendar", size=20, color="#F59E0B")
-gold_svg = get_svg_icon("gold_medal", size=20)
-trend_up_svg = get_svg_icon("trend_up", size=16, color="#10B981")
-trend_down_svg = get_svg_icon("trend_down", size=16, color="#EF4444")
-search_svg = get_svg_icon("search", size=18, color="#94A3B8")
-
-total_medals_count = len(filtered_df)
-participating_nations = filtered_df["country"].nunique()
-sports_covered = filtered_df["sport"].nunique()
-editions_analyzed = filtered_df["games"].nunique()
-years_span = f"{year_range[0]} – {year_range[1]}" if year_range[0] != year_range[1] else str(year_range[0])
-
-# 1. FORBES MINIMALIST EDITORIAL MASTHEAD
-render_html(f"""
-<div style="text-align: center; padding: 2.4rem 1.2rem 1.8rem 1.2rem; border-bottom: 1px solid #E5DED2; margin-bottom: 1.5rem; background: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(46,42,37,0.05);">
-    <div style="font-size: 0.85rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.16em; font-weight: 700; margin-bottom: 0.35rem;">
-        The World's
-    </div>
-    <h1 style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif !important; font-size: 3.1rem; font-weight: 900; color: #2E2A25; margin: 0; line-height: 1.15; letter-spacing: -0.01em;">
-        Real-Time Olympic Dynasties
-    </h1>
-    <div style="color: #8B857C; font-size: 1.05rem; max-width: 780px; margin: 0.65rem auto 1.1rem auto; line-height: 1.5; font-family: 'Segoe UI', sans-serif;">
-        The definitive, historical and analytical intelligence guide to Olympic champions, podium supremacy, and athletic dynasties across 1896 – 2024.
-    </div>
-    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: #FFFFFF; border: 1px solid #E5DED2; padding: 0.35rem 1rem; border-radius: 20px; font-size: 0.78rem; color: #8B857C;">
-        <span style="color: #AA820A; font-weight: 700;">Data Synchronized</span> Oct 13, 2026 • 53 Olympic Editions • SQLite Star Schema Active
-    </div>
-</div>
-""")
-
-# 2. FORBES RUNNING TICKER RIBBON (MACRO METRICS)
-render_html(f"""
-<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 8px; padding: 0.85rem 1.4rem; margin-bottom: 1.8rem;">
-    <div style="display: flex; align-items: center; gap: 0.6rem;">
-        {trophy_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #AA820A; font-family: 'Inter', sans-serif;">{total_medals_count:,}</span>
-        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Total Medals Analyzed</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.6rem;">
-        {globe_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #D4AF37; font-family: 'Inter', sans-serif;">{participating_nations}</span>
-        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Competing Nations & NOCs</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.6rem;">
-        {calendar_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #F59E0B; font-family: 'Inter', sans-serif;">{editions_analyzed} Editions</span>
-        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Historical Span ({years_span})</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 0.6rem;">
-        {gold_svg}
-        <span style="font-size: 1.25rem; font-weight: 800; color: #2E2A25; font-family: 'Inter', sans-serif;">USA (2,980)</span>
-        <span style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.04em;">Rank #1 All-Time Dynasty</span>
-    </div>
-</div>
-""")
-
-
-# ------------------------------------------------------------
 # 8. Check for Empty Data Fallback
 # ------------------------------------------------------------
 if filtered_df.empty:
@@ -1498,10 +1427,10 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             flag_html = get_country_flag_html(ctry, size=16)
             top5_rows_html += (
                 f'<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid #F4EFE6; font-size: 0.85rem;">'
-                f'<div style="display: flex; align-items: center; gap: 0.5rem; min-width: 130px;">'
-                f'<span style="font-family: \'JetBrains Mono\', monospace; font-size: 0.75rem; color: #8B857C; font-weight: 700; width: 14px;">{rank}</span>'
+                f'<div style="display: flex; align-items: center; gap: 0.5rem; min-width: 140px; max-width: 160px; overflow: hidden;">'
+                f'<span style="font-family: \'JetBrains Mono\', monospace; font-size: 0.75rem; color: #8B857C; font-weight: 700; width: 14px; flex-shrink: 0;">{rank}</span>'
                 f'{flag_html}'
-                f'<span style="font-weight: 700; color: #2E2A25; font-size: 0.82rem;">{ctry[:12]}</span>'
+                f'<span style="font-weight: 700; color: #2E2A25; font-size: 0.82rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{ctry}">{ctry}</span>'
                 f'</div>'
                 f'<div style="flex: 1; margin: 0 0.8rem; background: #EAE3D5; height: 6px; border-radius: 3px; overflow: hidden;">'
                 f'<div style="width: {pct}%; height: 100%; background: linear-gradient(90deg, #EBD9C3, #D4AF37); border-radius: 3px;"></div>'

@@ -17,7 +17,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Michael PHELPS": {
         "display_name": "Michael Phelps",
         "description": "American competitive swimmer • 28 Olympic Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Michael_Phelps_Rio_2016.jpg/800px-Michael_Phelps_Rio_2016.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Michael_Phelps_Rio_Olympics_2016.jpg/330px-Michael_Phelps_Rio_Olympics_2016.jpg",
         "extract": "Michael Fred Phelps II is an American former competitive swimmer. He is the most successful and most decorated Olympian of all time with a total of 28 medals, including 23 gold medals, more than double the second-highest record.",
         "facts": [
             "All-time record holder for most Olympic gold medals (23)",
@@ -30,7 +30,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Usain BOLT": {
         "display_name": "Usain Bolt",
         "description": "Jamaican sprinter • 8 Olympic Gold Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Usain_Bolt_after_400_m_semi_final_at_2013_World_Championships_in_Athletics.jpg/800px-Usain_Bolt_after_400_m_semi_final_at_2013_World_Championships_in_Athletics.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c3/Usain_Bolt_smiling_Berlin_2009.JPG/330px-Usain_Bolt_smiling_Berlin_2009.JPG",
         "extract": "Usain St. Leo Bolt is a Jamaican retired sprinter, widely considered to be the greatest sprinter of all time. He is a world record holder in the 100 metres, 200 metres, and 4 × 100 metres relay.",
         "facts": [
             "Triple-double Olympic sprint champion (100m, 200m at 2008, 2012, 2016)",
@@ -43,7 +43,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Simone BILES": {
         "display_name": "Simone Biles",
         "description": "American artistic gymnast • 11 Olympic Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Simone_Biles_at_the_2024_Olympics_all-around_podium_02.jpg/800px-Simone_Biles_at_the_2024_Olympics_all-around_podium_02.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Simone_Biles_National_Team_2024.jpg/330px-Simone_Biles_National_Team_2024.jpg",
         "extract": "Simone Arianne Biles Owens is an American artistic gymnast. With 11 Olympic medals and 30 World Championship medals, she is the most decorated gymnast in history.",
         "facts": [
             "Most decorated gymnast in world history with 41 global medals",
@@ -56,7 +56,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Larisa LATYNINA": {
         "display_name": "Larisa Latynina",
         "description": "Soviet artistic gymnast • 18 Olympic Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Larisa_Latynina_1964.jpg/800px-Larisa_Latynina_1964.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Larisa_Latynina%2C_2010.jpg/330px-Larisa_Latynina%2C_2010.jpg",
         "extract": "Larisa Semyonovna Latynina is a former Soviet artistic gymnast. Between 1956 and 1964, she won 14 individual Olympic medals and four team medals, holding the record for most Olympic medals for 48 years.",
         "facts": [
             "Won 18 Olympic medals (9 Gold, 5 Silver, 4 Bronze)",
@@ -69,7 +69,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Carl LEWIS": {
         "display_name": "Carl Lewis",
         "description": "American track & field legend • 9 Olympic Gold Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Carl_Lewis_1984.jpg/800px-Carl_Lewis_1984.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1d/Carl_Lewis_%28cropped%29.jpg/330px-Carl_Lewis_%28cropped%29.jpg",
         "extract": "Frederick Carlton Lewis is an American former track and field athlete who won nine Olympic gold medals and one silver medal. He dominated sprinting and long jump across four Olympic Games from 1984 to 1996.",
         "facts": [
             "Won 4 gold medals at the 1984 Los Angeles Games, matching Jesse Owens",
@@ -82,7 +82,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Paavo NURMI": {
         "display_name": "Paavo Nurmi",
         "description": "Finnish middle and long-distance runner • 9 Olympic Golds",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Paavo_Nurmi_1920.jpg/800px-Paavo_Nurmi_1920.jpg",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Paavo_Nurmi_%28Antwerp_1920%29.jpg",
         "extract": "Paavo Johannes Nurmi was a Finnish middle-distance and long-distance runner, famously nicknamed the 'Flying Finn'. He set 22 official world records and won 9 Olympic gold and 3 silver medals.",
         "facts": [
             "Won 5 gold medals at the 1924 Paris Olympics alone",
@@ -95,7 +95,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Katie LEDECKY": {
         "display_name": "Katie Ledecky",
         "description": "American freestyle distance swimmer • 14 Olympic Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Katie_Ledecky_2024.jpg/800px-Katie_Ledecky_2024.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Katie_Ledecky_at_the_2023_Golden_Goggle_Awards_%28cropped%29.jpg/330px-Katie_Ledecky_at_the_2023_Golden_Goggle_Awards_%28cropped%29.jpg",
         "extract": "Kathleen Genevieve Ledecky is an American competitive swimmer. She has won 9 Olympic gold medals and 21 world championship gold medals, the most in history for a female swimmer.",
         "facts": [
             "Most decorated female Olympic swimmer in history (9 Gold Medals)",
@@ -108,7 +108,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Birgit FISCHER": {
         "display_name": "Birgit Fischer",
         "description": "German kayaker • 8 Olympic Gold Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Birgit_Fischer_2004.jpg/800px-Birgit_Fischer_2004.jpg",
+        "image_url": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Birgit_Fischer_%282010%29.jpg",
         "extract": "Birgit Fischer is a German kayaker who won eight Olympic gold medals over six different Olympic Games, representing both East Germany and unified Germany across 24 years.",
         "facts": [
             "Won Olympic medals across 6 different Olympic Games (1980 – 2004)",
@@ -121,7 +121,7 @@ CURATED_LEGEND_CACHE: Dict[str, Dict[str, Any]] = {
     "Mark SPITZ": {
         "display_name": "Mark Spitz",
         "description": "American swimmer • 9 Olympic Gold Medals",
-        "image_url": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Mark_Spitz_1972.jpg/800px-Mark_Spitz_1972.jpg",
+        "image_url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/03/Mark_Spitz.jpg/330px-Mark_Spitz.jpg",
         "extract": "Mark Andrew Spitz is an American former competitive swimmer and nine-time Olympic champion. At the 1972 Munich Games, he won 7 gold medals, all in world-record times, a feat that stood for 36 years.",
         "facts": [
             "Won 7 gold medals in a single Games at Munich 1972",
