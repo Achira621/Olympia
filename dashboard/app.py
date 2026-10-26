@@ -86,7 +86,8 @@ from dashboard.components.flags import (
     get_country_flag_emoji,
     get_country_flag_html,
     get_country_with_flag,
-    get_country_iso2
+    get_country_iso2,
+    get_country_flag_url
 )
 from dashboard.components.athlete_photos import (
     get_athlete_avatar_html,
@@ -218,7 +219,7 @@ with st.sidebar:
     ]
 
     # Sync default navigation index with URL query parameter (?nav=...)
-    nav_query = str(st.query_params.get("nav", "")).lower()
+    nav_query = (st.query_params.get("nav") or "").lower()
     default_nav_idx = 0
     if "home" in nav_query:
         default_nav_idx = 0
@@ -443,7 +444,7 @@ def render_admin_dashboard(df: pd.DataFrame):
             edit_slice = edit_slice[edit_slice["sport"] == search_sport]
         
         edit_cols = ["medal_fact_id", "year", "games", "country", "sport", "event_name", "medal", "athletes"]
-        edit_slice = edit_slice[edit_cols].head(int(limit_rows)).reset_index(drop=True)
+        edit_slice = edit_slice[edit_cols].head(limit_rows).reset_index(drop=True)
 
         edited_data = st.data_editor(
             edit_slice,
@@ -547,12 +548,12 @@ def render_admin_dashboard(df: pd.DataFrame):
                     conn = get_db_connection()
                     try:
                         cursor = conn.cursor()
-                        cursor.execute("SELECT medal_fact_id, athletes FROM fact_medal WHERE medal_fact_id = ?", (int(del_id),))
+                        cursor.execute("SELECT medal_fact_id, athletes FROM fact_medal WHERE medal_fact_id = ?", (del_id,))
                         rec = cursor.fetchone()
                         if not rec:
                             st.error(f"No record found with Medal Fact ID #{del_id}.")
                         else:
-                            cursor.execute("DELETE FROM fact_medal WHERE medal_fact_id = ?", (int(del_id),))
+                            cursor.execute("DELETE FROM fact_medal WHERE medal_fact_id = ?", (del_id,))
                             conn.commit()
                             st.success(f"Successfully deleted Record #{del_id} (Athlete: {rec[1]}).")
                     except Exception as e:
@@ -616,7 +617,7 @@ def render_professional_dashboard(df: pd.DataFrame):
     unique_nations = df["country"].nunique()
     gold_medals = int((df["medal"] == "Gold").sum())
     total_points = int(df["medal_points"].sum())
-    top_3_concentration = (df.groupby("country").size().nlargest(3).sum() / max(total_medals, 1) * 100)
+    top_3_concentration = (df["country"].value_counts().head(3).sum() / max(total_medals, 1) * 100)
 
     # FORBES RUNNING TICKER RIBBON (MACRO METRICS)
     render_html(f"""
@@ -1789,6 +1790,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
 
     # 3. FORBES MOMENTUM BAROMETERS (BIGGEST CLIMBERS VS HISTORICAL TRANSITIONS)
     st.markdown("<div style='margin-top: 1.8rem;'></div>", unsafe_allow_html=True)
+    trend_up_svg = get_svg_icon("trend_up", size=14, color="#10B981")
+    trend_down_svg = get_svg_icon("trend_down", size=14, color="#EF4444")
     col_baro_left, col_baro_right = st.columns(2)
 
     with col_baro_left:
@@ -2612,7 +2615,7 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
     st.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
     st.markdown(f"#### Olympic Medal Breakdown by Edition: {active_athlete}")
 
-    edition_medals = athlete_records.groupby(["games", "year", "medal"]).size().reset_index(name="count")
+    edition_medals = athlete_records.groupby(["games", "year", "medal"]).size().rename("count").reset_index()
     edition_medals = edition_medals.sort_values(by="year")
 
     fig_bar = px.bar(
@@ -2668,7 +2671,7 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
 # ------------------------------------------------------------
 # 10. CONDITIONAL PAGE ROUTING
 # ------------------------------------------------------------
-mode = str(selected_mode or "")
+mode = selected_mode or ""
 
 # Global Floating Glass Command Header (Top Telemetry HUD Bar)
 render_telemetry_hud(
