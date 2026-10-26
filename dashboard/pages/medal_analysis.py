@@ -24,7 +24,7 @@ from analytics.visualization import (
 )
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
 

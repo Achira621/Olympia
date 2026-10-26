@@ -13,7 +13,7 @@ from warehouse.warehouse import get_denormalized_medals
 from dashboard.components.coach_strategy_ui import render_coach_strategy_studio
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
     render_coach_strategy_studio(df)

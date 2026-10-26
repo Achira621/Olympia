@@ -17,7 +17,7 @@ from dashboard.components.charts import display_chart
 from analytics.visualization import create_bar_chart, create_line_chart
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
 

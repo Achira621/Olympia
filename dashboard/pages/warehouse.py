@@ -15,7 +15,7 @@ from dashboard.components.metrics import render_kpi_row, render_viva_note, rende
 from dashboard.components.kinetic_engine import render_star_schema_blueprint_html
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     # 1. Page Title & Forbes Masthead
     render_forbes_masthead(
         tag="The World's",

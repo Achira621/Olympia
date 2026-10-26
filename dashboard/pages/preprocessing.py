@@ -26,7 +26,7 @@ from analytics.preprocessing import (
 from analytics.visualization import create_bar_chart, create_line_chart, create_scatter_plot
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
 

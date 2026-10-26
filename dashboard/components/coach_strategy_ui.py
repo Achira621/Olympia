@@ -433,7 +433,7 @@ def plot_inclination_radar(athlete_profile: dict) -> go.Figure:
     return fig
 
 
-def render_coach_strategy_studio(df: pd.DataFrame = None):
+def render_coach_strategy_studio(df: pd.DataFrame | None = None):
     """
     Renders the complete Coach Intelligence & Player Inclination Strategy Studio.
     Available across both the Professional / Academy role and the Enthusiast menu.

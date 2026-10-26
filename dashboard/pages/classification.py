@@ -22,7 +22,7 @@ from analytics.decision_tree import (
 from analytics.naive_bayes import train_naive_bayes, compare_classifiers
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
 

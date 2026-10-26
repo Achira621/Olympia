@@ -28,7 +28,7 @@ from analytics.visualization import create_bar_chart
 from dashboard.components.kinetic_engine import render_isometric_3d_olap_cube
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
 
@@ -93,10 +93,12 @@ def render_page(df: pd.DataFrame = None):
 
         st.markdown(f"**Resulting Slice for `{slice_dim} = {slice_val}`:**")
         if not sliced_df.empty:
+            group_col = "country" if slice_dim != "country" else "sport"
             slice_chart_df = (
-                sliced_df.groupby("country" if slice_dim != "country" else "sport")
+                sliced_df.groupby(group_col)
                 .size()
-                .reset_index(name="medals")
+                .to_frame(name="medals")
+                .reset_index()
                 .sort_values(by="medals", ascending=False)
                 .head(10)
             )
@@ -143,7 +145,7 @@ def render_page(df: pd.DataFrame = None):
 
         st.markdown(f"**Diced Sub-Cube Result: `{len(diced_df):,}` fact records found**")
         if not diced_df.empty:
-            d_summary = diced_df.groupby(["country", "medal"]).size().reset_index(name="count")
+            d_summary = diced_df.groupby(["country", "medal"]).size().to_frame(name="count").reset_index()
             fig_dice = create_bar_chart(d_summary, x="country", y="count", color="medal", title="Diced Sub-Cube: Medals by Country & Medal Type", barmode="stack")
             display_chart(fig_dice, key="olap_dice_chart")
 

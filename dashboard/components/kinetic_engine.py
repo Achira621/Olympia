@@ -958,7 +958,8 @@ def render_apriori_energy_conduits_html(top_rules_df=None) -> str:
     y_start = 45
     for idx, r in enumerate(rules_data):
         y = y_start + idx * 52
-        speed_sec = round(max(0.8, 4.0 / r["lift"]), 2)
+        lift_val = float(r["lift"])
+        speed_sec = round(max(0.8, 4.0 / lift_val), 2)
         conduits_svg.append(f"""
         <g class="apriori-conduit-pair" style="cursor: pointer;">
             <!-- Antecedent Node (Left) -->
@@ -1204,7 +1205,7 @@ def render_bifurcating_tree_svg_html() -> str:
 # ============================================================
 # 12. STAR SCHEMA WAREHOUSE: INTERACTIVE BLUEPRINT & CONDUITS
 # ============================================================
-def render_star_schema_blueprint_html(counts: dict = None) -> str:
+def render_star_schema_blueprint_html(counts: dict | None = None) -> str:
     """
     Renders the full-width Interactive SVG Star Schema Blueprint:
     fact_medal (20,582 rows) as a glowing 3D Octagonal Gold Core surrounded

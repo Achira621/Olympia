@@ -17,7 +17,7 @@ from dashboard.components.kinetic_engine import render_apriori_energy_conduits_h
 from analytics.apriori import mine_association_rules
 
 
-def render_page(df: pd.DataFrame = None):
+def render_page(df: pd.DataFrame | None = None):
     if df is None:
         df = get_denormalized_medals()
 

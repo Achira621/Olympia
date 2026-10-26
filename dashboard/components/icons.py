@@ -255,7 +255,7 @@ def get_isometric_olap_cube_widget(active_op: str = "slice") -> str:
     return render_isometric_3d_olap_cube(active_op=active_op)
 
 
-def get_star_schema_blueprint_widget(counts: dict = None) -> str:
+def get_star_schema_blueprint_widget(counts: dict | None = None) -> str:
     """Returns the Interactive SVG Star Schema Blueprint widget."""
     from dashboard.components.kinetic_engine import render_star_schema_blueprint_html
     return render_star_schema_blueprint_html(counts=counts)
