@@ -489,8 +489,8 @@ The fact table records every verified podium finish in Olympic history.
 > - **RMSE (Root Mean Squared Error):** Heavily penalizes large forecasting misses by squaring residuals.
 > - **$R^2$ Score:** Indicates the percentage of variance in medal outcomes explained by prior historical performance ($R^2 \approx 0.90$).
 
-#### Q28: How does the "Predict Your Potential" Biomechanical module work?
-> **Answer:** It uses **K-Nearest Neighbors (KNN)** and normalized feature distance. The user inputs their Age, Height, Weight, and Biological Gender. The engine normalizes these attributes against the physiological distribution (mean and standard deviation) of historical Olympic champions across 12 sports, computing a **Podium Compatibility Score (%)** and identifying their nearest athletic archetypes.
+#### Q28: How does the Coach Strategy Pacing & What-If Simulator work?
+> **Answer:** It models athletic energy reserve depletion curves and aerodynamic draft slipstream mechanics across race sectors (Start, 25%, 50%, 75%, Finish). It evaluates tactical pacing protocols (Negative Split, Even Split, Early Breakaway Attack, Controlled Drafting & Surge) against venue altitude and ambient air density, calculating real-time podium conversion probability deltas.
 
 #### Q29: What is the difference between supervised and unsupervised learning in OLYMPIA?
 > **Answer:**

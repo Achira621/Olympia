@@ -34,7 +34,6 @@ from warehouse.warehouse import (
     get_table_counts,
     get_db_path
 )
-from analytics.knn_potential import predict_athlete_potential, SPORT_PROFILES
 from analytics.sports_science import (
     compute_peak_performance_window,
     compute_consistency_scores,
@@ -204,7 +203,7 @@ with st.sidebar:
     </div>
     """)
 
-    # Unified Master Navigation: All 10 Core Workspaces
+    # Unified Master Navigation: Core High-Value Workspaces
     MASTER_NAV_OPTIONS = [
         "🏠 Home",
         "🏆 Medal Analysis",
@@ -212,11 +211,10 @@ with st.sidebar:
         "🏃 Sport Analysis",
         "👤 Athlete Insights",
         "⚡ Coach Strategy",
-        "📈 Predictions",
-        "🧊 OLAP Explorer",
-        "⛏️ Data Mining",
-        "🗄️ Data Warehouse"
+        "📈 Predictions"
     ]
+    if active_role == "admin":
+        MASTER_NAV_OPTIONS.append("🗄️ Data Warehouse")
 
     # Sync default navigation index with URL query parameter (?nav=...)
     nav_query = (st.query_params.get("nav") or "").lower()
@@ -235,16 +233,12 @@ with st.sidebar:
         default_nav_idx = 5
     elif "predict" in nav_query or "regr" in nav_query:
         default_nav_idx = 6
-    elif "olap" in nav_query:
-        default_nav_idx = 7
-    elif "min" in nav_query:
-        default_nav_idx = 8
-    elif "wareh" in nav_query or "admin" in nav_query:
-        default_nav_idx = 9
+    elif ("wareh" in nav_query or "admin" in nav_query) and "🗄️ Data Warehouse" in MASTER_NAV_OPTIONS:
+        default_nav_idx = MASTER_NAV_OPTIONS.index("🗄️ Data Warehouse")
     elif active_role == "professional" and not nav_query:
         default_nav_idx = 5
-    elif active_role == "admin" and not nav_query:
-        default_nav_idx = 9
+    elif active_role == "admin" and not nav_query and "🗄️ Data Warehouse" in MASTER_NAV_OPTIONS:
+        default_nav_idx = MASTER_NAV_OPTIONS.index("🗄️ Data Warehouse")
 
     target_nav_opt = MASTER_NAV_OPTIONS[default_nav_idx]
     if "olympia_unified_navigation" not in st.session_state:
@@ -339,12 +333,6 @@ if selected_sports:
     filtered_df = filtered_df[filtered_df["sport"].isin(selected_sports)]
 
 if filtered_df.empty:
-    render_telemetry_hud(
-        active_role=active_role,
-        active_module=selected_mode or active_role,
-        year_range=year_range,
-        total_facts=len(df_master)
-    )
     render_empty_telemetry_card()
     render_telemetry_footer()
     st.stop()
@@ -661,97 +649,7 @@ def render_professional_dashboard(df: pd.DataFrame):
         render_coach_strategy_studio(df)
         return
 
-    # 2. CRUCIAL FEATURE: PREDICT YOUR POTENTIAL MODULE
-    st.markdown("### The Predict Your Potential Biomechanical Module")
-    st.markdown("""
-    Enter your physiological attributes below to evaluate your morphology against **historical Olympic medalists** in your target discipline.
-    Our multidimensional predictive model (K-Nearest Neighbors & Normalized Mahalanobis-Weighted Feature Distance) computes your **Podium Compatibility Score** and highlights your nearest Olympic sport affinities.
-    """)
-
-    with st.form("predict_potential_form"):
-        p_col1, p_col2, p_col3, p_col4, p_col5 = st.columns(5)
-        with p_col1:
-            input_age = st.number_input("Age (Years):", min_value=12, max_value=75, value=22, step=1, key="pot_age")
-        with p_col2:
-            input_gender = st.selectbox("Biological Category:", ["Men", "Women"], index=0, key="pot_gender")
-        with p_col3:
-            input_height = st.number_input("Height (cm):", min_value=130, max_value=230, value=182, step=1, key="pot_height")
-        with p_col4:
-            input_weight = st.number_input("Weight (kg):", min_value=35, max_value=180, value=76, step=1, key="pot_weight")
-        with p_col5:
-            sport_keys = list(SPORT_PROFILES.keys())
-            input_sport = st.selectbox("Target Olympic Sport:", sport_keys, index=0, key="pot_sport")
-
-        btn_predict = st.form_submit_button("Run Predictive Potential Analysis", type="primary", use_container_width=True)
-
-    # Execute and render predictions
-    if btn_predict or "last_potential_result" in st.session_state:
-        if btn_predict:
-            result = predict_athlete_potential(
-                age=float(input_age),
-                height_cm=float(input_height),
-                weight_kg=float(input_weight),
-                gender=input_gender,
-                sport=input_sport
-            )
-            st.session_state["last_potential_result"] = result
-        else:
-            result = st.session_state["last_potential_result"]
-
-        st.markdown("<div style='margin-top: 1.5rem;'></div>", unsafe_allow_html=True)
-        st.markdown(f"#### Potential Analysis: **{result['user_inputs']['sport']}** ({result['user_inputs']['gender']})")
-
-        res_col1, res_col2 = st.columns([1, 2])
-        with res_col1:
-            score = result["score"]
-            render_html(f"""
-            <div style="
-                background: #FFFFFF;
-                border: 2px solid {result['tier_color']};
-                border-radius: 12px;
-                padding: 1.8rem;
-                text-align: center;
-                box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            ">
-                <div style="font-size: 0.85rem; color: #A0A0A0; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">
-                    Podium Compatibility Score
-                </div>
-                <div class="potential-score-badge" style="font-size: 3.5rem; font-weight: 900; color: {result['tier_color']}; line-height: 1.1; margin: 0.5rem 0;">
-                    {score}%
-                </div>
-                <div style="font-size: 1.05rem; font-weight: 800; color: #2E2A25; margin-bottom: 0.4rem;">
-                    {result['tier']}
-                </div>
-                <div style="font-size: 0.82rem; color: #D4AF37; background: rgba(212, 175, 55, 0.12); padding: 0.35rem 0.75rem; border-radius: 20px; display: inline-block; border: 1px solid #D4AF37;">
-                    {result['badge']}
-                </div>
-                <div style="margin-top: 1.2rem; font-size: 0.82rem; color: #A0A0A0; text-align: left; border-top: 1px solid #262626; padding-top: 0.8rem;">
-                    <strong>Biomechanical Archetype:</strong><br>
-                    {result['benchmarks']['archetype']}
-                </div>
-            </div>
-            """)
-
-        with res_col2:
-            st.markdown("##### Physiological Attribute Comparison vs Historical Medalists")
-            bench = result["benchmarks"]
-            user = result["user_inputs"]
-            deltas = result["deltas"]
-
-            comparison_data = [
-                {"Attribute": "Age", "Your Value": f"{user['age']} yrs", "Olympic Medalist Benchmark": f"{bench['age_mean']} yrs", "Variance Delta": f"{'+' if deltas['age_delta'] > 0 else ''}{deltas['age_delta']} yrs"},
-                {"Attribute": "Height", "Your Value": f"{user['height_cm']} cm", "Olympic Medalist Benchmark": f"{bench['height_mean']} cm", "Variance Delta": f"{'+' if deltas['height_delta'] > 0 else ''}{deltas['height_delta']} cm"},
-                {"Attribute": "Weight", "Your Value": f"{user['weight_kg']} kg", "Olympic Medalist Benchmark": f"{bench['weight_mean']} kg", "Variance Delta": f"{'+' if deltas['weight_delta'] > 0 else ''}{deltas['weight_delta']} kg"},
-                {"Attribute": "Body Mass Index (BMI)", "Your Value": f"{user['bmi']} kg/m²", "Olympic Medalist Benchmark": f"{bench['bmi_mean']} kg/m²", "Variance Delta": f"{'+' if deltas['bmi_delta'] > 0 else ''}{deltas['bmi_delta']} kg/m²"},
-            ]
-            st.dataframe(pd.DataFrame(comparison_data), use_container_width=True, hide_index=True)
-
-            st.markdown("##### Top Alternative Olympic Sport Affinities")
-            st.caption("Based on multidimensional Euclidean distance against all 12 Olympic sports benchmark profiles:")
-            top_aff_df = result["top_affinities"].copy()
-            top_aff_df.columns = ["Sport Discipline", "Compatibility Score (%)", "Biomechanical Target Archetype"]
-            st.dataframe(top_aff_df, use_container_width=True, hide_index=True)
-
+    # 2. PERFORMANCE WORKSPACE
     st.markdown("---")
 
     # ============================================================
@@ -2673,14 +2571,6 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
 # 10. CONDITIONAL PAGE ROUTING
 # ------------------------------------------------------------
 mode = selected_mode or ""
-
-# Global Floating Glass Command Header (Top Telemetry HUD Bar)
-render_telemetry_hud(
-    active_role=active_role,
-    active_module=mode or active_role,
-    year_range=year_range,
-    total_facts=len(df_master)
-)
 
 if "Home" in mode or "Overview" in mode or "Legacy" in mode or (active_role == "enthusiast" and not selected_mode):
     render_overview_view(filtered_df, df_master)
