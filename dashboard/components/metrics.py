@@ -4,10 +4,12 @@ Implements the Legendary Olympic Intelligence Archive architectural marble & gol
 """
 
 import re
+from typing import Any, Optional, List, Dict
 import streamlit as st
-from typing import List, Dict, Any, Optional
 from dashboard.components.icons import get_svg_icon, get_olympic_rings_svg, get_olympic_sculpted_rings_svg
 from dashboard.components.theme import get_olympia_logo, COLOR_GOLD, COLOR_CHARCOAL, COLOR_RED
+from dashboard.components.flags import get_country_flag_html
+
 
 
 def render_telemetry_hud(active_role: str, active_module: str, year_range: tuple = (1896, 2026), total_facts: int = 20582):
@@ -17,30 +19,25 @@ def render_telemetry_hud(active_role: str, active_module: str, year_range: tuple
     """
     role_normalized = str(active_role).upper()
     role_display = "COACH" if ("PROF" in role_normalized or "COACH" in role_normalized) else ("ADMIN" if "ADMIN" in role_normalized else "FAN")
-    logo_svg = get_olympia_logo(variant="horizontal", width=175, height=34)
+    logo_svg = get_olympia_logo(variant="horizontal", width=165, height=32)
+    mod_lower = str(active_module).lower()
 
     hud_html = f"""
     <div class="telemetry-hud-bar">
         <div class="hud-left">
-            <div style="display: flex; align-items: center;">{logo_svg}</div>
-            <div class="hud-breadcrumb">
-                <span class="hud-sep">//</span>
-                <span class="hud-role">{role_display}</span>
-                <span class="hud-sep">//</span>
-                <span class="hud-module">{active_module.upper()}</span>
-            </div>
+            <a href="?nav=home" target="_self" style="text-decoration: none; display: flex; align-items: center;">{logo_svg}</a>
         </div>
-        <div class="hud-center">
-            <div class="hud-ticker-pill">
-                <span class="ticker-dot">●</span>
-                <span class="ticker-text"><strong>{total_facts:,}</strong> MEDAL RECORDS</span>
-                <span style="color: #D5CBBB;">•</span>
-                <span class="ticker-text"><strong>131</strong> YEARS ARCHIVE</span>
-                <span style="color: #D5CBBB;">•</span>
-                <span class="ticker-text">STAR SCHEMA <strong>100% HEALTHY</strong></span>
-            </div>
+        <div class="hud-nav-links" style="display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+            <a href="?nav=home" target="_self" class="hud-nav-item {'active-nav' if 'home' in mod_lower or 'overview' in mod_lower else ''}">🏠 Home</a>
+            <a href="?nav=medals" target="_self" class="hud-nav-item {'active-nav' if 'medal' in mod_lower or 'podium' in mod_lower else ''}">🏆 Medal Analysis</a>
+            <a href="?nav=country" target="_self" class="hud-nav-item {'active-nav' if 'countr' in mod_lower else ''}">🌐 Countries</a>
+            <a href="?nav=sports" target="_self" class="hud-nav-item {'active-nav' if 'sport' in mod_lower else ''}">🏃 Sports</a>
+            <a href="?nav=athletes" target="_self" class="hud-nav-item {'active-nav' if 'athlet' in mod_lower else ''}">👤 Athletes</a>
+            <a href="?nav=predictions" target="_self" class="hud-nav-item {'active-nav' if 'predict' in mod_lower or 'regr' in mod_lower else ''}">📈 Predictions</a>
+            <a href="?nav=coach" target="_self" class="hud-nav-item {'active-nav' if 'coach' in mod_lower or 'strat' in mod_lower else ''}">⚡ Coach Strategy</a>
+            <a href="?nav=warehouse" target="_self" class="hud-nav-item {'active-nav' if 'wareh' in mod_lower or 'admin' in mod_lower else ''}">🗄️ Data Warehouse</a>
         </div>
-        <div class="hud-right">
+        <div class="hud-right" style="display: flex; align-items: center; gap: 0.75rem;">
             <div class="hud-scrubber-pill">
                 <span style="color: #8B857C; font-weight: 600;">ERA:</span>
                 <span style="font-weight: 700; color: #2E2A25;">{year_range[0]} — {year_range[1]}</span>
@@ -55,6 +52,7 @@ def render_telemetry_hud(active_role: str, active_module: str, year_range: tuple
     """
     cleaned = re.sub(r'\s+', ' ', hud_html).strip()
     st.markdown(cleaned, unsafe_allow_html=True)
+
 
 
 def render_hero_split_banner():
@@ -249,7 +247,10 @@ def render_podium_showcase(first: dict, second: dict, third: dict):
             <div>
                 <div style="margin-bottom: 0.2rem;">{silver_icon}</div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #8B857C; font-weight: 700;">#2 RANK</div>
-                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.15rem; font-weight: 800; color: #2E2A25; margin: 0.2rem 0;">{second.get('country', 'Silver Nation')}</div>
+                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.15rem; font-weight: 800; color: #2E2A25; margin: 0.2rem 0; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                    {get_country_flag_html(second.get('country', ''), size=18)}
+                    <span>{second.get('country', 'Silver Nation')}</span>
+                </div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 800; color: #5A544A;">{second.get('points', 0):,} <span style="font-size: 0.75rem; color: #8B857C;">PTS</span></div>
             </div>
             <div style="background: #EAE3D5; border-radius: 6px; padding: 0.4rem; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: #2E2A25; font-weight: 600;">
@@ -262,7 +263,10 @@ def render_podium_showcase(first: dict, second: dict, third: dict):
             <div>
                 <div style="margin-bottom: 0.2rem;">{gold_icon}</div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #AA820A; font-weight: 800; letter-spacing: 0.08em;">🏆 1ST CHAMPION</div>
-                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.45rem; font-weight: 900; color: #2E2A25; margin: 0.2rem 0;">{first.get('country', 'Gold Champion')}</div>
+                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.45rem; font-weight: 900; color: #2E2A25; margin: 0.2rem 0; display: flex; align-items: center; justify-content: center; gap: 0.4rem;">
+                    {get_country_flag_html(first.get('country', ''), size=22)}
+                    <span>{first.get('country', 'Gold Champion')}</span>
+                </div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; font-weight: 900; color: #D4AF37;">{first.get('points', 0):,} <span style="font-size: 0.85rem; color: #AA820A;">PTS</span></div>
             </div>
             <div style="background: #F3E7C5; border: 1px solid rgba(212,175,55,0.4); border-radius: 8px; padding: 0.5rem; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace; color: #5A4005; font-weight: 700;">
@@ -275,7 +279,10 @@ def render_podium_showcase(first: dict, second: dict, third: dict):
             <div>
                 <div style="margin-bottom: 0.2rem;">{bronze_icon}</div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #8B857C; font-weight: 700;">#3 RANK</div>
-                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.15rem; font-weight: 800; color: #2E2A25; margin: 0.2rem 0;">{third.get('country', 'Bronze Nation')}</div>
+                <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.15rem; font-weight: 800; color: #2E2A25; margin: 0.2rem 0; display: flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                    {get_country_flag_html(third.get('country', ''), size=18)}
+                    <span>{third.get('country', 'Bronze Nation')}</span>
+                </div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 800; color: #B45309;">{third.get('points', 0):,} <span style="font-size: 0.75rem; color: #8B857C;">PTS</span></div>
             </div>
             <div style="background: #EAE3D5; border-radius: 6px; padding: 0.4rem; font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; color: #2E2A25; font-weight: 600;">
@@ -283,6 +290,7 @@ def render_podium_showcase(first: dict, second: dict, third: dict):
             </div>
         </div>
     </div>
+
     """
     cleaned = re.sub(r'\s+', ' ', podium_html).strip()
     st.markdown(cleaned, unsafe_allow_html=True)

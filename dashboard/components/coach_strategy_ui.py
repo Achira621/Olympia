@@ -16,8 +16,10 @@ from analytics.coach_strategy import (
     TACTICAL_ARCHETYPES
 )
 from dashboard.components.icons import get_svg_icon
-from analytics.visualization import apply_dark_theme, THEME_BG, PAPER_BG, TEXT_COLOR
 from dashboard.components.theme import COLOR_GOLD, COLOR_CHARCOAL, COLOR_RED, COLOR_SANDSTONE, COLOR_BORDER
+from dashboard.components.athlete_photos import get_athlete_avatar_html
+from dashboard.components.flags import get_country_flag_html
+
 
 # Top Marquee Athletes across Summer and Winter Olympics
 FEATURED_ATHLETES = [
@@ -384,16 +386,22 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
         tier_label, tier_col, tier_glow = get_ovr_tier_card(profile["composite_rating"])
 
         # Athlete Scouting Hero Bar
+        ath_avatar = get_athlete_avatar_html(target_athlete_name, size=72, sport=sport_val, country=ath_meta['country'] if ath_meta else '')
+        ctry_flag = get_country_flag_html(ath_meta['country'] if ath_meta else '', size=16)
+
         st.markdown(f"""
         <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 16px; padding: 1.4rem 1.6rem; margin: 1rem 0 1.5rem 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: var(--shadow-subtle);">
             <div style="display: flex; align-items: center; gap: 1.2rem;">
+                <div style="flex-shrink: 0;">
+                    {ath_avatar}
+                </div>
                 <div class="fifa-ovr-card" style="border-color: {tier_col};">
                     <span class="fifa-ovr-num" style="color: {tier_col};">{int(round(profile['composite_rating']))}</span>
                     <span class="fifa-ovr-tier" style="color: {tier_col};">{tier_label}</span>
                 </div>
                 <div>
-                    <div style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; font-family: 'JetBrains Mono', monospace;">
-                        {sport_val} // {ath_meta['country'] if ath_meta else 'Olympian'}
+                    <div style="font-size: 0.78rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 0.35rem;">
+                        <span>{sport_val}</span> // {ctry_flag} <span>{ath_meta['country'] if ath_meta else 'Olympian'}</span>
                     </div>
                     <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.65rem; font-weight: 800; color: #2E2A25;">
                         {target_athlete_name}
@@ -526,16 +534,24 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
         t_a_label, t_a_col, t_a_glow = get_ovr_tier_card(p_a_profile["composite_rating"])
         t_b_label, t_b_col, t_b_glow = get_ovr_tier_card(p_b_profile["composite_rating"])
 
+        av_a = get_athlete_avatar_html(p_a_name, size=52, sport=ath_a_meta['sport'], country=ath_a_meta['country'])
+        av_b = get_athlete_avatar_html(p_b_name, size=52, sport=ath_b_meta['sport'], country=ath_b_meta['country'])
+        fl_a = get_country_flag_html(ath_a_meta['country'], size=15)
+        fl_b = get_country_flag_html(ath_b_meta['country'], size=15)
+
         st.markdown(f"""
         <div class="vs-fight-header">
             <!-- Athlete A (Gold) -->
             <div class="vs-fighter-card">
+                <div style="flex-shrink: 0;">{av_a}</div>
                 <div class="fifa-ovr-card" style="border-color: #D4AF37;">
                     <span class="fifa-ovr-num" style="color: #D4AF37;">{int(round(p_a_profile['composite_rating']))}</span>
                     <span class="fifa-ovr-tier" style="color: #AA820A;">{t_a_label}</span>
                 </div>
                 <div>
-                    <div style="font-size: 0.72rem; color: #AA820A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace;">PRIMARY ATHLETE</div>
+                    <div style="font-size: 0.72rem; color: #AA820A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; gap: 0.3rem;">
+                        PRIMARY ATHLETE • {fl_a} {ath_a_meta['country']}
+                    </div>
                     <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.35rem; font-weight: 800; color: #2E2A25;">{p_a_name}</div>
                     <div style="font-size: 0.78rem; color: #8B857C; margin-top: 0.2rem;">
                         {p_a_profile['archetype']} • Clutch: <strong style="color: #D4AF37;">{p_a_profile['clutch_index']}</strong>
@@ -549,7 +565,9 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
             <!-- Athlete B (Charcoal) -->
             <div class="vs-fighter-card" style="justify-content: flex-end; text-align: right;">
                 <div>
-                    <div style="font-size: 0.72rem; color: #5A544A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace;">SCOUTED OPPONENT</div>
+                    <div style="font-size: 0.72rem; color: #5A544A; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace; display: flex; align-items: center; justify-content: flex-end; gap: 0.3rem;">
+                        {fl_b} {ath_b_meta['country']} • SCOUTED OPPONENT
+                    </div>
                     <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.35rem; font-weight: 800; color: #2E2A25;">{p_b_name}</div>
                     <div style="font-size: 0.78rem; color: #8B857C; margin-top: 0.2rem;">
                         {p_b_profile['archetype']} • Clutch: <strong style="color: #2E2A25;">{p_b_profile['clutch_index']}</strong>
@@ -559,9 +577,11 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
                     <span class="fifa-ovr-num" style="color: #2E2A25;">{int(round(p_b_profile['composite_rating']))}</span>
                     <span class="fifa-ovr-tier" style="color: #5A544A;">{t_b_label}</span>
                 </div>
+                <div style="flex-shrink: 0;">{av_b}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
+
 
         # Tactical Tug-of-War Win Probability Energy Bar
         win_pct = matchup["win_probability"]

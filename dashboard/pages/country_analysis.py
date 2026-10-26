@@ -14,6 +14,12 @@ from warehouse.warehouse import get_denormalized_medals
 from dashboard.components.metrics import render_kpi_row, render_viva_note, render_forbes_masthead
 from dashboard.components.charts import display_chart
 from dashboard.components.knowledge_api import get_country_intel
+from dashboard.components.flags import (
+    get_country_flag_emoji,
+    get_country_flag_html,
+    get_country_with_flag,
+    get_country_flag_url
+)
 from analytics.visualization import (
     create_bar_chart,
     create_line_chart,
@@ -49,7 +55,7 @@ def render_page(df: pd.DataFrame = None):
     if mode == "Single Country Deep Dive":
         # Country Selector Filter
         default_idx = all_countries.index("India") if "India" in all_countries else 0
-        selected_country = st.selectbox("Select Country", options=all_countries, index=default_idx)
+        selected_country = st.selectbox("Select Country", options=all_countries, index=default_idx, format_func=get_country_with_flag)
 
         c_df = df[df["country"] == selected_country]
 
@@ -71,10 +77,12 @@ def render_page(df: pd.DataFrame = None):
         
         col_flag, col_bio = st.columns([1, 4])
         with col_flag:
-            if c_intel.get("flag_url"):
-                st.image(c_intel["flag_url"], use_container_width=True)
+            flag_url = c_intel.get("flag_url") or get_country_flag_url(selected_country)
+            if flag_url:
+                st.image(flag_url, use_container_width=True)
         with col_bio:
-            st.markdown(f"### {selected_country}")
+            flag_emoji = get_country_flag_emoji(selected_country)
+            st.markdown(f"### {flag_emoji} {selected_country}")
             st.markdown(c_intel.get("extract", ""))
             if c_intel.get("facts"):
                 st.caption(" • ".join(c_intel["facts"][:2]))
@@ -186,24 +194,26 @@ def render_page(df: pd.DataFrame = None):
         col_c1, col_c2 = st.columns(2)
         with col_c1:
             def1 = all_countries.index("India") if "India" in all_countries else 0
-            country_a = st.selectbox("Select Country A", options=all_countries, index=def1, key="comp_a_select")
+            country_a = st.selectbox("Select Country A", options=all_countries, index=def1, format_func=get_country_with_flag, key="comp_a_select")
         with col_c2:
             def2 = all_countries.index("United States") if "United States" in all_countries else min(1, len(all_countries) - 1)
-            country_b = st.selectbox("Select Country B", options=all_countries, index=def2, key="comp_b_select")
+            country_b = st.selectbox("Select Country B", options=all_countries, index=def2, format_func=get_country_with_flag, key="comp_b_select")
 
         df_a = df[df["country"] == country_a]
         df_b = df[df["country"] == country_b]
 
         col_m1, col_m2 = st.columns(2)
         with col_m1:
-            st.markdown(f"### {country_a}")
+            flag_a = get_country_flag_emoji(country_a)
+            st.markdown(f"### {flag_a} {country_a}")
             render_kpi_row([
                 {"title": "Total Medals", "value": str(len(df_a)), "icon": "trophy"},
                 {"title": "Gold Medals", "value": str(int((df_a["medal"] == "Gold").sum())), "icon": "gold_medal"},
                 {"title": "Points", "value": str(int(df_a["medal_points"].sum())), "icon": "star"},
             ])
         with col_m2:
-            st.markdown(f"### {country_b}")
+            flag_b = get_country_flag_emoji(country_b)
+            st.markdown(f"### {flag_b} {country_b}")
             render_kpi_row([
                 {"title": "Total Medals", "value": str(len(df_b)), "icon": "trophy"},
                 {"title": "Gold Medals", "value": str(int((df_b["medal"] == "Gold").sum())), "icon": "gold_medal"},
@@ -249,10 +259,10 @@ def render_comparison_page(df: pd.DataFrame = None):
     col_c1, col_c2 = st.columns(2)
     with col_c1:
         def1 = all_countries.index("India") if "India" in all_countries else 0
-        country_a = st.selectbox("Select First Country", options=all_countries, index=def1, key="h2h_a_select")
+        country_a = st.selectbox("Select First Country", options=all_countries, index=def1, format_func=get_country_with_flag, key="h2h_a_select")
     with col_c2:
         def2 = all_countries.index("United States") if "United States" in all_countries else min(1, len(all_countries) - 1)
-        country_b = st.selectbox("Select Second Country", options=all_countries, index=def2, key="h2h_b_select")
+        country_b = st.selectbox("Select Second Country", options=all_countries, index=def2, format_func=get_country_with_flag, key="h2h_b_select")
 
     df_a = df[df["country"] == country_a]
     df_b = df[df["country"] == country_b]

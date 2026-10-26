@@ -76,6 +76,32 @@ from dashboard.auth import (
 from dashboard.components.icons import get_svg_icon, render_medal_pills
 from dashboard.components.coach_strategy_ui import render_coach_strategy_studio
 from dashboard.components.theme import inject_olympia_theme, get_olympia_logo
+from dashboard.components.knowledge_api import (
+    get_athlete_intel,
+    get_country_intel,
+    fetch_wikipedia_summary,
+    CURATED_LEGEND_CACHE
+)
+from dashboard.components.flags import (
+    get_country_flag_emoji,
+    get_country_flag_html,
+    get_country_with_flag,
+    get_country_iso2
+)
+from dashboard.components.athlete_photos import (
+    get_athlete_avatar_html,
+    get_athlete_photo_url,
+    get_top_legends_list,
+    generate_olympic_portrait_svg
+)
+from dashboard.components.globe import (
+    create_olympic_3d_globe
+)
+from dashboard.pages import (
+    country_analysis,
+    sport_analysis,
+    regression
+)
 from dashboard.components.metrics import (
     render_telemetry_hud,
     render_hero_split_banner,
@@ -85,6 +111,7 @@ from dashboard.components.metrics import (
     render_empty_telemetry_card,
     render_telemetry_footer
 )
+
 
 
 # ------------------------------------------------------------
@@ -159,73 +186,73 @@ st.session_state["user_role"] = active_role
 
 # Sidebar Controller (The Control Center)
 with st.sidebar:
-    # Authenticated User Badge & Logout Button at top of sidebar
-    render_sidebar_user_badge()
-
     sidebar_logo = get_olympia_logo(variant="horizontal", width=180, height=36)
     filter_icon = get_svg_icon("filter", size=18, color="#D4AF37")
 
     render_html(f"""
-    <div style="padding: 0.4rem 0 0.9rem 0; border-bottom: 1px solid #E5DED2; margin-bottom: 1.1rem;">
+    <div style="padding: 0.2rem 0 0.8rem 0; border-bottom: 1px solid #E5DED2; margin-bottom: 0.9rem;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
             <div>{sidebar_logo}</div>
             <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; background: #FAF0D8; color: #7A5C05; border: 1px solid rgba(212, 175, 55, 0.4); padding: 0.15rem 0.5rem; border-radius: 6px; font-weight: 700;">
                 {active_role.upper()}
             </span>
         </div>
-        <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.45rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; font-family: 'Inter', sans-serif;">
-            ARCHIVE CONTROL CENTER
+        <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.4rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 600; font-family: 'Inter', sans-serif;">
+            OLYMPIC INTELLIGENCE SUITE
         </div>
     </div>
     """)
 
-    if active_role == "professional":
-        st.markdown(f"**Coaching & Performance Navigation**")
-        selected_mode = st.sidebar.radio(
-            "Coaching & Performance Navigation",
-            options=[
-                "Coach Strategy Studio",
-                "Discipline Depth & Parity",
-                "Athlete Hall of Fame & Scouting",
-                "Podium & Medal Benchmarks",
-                "OLAP Cube (Slice & Dice)"
-            ],
-            index=0,
-            label_visibility="collapsed",
-            key="coach_mode_controller"
-        )
-    elif active_role == "admin":
-        st.markdown(f"**Administration Navigation**")
-        selected_mode = st.sidebar.radio(
-            "Administration Navigation",
-            options=[
-                "Warehouse Administration",
-                "Data Mining Arena",
-                "OLAP Cube (Slice & Dice)",
-                "Podium & Medal Tally",
-                "Coach Strategy Studio"
-            ],
-            index=0,
-            label_visibility="collapsed",
-            key="admin_mode_controller"
-        )
-    else:
-        # Mode Toggle for Enthusiast without emojis
-        st.markdown(f"**Navigation Workspace**")
-        selected_mode = st.sidebar.radio(
-            "Navigation Workspace",
-            options=[
-                "Overview & Legacy",
-                "Podium & Medal Tally",
-                "Coach Strategy Studio",
-                "Athlete Hall of Fame",
-                "OLAP Cube (Slice & Dice)",
-                "Data Mining Arena"
-            ],
-            index=0,
-            label_visibility="collapsed",
-            key="quick_mode_controller"
-        )
+    # Unified Master Navigation: All 10 Core Workspaces
+    MASTER_NAV_OPTIONS = [
+        "🏠 Home",
+        "🏆 Medal Analysis",
+        "🌐 Country Analysis",
+        "🏃 Sport Analysis",
+        "👤 Athlete Insights",
+        "⚡ Coach Strategy",
+        "📈 Predictions",
+        "🧊 OLAP Explorer",
+        "⛏️ Data Mining",
+        "🗄️ Data Warehouse"
+    ]
+
+    # Sync default navigation index with URL query parameter (?nav=...)
+    nav_query = str(st.query_params.get("nav", "")).lower()
+    default_nav_idx = 0
+    if "home" in nav_query:
+        default_nav_idx = 0
+    elif "medal" in nav_query or "podium" in nav_query:
+        default_nav_idx = 1
+    elif "countr" in nav_query:
+        default_nav_idx = 2
+    elif "sport" in nav_query:
+        default_nav_idx = 3
+    elif "athlet" in nav_query:
+        default_nav_idx = 4
+    elif "coach" in nav_query or "strat" in nav_query:
+        default_nav_idx = 5
+    elif "predict" in nav_query or "regr" in nav_query:
+        default_nav_idx = 6
+    elif "olap" in nav_query:
+        default_nav_idx = 7
+    elif "min" in nav_query:
+        default_nav_idx = 8
+    elif "wareh" in nav_query or "admin" in nav_query:
+        default_nav_idx = 9
+    elif active_role == "professional" and not nav_query:
+        default_nav_idx = 5
+    elif active_role == "admin" and not nav_query:
+        default_nav_idx = 9
+
+    st.markdown("**Navigation Workspace**")
+    selected_mode = st.radio(
+        "Navigation Workspace",
+        options=MASTER_NAV_OPTIONS,
+        index=default_nav_idx,
+        label_visibility="collapsed",
+        key="olympia_unified_navigation"
+    )
 
     st.markdown("---")
     render_html(f"<div style='font-size: 0.82rem; font-weight: 700; color: #2E2A25; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;'>{filter_icon} Filter Controls</div>")
@@ -245,24 +272,25 @@ with st.sidebar:
         step=4
     )
 
-    # Country / NOC Multi-select
-    all_countries = sorted(df_master["country"].unique().tolist())
+    # Country / NOC Multi-select with national flags
+    all_countries = sorted(df_master["country"].dropna().unique().tolist())
     selected_countries = st.multiselect(
         "NOC / Countries (Default: All):",
         options=all_countries,
-        placeholder="Filter by nation (e.g., United States)..."
+        format_func=get_country_with_flag,
+        placeholder="Filter by nation (e.g. United States)..."
     )
 
     # Sport / Discipline Filter
-    all_sports = sorted(df_master["sport"].unique().tolist())
+    all_sports = sorted(df_master["sport"].dropna().unique().tolist())
     selected_sports = st.multiselect(
         "Sport / Discipline (Default: All):",
         options=all_sports,
-        placeholder="Filter by sport (e.g., Athletics)..."
+        placeholder="Filter by sport (e.g. Athletics)..."
     )
 
     # Filter Presets
-    st.markdown("<div style='margin-top: 0.8rem;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 0.6rem;'></div>", unsafe_allow_html=True)
     if st.button("🔄 Reset Filters", use_container_width=True):
         st.rerun()
 
@@ -270,7 +298,7 @@ with st.sidebar:
     st.markdown("---")
     db_icon_svg = get_svg_icon("database", size=20, color="#D4AF37")
     render_html(f"""
-    <div style="background: #FAF0D8; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1);">
+    <div style="background: #FAF0D8; border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 12px; padding: 0.85rem 1rem; display: flex; align-items: center; gap: 0.75rem; box-shadow: 0 2px 8px rgba(212, 175, 55, 0.1); margin-bottom: 1rem;">
         <div style="width: 38px; height: 38px; border-radius: 8px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(212, 175, 55, 0.3); flex-shrink: 0;">
             {db_icon_svg}
         </div>
@@ -280,6 +308,10 @@ with st.sidebar:
         </div>
     </div>
     """)
+
+    # User Accreditation Badge & Logout at bottom of sidebar
+    render_sidebar_user_badge()
+
 
 
 # ------------------------------------------------------------
@@ -1302,9 +1334,11 @@ if hasattr(st, "dialog"):
     def show_country_dialog(country_name: str, intel: dict, ctry_df: pd.DataFrame):
         col_d1, col_d2 = st.columns([1, 2])
         with col_d1:
-            if intel.get("flag_url"):
-                render_html(f"""<img src="{intel['flag_url']}" referrerpolicy="no-referrer" style="width: 100%; border-radius: 6px; border: 1px solid #E5DED2; margin-bottom: 0.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" />""")
-            st.markdown(f"### {country_name}")
+            flag_url = intel.get("flag_url") or get_country_flag_url(country_name)
+            if flag_url:
+                render_html(f"""<img src="{flag_url}" referrerpolicy="no-referrer" style="width: 100%; border-radius: 6px; border: 1px solid #E5DED2; margin-bottom: 0.6rem; box-shadow: 0 4px 12px rgba(0,0,0,0.5);" />""")
+            flag_emoji = get_country_flag_emoji(country_name)
+            st.markdown(f"### {flag_emoji} {country_name}")
             tot = len(ctry_df)
             g = int((ctry_df["medal"] == "Gold").sum()) if not ctry_df.empty else 0
             s = int((ctry_df["medal"] == "Silver").sum()) if not ctry_df.empty else 0
@@ -1329,8 +1363,8 @@ if hasattr(st, "dialog"):
     def show_athlete_dialog(athlete_name: str, ath_intel: dict, ath_df: pd.DataFrame):
         col_m1, col_m2 = st.columns([1, 2])
         with col_m1:
-            if ath_intel.get("image_url"):
-                render_html(f"""<img src="{ath_intel['image_url']}" referrerpolicy="no-referrer" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; border: 2px solid #D4AF37; margin-bottom: 0.6rem; box-shadow: 0 4px 14px rgba(0,0,0,0.6);" />""")
+            avatar_html = get_athlete_avatar_html(athlete_name, size=150)
+            render_html(f"""<div style="text-align: center; margin-bottom: 0.8rem;">{avatar_html}</div>""")
             st.markdown(f"### {ath_intel.get('display_name', athlete_name)}")
             st.caption(ath_intel.get("description", "Olympic Legend"))
         with col_m2:
@@ -1366,51 +1400,58 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
     render_hero_split_banner()
 
     # 2. Middle Bento Grid Row (3 columns)
-    col_m1, col_m2, col_m3 = st.columns([1.3, 1.15, 1.05], gap="medium")
+    col_m1, col_m2, col_m3 = st.columns([1.35, 1.15, 1.05], gap="medium")
 
     with col_m1:
         st.markdown("""
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
             <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
-                Global Medal Distribution
+                Global Medal Distribution (3D Globe)
             </div>
-            <span style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; cursor: pointer;">View Details →</span>
+            <a href="?nav=country" target="_self" style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; text-decoration: none;">Country Deep-Dive →</a>
         </div>
         """, unsafe_allow_html=True)
-        
-        country_geo = filtered_df.groupby("country").size().reset_index(name="medals")
-        fig_map = px.choropleth(
-            country_geo,
-            locations="country",
-            locationmode="country names",
-            color="medals",
-            color_continuous_scale=[[0, "#FAF8F2"], [0.2, "#F3E7C5"], [0.5, "#EBD9C3"], [0.8, "#D4AF37"], [1.0, "#AA820A"]],
-            labels={"medals": "Medals Won"}
-        )
-        fig_map.update_geos(
-            showcoastlines=True,
-            coastlinecolor="#E5DED2",
-            showland=True,
-            landcolor="#FDFCF9",
-            showocean=True,
-            oceancolor="#FAF8F2",
-            showlakes=False,
-            fitbounds="locations"
-        )
-        fig_map.update_layout(
-            margin=dict(l=0, r=0, t=0, b=0),
-            height=260,
-            paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)",
-            coloraxis_showscale=False
-        )
-        st.plotly_chart(fig_map, use_container_width=True, config={"displayModeBar": False})
-        
+
+        # Region quick-spin perspective buttons
+        col_g1, col_g2, col_g3, col_g4 = st.columns([1, 1, 1, 1])
+        with col_g1:
+            btn_eu = st.button("🌍 EMEA", key="btn_globe_eu", use_container_width=True)
+        with col_g2:
+            btn_am = st.button("🌎 Americas", key="btn_globe_am", use_container_width=True)
+        with col_g3:
+            btn_ap = st.button("🌏 Asia-Pac", key="btn_globe_ap", use_container_width=True)
+        with col_g4:
+            btn_flat = st.button("🗺️ 2D Map", key="btn_globe_flat", use_container_width=True)
+
+        if "globe_view" not in st.session_state:
+            st.session_state["globe_view"] = "eu"
+        if btn_am:
+            st.session_state["globe_view"] = "am"
+        elif btn_ap:
+            st.session_state["globe_view"] = "ap"
+        elif btn_eu:
+            st.session_state["globe_view"] = "eu"
+        elif btn_flat:
+            st.session_state["globe_view"] = "flat"
+
+        g_view = st.session_state.get("globe_view", "eu")
+        if g_view == "am":
+            lat, lon, proj = 20.0, -90.0, "orthographic"
+        elif g_view == "ap":
+            lat, lon, proj = 25.0, 115.0, "orthographic"
+        elif g_view == "flat":
+            lat, lon, proj = 20.0, 0.0, "equirectangular"
+        else:
+            lat, lon, proj = 25.0, 15.0, "orthographic"
+
+        fig_globe = create_olympic_3d_globe(filtered_df, center_lat=lat, center_lon=lon, height=270, projection=proj)
+        st.plotly_chart(fig_globe, use_container_width=True, config={"displayModeBar": False, "scrollZoom": True})
+
         st.markdown("""
-        <div style="display: flex; gap: 1rem; font-size: 0.74rem; font-family: 'JetBrains Mono', monospace; margin-top: 0.2rem;">
-            <span><span style="color: #D4AF37;">●</span> Gold Tier</span>
-            <span><span style="color: #8B857C;">●</span> Silver Tier</span>
-            <span><span style="color: #B45309;">●</span> Bronze Tier</span>
+        <div style="display: flex; gap: 0.9rem; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; margin-top: 0.15rem;">
+            <span><span style="color: #D4AF37;">●</span> Dynasty (>1,000)</span>
+            <span><span style="color: #AA820A;">●</span> High Podium (500–1,000)</span>
+            <span><span style="color: #EBD9C3;">●</span> Emerging (<500)</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1449,23 +1490,17 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
         top5 = country_agg.sort_values(by=sort_col, ascending=False).head(5)
         max_val = max(top5[sort_col].max(), 1) if not top5.empty else 1
 
-        flag_emojis = {
-            "United States": "🇺🇸", "Soviet Union": "🇷🇺", "Great Britain": "🇬🇧",
-            "China": "🇨🇳", "France": "🇫🇷", "Germany": "🇩🇪", "Italy": "🇮🇹",
-            "Sweden": "🇸🇪", "Australia": "🇦🇺", "Norway": "🇳🇴", "India": "🇮🇳"
-        }
-
         top5_rows_html = ""
         for rank, (_, row) in enumerate(top5.iterrows(), 1):
             ctry = row["country"]
             val = int(row[sort_col])
             pct = int((val / max_val) * 100)
-            flag = flag_emojis.get(ctry, "🏛️")
+            flag_html = get_country_flag_html(ctry, size=16)
             top5_rows_html += (
                 f'<div style="display: flex; align-items: center; justify-content: space-between; padding: 0.45rem 0; border-bottom: 1px solid #F4EFE6; font-size: 0.85rem;">'
-                f'<div style="display: flex; align-items: center; gap: 0.6rem; min-width: 120px;">'
+                f'<div style="display: flex; align-items: center; gap: 0.5rem; min-width: 130px;">'
                 f'<span style="font-family: \'JetBrains Mono\', monospace; font-size: 0.75rem; color: #8B857C; font-weight: 700; width: 14px;">{rank}</span>'
-                f'<span>{flag}</span>'
+                f'{flag_html}'
                 f'<span style="font-weight: 700; color: #2E2A25; font-size: 0.82rem;">{ctry[:12]}</span>'
                 f'</div>'
                 f'<div style="flex: 1; margin: 0 0.8rem; background: #EAE3D5; height: 6px; border-radius: 3px; overflow: hidden;">'
@@ -1490,7 +1525,14 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
         """, unsafe_allow_html=True)
 
         top_candidates = ["India", "United States", "China", "Great Britain", "France", "Germany", "Japan", "Australia"]
-        sel_trend_country = st.selectbox("Predict Nation:", options=top_candidates, index=0, label_visibility="collapsed", key="home_trend_select")
+        sel_trend_country = st.selectbox(
+            "Predict Nation:",
+            options=top_candidates,
+            index=0,
+            format_func=get_country_with_flag,
+            label_visibility="collapsed",
+            key="home_trend_select"
+        )
 
         c_df = df_master[df_master["country"] == sel_trend_country]
         y_df = c_df.groupby("year").size().reset_index(name="medals").sort_values("year")
@@ -1535,6 +1577,39 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             """)
             st.plotly_chart(fig_trend, use_container_width=True, config={"displayModeBar": False})
 
+    # 2B. Featured Olympic Legends Spotlight with Real Verified Photos
+    st.markdown("<div style='height: 14px;'></div>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+        <div style="font-family: 'Cinzel', Georgia, serif; font-size: 1.05rem; font-weight: 800; color: #2E2A25;">
+            Featured Olympic Legends & All-Time Champions
+        </div>
+        <a href="?nav=athletes" target="_self" style="font-size: 0.75rem; color: #D4AF37; font-weight: 700; text-decoration: none;">Explore All Athletes →</a>
+    </div>
+    """, unsafe_allow_html=True)
+
+    legends = get_top_legends_list()[:4]
+    l_cols = st.columns(4, gap="small")
+    for col, leg in zip(l_cols, legends):
+        with col:
+            av_html = get_athlete_avatar_html(leg["name"], size=56, sport=leg["sport"], country=leg["country"])
+            fl_html = get_country_flag_html(leg["country"], size=16)
+            render_html(f"""
+            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.85rem; box-shadow: 0 2px 8px rgba(46,42,37,0.04); display: flex; align-items: center; gap: 0.75rem;">
+                <div style="flex-shrink: 0;">{av_html}</div>
+                <div style="min-width: 0;">
+                    <div style="font-family: 'Cinzel', Georgia, serif; font-size: 0.92rem; font-weight: 800; color: #2E2A25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {leg['name']}
+                    </div>
+                    <div style="font-size: 0.74rem; color: #8B857C; display: flex; align-items: center; gap: 0.3rem; margin-top: 0.15rem;">
+                        {fl_html} <span>{leg['country']}</span> • <span>{leg['sport']}</span>
+                    </div>
+                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; font-weight: 700; color: #AA820A; margin-top: 0.25rem;">
+                        🥇 {leg['golds']} Gold • {leg['total']} Total
+                    </div>
+                </div>
+            </div>
+            """)
 
     # 3. Bottom Bento Row
     st.markdown("<div style='height: 18px;'></div>", unsafe_allow_html=True)
@@ -1548,26 +1623,34 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             </div>
         </div>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem;">
-            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
-                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">📊</div>
-                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Medal Analysis</div>
-                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Trends & records</div>
-            </div>
-            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
-                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🎯</div>
-                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Classification</div>
-                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Podium prediction</div>
-            </div>
-            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
-                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🧬</div>
-                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Clustering</div>
-                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Country & sports</div>
-            </div>
-            <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left;">
-                <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">⚔️</div>
-                <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Coach Strategy</div>
-                <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Tactical insights</div>
-            </div>
+            <a href="?nav=medals" target="_self" style="text-decoration: none;">
+                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                    <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">📊</div>
+                    <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Medal Analysis</div>
+                    <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Trends & records</div>
+                </div>
+            </a>
+            <a href="?nav=predictions" target="_self" style="text-decoration: none;">
+                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                    <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🎯</div>
+                    <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Classification</div>
+                    <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Podium prediction</div>
+                </div>
+            </a>
+            <a href="?nav=olap" target="_self" style="text-decoration: none;">
+                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                    <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🧬</div>
+                    <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Clustering</div>
+                    <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Country & sports</div>
+                </div>
+            </a>
+            <a href="?nav=coach" target="_self" style="text-decoration: none;">
+                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                    <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">⚔️</div>
+                    <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Coach Strategy</div>
+                    <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Tactical insights</div>
+                </div>
+            </a>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1582,11 +1665,12 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
                     GREATER ATHLETES
                 </div>
             </div>
-            <a href="?role=coach" target="_self" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <a href="?nav=coach" target="_self" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
                 ▶ Enter Lab
             </a>
         </div>
         """, unsafe_allow_html=True)
+
 
 
 def render_podium_view(filtered_df: pd.DataFrame):
@@ -1649,11 +1733,12 @@ def render_podium_view(filtered_df: pd.DataFrame):
             active_style = "border-left: 3px solid #D4AF37; background: #FAF8F2;" if is_active else "border-left: 3px solid transparent;"
             ctry_df = filtered_df[filtered_df["country"] == row["country"]]
             top_sport = ctry_df["sport"].mode().iloc[0] if not ctry_df.empty else "Olympics"
+            flag_top5 = get_country_flag_html(row['country'], size=18)
             render_html(f"""
             <div style="padding: 0.65rem 0.8rem; margin-bottom: 0.5rem; border-radius: 4px; {active_style}">
                 <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                    <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.05rem; font-weight: 700; color: #2E2A25;">
-                        {rank_num}. {row['country']}
+                    <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.05rem; font-weight: 700; color: #2E2A25; display: flex; align-items: center; gap: 0.45rem;">
+                        {flag_top5} <span>{rank_num}. {row['country']}</span>
                     </div>
                     <div style="font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 800; color: #D4AF37;">
                         {row['total_medals']:,}
@@ -1704,8 +1789,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
                         <div style="font-size: 0.75rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">
                             FEATURED SPOTLIGHT
                         </div>
-                        <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #2E2A25;">
-                            1. {leader_name}
+                        <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-size: 1.6rem; font-weight: 800; color: #2E2A25; display: flex; align-items: center; gap: 0.5rem;">
+                            {get_country_flag_html(leader_name, size=24)} 1. {leader_name}
                         </div>
                     </div>
                 </div>
@@ -1788,8 +1873,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    1. China
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("China", size=18)} 1. China
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #10B981 100%); border-radius: 2px;"></div>
@@ -1800,8 +1885,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    2. Great Britain
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("Great Britain", size=18)} 2. Great Britain
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #10B981 100%); border-radius: 2px;"></div>
@@ -1812,8 +1897,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    3. France
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("France", size=18)} 3. France
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #10B981 100%); border-radius: 2px;"></div>
@@ -1824,8 +1909,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    4. Australia
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("Australia", size=18)} 4. Australia
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #10B981 100%); border-radius: 2px;"></div>
@@ -1848,8 +1933,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    1. Soviet Union
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("Soviet Union", size=18)} 1. Soviet Union
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #EF4444 100%); border-radius: 2px;"></div>
@@ -1860,8 +1945,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    2. East Germany
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("East Germany", size=18)} 2. East Germany
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #EF4444 100%); border-radius: 2px;"></div>
@@ -1872,8 +1957,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1F1F1F;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    3. Sweden
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("Sweden", size=18)} 3. Sweden
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #EF4444 100%); border-radius: 2px;"></div>
@@ -1884,8 +1969,8 @@ def render_podium_view(filtered_df: pd.DataFrame):
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25;">
-                    4. Finland
+                <div style="font-family: 'Cinzel', 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 0.95rem; color: #2E2A25; display: flex; align-items: center; gap: 0.4rem;">
+                    {get_country_flag_html("Finland", size=18)} 4. Finland
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.6rem;">
                     <div style="width: 70px; height: 3px; background: linear-gradient(90deg, #1F1F1F 0%, #EF4444 100%); border-radius: 2px;"></div>
@@ -1931,7 +2016,7 @@ def render_podium_view(filtered_df: pd.DataFrame):
 
         # Intelligence data with flag picture & verified facts
         intel = get_country_intel(row['country'], fallback_sport=top_sport)
-        flag_url = intel.get("flag_url", "")
+        flag_url = intel.get("flag_url") or get_country_flag_url(row['country'])
         fact_preview = intel.get("facts", ["Verified Olympic podium nation."])[0]
         initials = "".join([w[0] for w in str(row["country"]).split()[:2]]).upper()
         
@@ -2417,23 +2502,39 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
     if st.session_state["selected_athlete"] not in all_athlete_names:
         all_athlete_names = [st.session_state["selected_athlete"]] + all_athlete_names
 
-    # Callback when quick-select buttons are clicked
-    def set_athlete_selection(name: str):
-        st.session_state["selected_athlete"] = name
-        st.session_state["athlete_selectbox_key"] = name
+    # 1B. QUICK SELECT LEGENDARY CHAMPIONS SHOWCASE WITH PHOTOS & FLAGS
+    LEGENDS_SHOWCASE = [
+        ("Michael PHELPS", "United States", "Swimming", "23G • 28T"),
+        ("Usain BOLT", "Jamaica", "Athletics", "8G • 8T"),
+        ("Simone BILES", "United States", "Gymnastics", "7G • 11T"),
+        ("Larisa LATYNINA", "USSR", "Gymnastics", "9G • 18T"),
+        ("Carl LEWIS", "United States", "Athletics", "9G • 10T"),
+        ("Katie LEDECKY", "United States", "Swimming", "9G • 14T")
+    ]
 
-    st.markdown("##### 🌟 Quick Select Legendary Champions:")
-    quick_cols = st.columns(len(LEGENDARY_NAMES[:5]))
+    st.markdown("##### 🌟 Featured Legendary Champions:")
+    quick_cols = st.columns(6)
 
-    for i, name in enumerate(LEGENDARY_NAMES[:5]):
-        if quick_cols[i].button(
-            name,
-            key=f"legend_btn_{i}",
-            use_container_width=True,
-            on_click=set_athlete_selection,
-            args=(name,)
-        ):
-            st.session_state["selected_athlete"] = name
+    for i, (name, ctry, sprt, medal_summary) in enumerate(LEGENDS_SHOWCASE):
+        with quick_cols[i]:
+            av_mini = get_athlete_avatar_html(name, size=52, sport=sprt, country=ctry)
+            fl_mini = get_country_flag_html(ctry, size=14)
+            is_sel = (name == st.session_state.get("selected_athlete"))
+            border_c = "#D4AF37" if is_sel else "#E5DED2"
+            bg_c = "#FAF8F2" if is_sel else "#FFFFFF"
+            render_html(f"""
+            <div style="background: {bg_c}; border: 1.5px solid {border_c}; border-radius: 10px; padding: 0.5rem; text-align: center; margin-bottom: 0.4rem; box-shadow: 0 2px 6px rgba(46,42,37,0.04);">
+                <div style="display: flex; justify-content: center; margin-bottom: 0.3rem;">{av_mini}</div>
+                <div style="font-family: 'Cinzel', serif; font-size: 0.76rem; font-weight: 800; color: #2E2A25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{name.split()[-1].title()}</div>
+                <div style="font-size: 0.68rem; color: #8B857C; display: flex; align-items: center; justify-content: center; gap: 0.2rem; margin-top: 0.1rem;">
+                    {fl_mini} <span>{medal_summary}</span>
+                </div>
+            </div>
+            """)
+            if st.button("Inspect", key=f"leg_quick_{i}_{name}", use_container_width=True):
+                st.session_state["selected_athlete"] = name
+                st.session_state["athlete_selectbox_key"] = name
+                st.rerun()
 
     # Sync selectbox widget key with session state
     if "athlete_selectbox_key" not in st.session_state:
@@ -2482,15 +2583,16 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
 
     # 4B. ATHLETE KNOWLEDGE INTEL (API + CACHE)
     ath_intel = get_athlete_intel(active_athlete, fallback_sport=ath_sport, fallback_country=ath_country)
-    ath_img_url = ath_intel.get("image_url", "https://images.unsplash.com/photo-1517649763962-0c623266ddc0?auto=format&fit=crop&w=600&q=80")
     ath_bio_extract = ath_intel.get("extract", "")
+    ath_avatar_hero = get_athlete_avatar_html(active_athlete, size=140, sport=ath_sport, country=ath_country)
+    ath_flag_hero = get_country_flag_html(ath_country, size=20)
 
     # 5. ATHLETE INFOGRAPHIC HERO CARD
     render_html(f"""
     <div class="athlete-card">
         <div style="display: flex; gap: 1.5rem; align-items: flex-start; flex-wrap: wrap;">
             <div style="flex-shrink: 0;">
-                <img src="{ath_img_url}" referrerpolicy="no-referrer" alt="{active_athlete}" style="width: 140px; height: 140px; object-fit: cover; border-radius: 8px; border: 2px solid #D4AF37; box-shadow: 0 4px 18px rgba(0,0,0,0.6);" />
+                {ath_avatar_hero}
             </div>
 
             <div style="flex: 1; min-width: 280px;">
@@ -2500,10 +2602,10 @@ def render_hall_of_fame_view(df_master: pd.DataFrame):
                 <div style="font-size: 2.3rem; font-weight: 900; font-family: 'Cinzel', 'Playfair Display', Georgia, serif; color: #2E2A25; margin: 0.2rem 0;">
                     {active_athlete}
                 </div>
-                <div style="font-size: 1rem; color: #A0A0A0; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
-                    <span><strong style="color: #2E2A25;">{ath_country}</strong> ({ath_country_code})</span>
+                <div style="font-size: 1rem; color: #8B857C; display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
+                    <span style="display: inline-flex; align-items: center; gap: 0.35rem;">{ath_flag_hero} <strong style="color: #2E2A25;">{ath_country}</strong> ({ath_country_code})</span>
                     <span>•</span>
-                    <span><strong style="color: #D4AF37;">{ath_all_sports}</strong></span>
+                    <span><strong style="color: #AA820A;">{ath_all_sports}</strong></span>
                     <span>•</span>
                     <span><strong style="color: #2E2A25;">{games_span}</strong> ({editions_count} Editions)</span>
                 </div>
@@ -2647,23 +2749,29 @@ render_telemetry_hud(
     total_facts=len(df_master)
 )
 
-if "Overview" in mode or "Legacy" in mode or (active_role == "enthusiast" and not selected_mode):
+if "Home" in mode or "Overview" in mode or "Legacy" in mode or (active_role == "enthusiast" and not selected_mode):
     render_overview_view(filtered_df, df_master)
-elif "Warehouse" in mode or "Administration" in mode or (active_role == "admin" and not selected_mode):
-    render_admin_dashboard(filtered_df)
+elif "Medal" in mode or "Podium" in mode or "Benchmarks" in mode:
+    render_podium_view(filtered_df)
+elif "Country" in mode:
+    country_analysis.render_page(filtered_df)
+elif "Sport" in mode:
+    sport_analysis.render_page(filtered_df)
+elif "Athlete" in mode or "Hall" in mode or "Scouting" in mode:
+    render_hall_of_fame_view(df_master)
 elif "Coach" in mode or "Strategy" in mode or (active_role == "professional" and not selected_mode):
     render_coach_strategy_studio(filtered_df)
-elif "Depth" in mode or "Parity" in mode:
-    from dashboard.pages.academy_dashboard import render_page as render_academy_page
-    render_academy_page(filtered_df)
+elif "Predict" in mode or "Regr" in mode:
+    regression.render_page(filtered_df)
 elif "OLAP" in mode:
     render_olap_view(filtered_df, all_countries)
 elif "Mining" in mode:
     render_data_mining_view(filtered_df, df_master)
-elif "Athlete" in mode or "Hall" in mode or "Scouting" in mode:
-    render_hall_of_fame_view(df_master)
-elif "Podium" in mode or "Benchmarks" in mode:
-    render_podium_view(filtered_df)
+elif "Warehouse" in mode or "Administration" in mode or (active_role == "admin" and not selected_mode):
+    render_admin_dashboard(filtered_df)
+elif "Depth" in mode or "Parity" in mode:
+    from dashboard.pages.academy_dashboard import render_page as render_academy_page
+    render_academy_page(filtered_df)
 else:
     if active_role == "admin":
         render_admin_dashboard(filtered_df)

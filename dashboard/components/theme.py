@@ -518,7 +518,37 @@ def get_olympia_theme_css() -> str:
         50% {{ opacity: 0.4; transform: scale(0.85); }}
     }}
 
+    .hud-nav-links {{
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }}
+
+    .hud-nav-item {{
+        color: #5A544A !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
+        padding: 0.3rem 0.6rem !important;
+        border-radius: 8px !important;
+        transition: all 160ms ease !important;
+        white-space: nowrap !important;
+    }}
+
+    .hud-nav-item:hover {{
+        background: #F4EFE6 !important;
+        color: #2E2A25 !important;
+    }}
+
+    .hud-nav-item.active-nav {{
+        background: #FAF0D8 !important;
+        color: #7A5C05 !important;
+        font-weight: 700 !important;
+        border-bottom: 2px solid #D4AF37 !important;
+    }}
+
     .hud-right {{
+
         display: flex;
         align-items: center;
         gap: 0.75rem;
