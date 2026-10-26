@@ -12,6 +12,7 @@ import streamlit as st
 import pandas as pd
 from warehouse.warehouse import get_denormalized_medals
 from dashboard.components.metrics import render_kpi_row, render_viva_note, render_forbes_masthead
+from dashboard.components.kinetic_engine import render_bifurcating_tree_svg_html
 from dashboard.components.charts import display_chart
 from analytics.decision_tree import (
     train_decision_tree,
@@ -33,6 +34,9 @@ def render_page(df: pd.DataFrame = None):
         badge_text="Decision Tree & Naive Bayes Models",
         badge_status="Verified"
     )
+
+    # 11. Bifurcating Golden Decision Tree Graph
+    st.markdown(render_bifurcating_tree_svg_html(), unsafe_allow_html=True)
 
     # Methodological Transparency Disclaimer
     st.info("Methodological Transparency: Athletic medals are decided by fractions of a second or single points. Contextual features alone produce realistic ~36–39% baseline accuracy (random guessing = 33.3%). We strictly exclude medal_points to prevent target leakage.")

@@ -202,22 +202,55 @@ def render_antigravity_styles():
     }
     .tug-bar-track {
         display: flex;
-        height: 14px;
-        border-radius: 7px;
-        overflow: hidden;
-        background: #EAE3D5;
-        margin: 1rem 0;
-        border: 1px solid var(--olympia-border);
+        position: relative;
+        height: 22px;
+        border-radius: 11px;
+        overflow: visible;
+        background: #1F1F1F;
+        margin: 1.4rem 0;
+        border: 1px solid rgba(212, 175, 55, 0.45);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
     .tug-fill-a {
-        background: linear-gradient(90deg, #EBD9C3, #D4AF37);
-        box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+        background: linear-gradient(90deg, #FAF0D8 0%, #D4AF37 100%);
+        box-shadow: 0 0 16px rgba(212, 175, 55, 0.7);
         transition: width 400ms var(--spring-snappy);
+        border-radius: 10px 0 0 10px;
     }
     .tug-fill-b {
-        background: linear-gradient(90deg, #8B857C, #2E2A25);
-        box-shadow: 0 0 10px rgba(46, 42, 37, 0.3);
+        background: linear-gradient(90deg, #C41E3A 0%, #7F1D1D 100%);
+        box-shadow: 0 0 16px rgba(196, 30, 58, 0.7);
         transition: width 400ms var(--spring-snappy);
+        border-radius: 0 10px 10px 0;
+    }
+    .clash-spark-fulcrum {
+        position: absolute;
+        top: -8px;
+        bottom: -8px;
+        width: 7px;
+        transform: translateX(-50%);
+        background: #FFFFFF;
+        box-shadow: 0 0 18px 4px rgba(212, 175, 55, 0.9), 0 0 8px 2px #FFFFFF;
+        border-radius: 4px;
+        z-index: 10;
+        animation: clashOscillate 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes clashOscillate {
+        0% { transform: translateX(-50%) scaleY(0.95); box-shadow: 0 0 14px 3px rgba(212, 175, 55, 0.8), 0 0 6px #FFFFFF; }
+        100% { transform: translateX(-50%) scaleY(1.18); box-shadow: 0 0 24px 6px rgba(196, 30, 58, 0.95), 0 0 12px #FFFFFF; }
+    }
+    .clash-spark-particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: #D4AF37;
+        box-shadow: 0 0 6px #D4AF37;
+    }
+    @keyframes radarPing {
+        0% { transform: scale(0.9); opacity: 1; }
+        50% { transform: scale(1.4); opacity: 0.5; }
+        100% { transform: scale(0.9); opacity: 1; }
     }
 
     /* Terminal Playbook Card */
@@ -240,6 +273,95 @@ def render_antigravity_styles():
     }
     </style>
     """, unsafe_allow_html=True)
+
+
+def render_wind_tunnel_visualizer_html(drafting_val: float, altitude_val: int) -> str:
+    """
+    Renders the Biometric Wind-Tunnel Streamline Visualizer.
+    Flowing #D4AF37 (laminar flow) and #C41E3A (turbulent drag wake) streamlines
+    speed up and bend dynamically based on drafting slipstream and altitude.
+    """
+    speed_sec = round(max(0.4, 3.2 - (drafting_val / 60.0) * 2.2), 2)
+    wake_bend = round((altitude_val / 2500.0) * 18 + (1.0 - drafting_val / 60.0) * 22, 1)
+
+    return f"""
+    <div class="wind-tunnel-card" style="background: linear-gradient(135deg, #1C1B19 0%, #292622 100%); border: 1px solid rgba(212, 175, 55, 0.4); border-radius: 14px; padding: 1.2rem; color: #FAF8F2; margin: 1rem 0 1.5rem 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+        <style>
+        @keyframes laminarStream {{
+            from {{ stroke-dashoffset: 140; }}
+            to {{ stroke-dashoffset: 0; }}
+        }}
+        @keyframes wakeTurbulence {{
+            0% {{ transform: translateY(0px) scaleY(1); opacity: 0.8; }}
+            50% {{ transform: translateY(-4px) scaleY(1.2); opacity: 1; }}
+            100% {{ transform: translateY(3px) scaleY(0.9); opacity: 0.8; }}
+        }}
+        .laminar-path {{
+            stroke: #D4AF37;
+            stroke-width: 2.2;
+            stroke-dasharray: 18 80;
+            fill: none;
+            animation: laminarStream {speed_sec}s linear infinite;
+        }}
+        .wake-path {{
+            stroke: #C41E3A;
+            stroke-width: 2.2;
+            stroke-dasharray: 12 60;
+            fill: none;
+            animation: laminarStream {round(speed_sec * 0.7, 2)}s linear infinite, wakeTurbulence 1.2s ease-in-out infinite;
+        }}
+        </style>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+            <div>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #D4AF37; background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4); padding: 0.15rem 0.5rem; border-radius: 9999px; font-weight: 700;">
+                    LIVE AERODYNAMIC WIND-TUNNEL
+                </span>
+                <div style="font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 800; color: #FAF8F2; margin-top: 0.3rem;">
+                    Biometric Slipstream Flow & Boundary Layer Separation
+                </div>
+                <div style="font-size: 0.78rem; color: #8B857C;">
+                    Paced by Drafting Slipstream: <strong style="color: #D4AF37;">{drafting_val:.0f}%</strong> • Venue Altitude: <strong style="color: #E8D9C3;">{altitude_val}m</strong>
+                </div>
+            </div>
+            <div style="text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #D4AF37;">
+                FLOW VELOCITY: {speed_sec}s/CYCLE
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; overflow-x: auto;">
+            <svg width="680" height="160" viewBox="0 0 680 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Wind Tunnel Boundary Rails -->
+                <line x1="20" y1="15" x2="660" y2="15" stroke="rgba(212,175,55,0.2)" stroke-dasharray="4 4"/>
+                <line x1="20" y1="145" x2="660" y2="145" stroke="rgba(212,175,55,0.2)" stroke-dasharray="4 4"/>
+
+                <!-- Upstream Laminar Streamlines (Gold) -->
+                <path d="M 20 35 C 180 35, 270 45, 320 60 C 370 75, 440 {65 - wake_bend * 0.4}, 660 {60 - wake_bend * 0.4}" class="laminar-path"/>
+                <path d="M 20 60 C 180 60, 260 65, 305 75 C 345 85, 420 {80 - wake_bend * 0.2}, 660 {78 - wake_bend * 0.2}" class="laminar-path" style="animation-delay: 0.25s;"/>
+                <path d="M 20 85 C 180 85, 260 85, 300 85 C 340 85, 400 {90 + wake_bend * 0.2}, 660 {90 + wake_bend * 0.2}" class="laminar-path" style="animation-delay: 0.5s;"/>
+                <path d="M 20 110 C 180 110, 270 105, 315 95 C 365 85, 430 {105 + wake_bend * 0.3}, 660 {110 + wake_bend * 0.3}" class="laminar-path" style="animation-delay: 0.75s;"/>
+                <path d="M 20 130 C 180 130, 270 125, 330 115 C 380 105, 450 {125 + wake_bend * 0.5}, 660 {130 + wake_bend * 0.5}" class="laminar-path" style="animation-delay: 1.0s;"/>
+
+                <!-- Athlete Aero Silhouette (Center: 300, 45) -->
+                <g transform="translate(300, 45)">
+                    <ellipse cx="28" cy="18" rx="14" ry="9" transform="rotate(-15 28 18)" fill="#FAF8F2" stroke="#D4AF37" stroke-width="1.5"/>
+                    <path d="M 36 17 Q 41 20 37 24" stroke="#D4AF37" stroke-width="2" fill="none"/>
+                    <path d="M 22 22 C 14 26, -5 38, -15 48 C -22 55, -20 62, -10 60 C 5 56, 20 44, 30 35 Z" fill="#2E2A25" stroke="#D4AF37" stroke-width="1.5"/>
+                    <path d="M 22 28 L 38 42 L 52 38" stroke="#D4AF37" stroke-width="2.8" stroke-linecap="round" fill="none"/>
+                    <path d="M -15 48 L -32 68 L -45 58" stroke="#AA820A" stroke-width="3" stroke-linecap="round" fill="none"/>
+                </g>
+
+                <!-- Downstream Turbulent Drag Wake Vortices (Victory Red) -->
+                <path d="M 345 75 Q 380 {55 - wake_bend * 0.6} 430 {70 - wake_bend * 0.5} T 520 {65 - wake_bend * 0.6} T 660 {60 - wake_bend * 0.6}" class="wake-path"/>
+                <path d="M 340 85 Q 380 {95 + wake_bend * 0.6} 435 {85 + wake_bend * 0.5} T 530 {90 + wake_bend * 0.6} T 660 {95 + wake_bend * 0.6}" class="wake-path" style="animation-delay: 0.3s;"/>
+                <path d="M 330 92 Q 375 {108 + wake_bend * 0.8} 440 {102 + wake_bend * 0.7} T 540 {110 + wake_bend * 0.8} T 660 {115 + wake_bend * 0.8}" class="wake-path" style="animation-delay: 0.6s;"/>
+
+                <!-- Boundary Layer Separation Marker -->
+                <circle cx="340" cy="72" r="4" fill="#C41E3A" filter="drop-shadow(0 0 6px #C41E3A)"/>
+                <text x="350" y="68" fill="#C41E3A" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700">Separation Point</text>
+            </svg>
+        </div>
+    </div>
+    """
 
 
 def plot_inclination_radar(athlete_profile: dict) -> go.Figure:
@@ -432,7 +554,15 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
 
         col_radar, col_bars = st.columns([1.1, 1])
         with col_radar:
-            st.markdown("##### 6-Dimensional Inclination Radar")
+            st.markdown("""
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                <div style="font-weight: 700; color: #2E2A25; font-size: 0.95rem;">6-Dimensional Inclination Radar</div>
+                <div style="display: flex; align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: #AA820A; background: #FAF0D8; padding: 0.15rem 0.5rem; border-radius: 9999px; border: 1px solid rgba(212,175,55,0.4);">
+                    <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #D4AF37; box-shadow: 0 0 8px #D4AF37; animation: radarPing 1.4s ease-out infinite;"></span>
+                    SONIC BOOM SWEEP ACTIVE
+                </div>
+            </div>
+            """, unsafe_allow_html=True)
             fig_radar = plot_inclination_radar(profile)
             st.plotly_chart(fig_radar, use_container_width=True)
 
@@ -603,6 +733,11 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
             </div>
             <div class="tug-bar-track">
                 <div class="tug-fill-a" style="width: {win_pct}%;"></div>
+                <div class="clash-spark-fulcrum" style="left: {win_pct}%;">
+                    <div class="clash-spark-particle" style="top: 2px; left: -8px;"></div>
+                    <div class="clash-spark-particle" style="top: 14px; left: 8px; background: #C41E3A;"></div>
+                    <div class="clash-spark-particle" style="top: 24px; left: -6px; background: #FAF8F2;"></div>
+                </div>
                 <div class="tug-fill-b" style="width: {opp_pct}%;"></div>
             </div>
             <div style="font-size: 0.78rem; color: #8B857C;">
@@ -704,6 +839,9 @@ def render_coach_strategy_studio(df: pd.DataFrame = None):
         with k4:
             podium_delta = int(round(revised_podium - sim_res['podium_probability']))
             st.metric("Podium Conversion Prob", f"{revised_podium}%", delta=f"{podium_delta:+d}% vs Baseline")
+
+        # Biometric Wind-Tunnel Streamline Visualizer
+        st.markdown(render_wind_tunnel_visualizer_html(drafting_val, altitude_val), unsafe_allow_html=True)
 
         # Plot Energy Curve & Split Velocity Profile
         col_p1, col_p2 = st.columns([1, 1])

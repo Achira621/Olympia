@@ -51,7 +51,7 @@ def get_olympia_logo(variant: str = "horizontal", width: int = 220, height: int 
             <path d="M95 96 L95 160 C95 161.5 96.2 162 98 162 L105 162 C106.8 162 108 161.5 108 160 L108 84 C108 81.5 106 79.5 103 80 C98.5 81 95 87 95 96 Z" fill="#2E2A25"/>
             <path d="M113 104 L113 160 C113 161.5 114.2 162 116 162 L122 162 C123.8 162 125 161.5 125 160 L125 116 C125 113.5 123 111 120 110 Z" fill="#2E2A25"/>
             <rect x="74" y="164" width="55" height="3.5" rx="1.7" fill="url(#g_mark)"/>
-            <path d="M102 78 C99 68 102 52 112 36 C116 30 122 24 126 18 C126.5 17.5 127.5 18 127 19 C124 28 122 36 124 44 C126 52 133 60 134 70 C135 80 128 88 118 90 C125 80 124 66 118 56 C114 50 110 46 109 40 C108.5 39 107.5 39.5 107.8 40.5 C109 48 108 58 104 66 C102.5 69 101.5 73 102 78 Z" fill="url(#g_mark)"/>
+            <path d="M102 78 C99 68 102 52 112 36 C116 30 122 24 126 18 C126.5 17.5 127.5 18 127 19 C124 28 122 36 124 44 C126 52 133 60 134 70 C135 80 128 88 118 90 C125 80 124 66 118 56 C114 50 110 46 109 40 C108.5 39 107.5 39.5 107.8 40.5 C109 48 108 58 104 66 C102.5 69 101.5 73 102 78 Z" fill="url(#g_mark)" filter="url(#olympia-flame-shader)" class="flame-core olympia-flame-animated"/>
         </svg>"""
 
     elif variant == "light":
@@ -67,7 +67,7 @@ def get_olympia_logo(variant: str = "horizontal", width: int = 220, height: int 
                 <path d="M95 96 L95 160 C95 161.5 96.2 162 98 162 L105 162 C106.8 162 108 161.5 108 160 L108 84 Z" fill="#FFFFFF"/>
                 <path d="M113 104 L113 160 C113 161.5 114.2 162 116 162 L122 162 C123.8 162 125 161.5 125 160 L125 116 Z" fill="#FFFFFF"/>
                 <rect x="74" y="164" width="55" height="4" rx="2" fill="url(#g_light)"/>
-                <path d="M102 78 C99 68 102 52 112 36 C116 30 122 24 126 18 C126.5 17.5 127.5 18 127 19 C124 28 122 36 124 44 C126 52 133 60 134 70 C135 80 128 88 118 90 C125 80 124 66 118 56 C114 50 110 46 109 40 C108.5 39 107.5 39.5 107.8 40.5 C109 48 108 58 104 66 C102.5 69 101.5 73 102 78 Z" fill="url(#g_light)"/>
+                <path d="M102 78 C99 68 102 52 112 36 C116 30 122 24 126 18 C126.5 17.5 127.5 18 127 19 C124 28 122 36 124 44 C126 52 133 60 134 70 C135 80 128 88 118 90 C125 80 124 66 118 56 C114 50 110 46 109 40 C108.5 39 107.5 39.5 107.8 40.5 C109 48 108 58 104 66 C102.5 69 101.5 73 102 78 Z" fill="url(#g_light)" filter="url(#olympia-flame-shader)" class="flame-core olympia-flame-animated"/>
             </g>
             <text x="82" y="44" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="34" font-weight="800" letter-spacing="4" fill="#FFFFFF">
                 OLYMPI<tspan fill="url(#g_light)">A</tspan>
@@ -93,7 +93,7 @@ def get_olympia_logo(variant: str = "horizontal", width: int = 220, height: int 
             <path d="M95 96 L95 160 C95 161.5 96.2 162 98 162 L105 162 C106.8 162 108 161.5 108 160 L108 84 Z" fill="url(#g_char)"/>
             <path d="M113 104 L113 160 C113 161.5 114.2 162 116 162 L122 162 C123.8 162 125 161.5 125 160 L125 116 Z" fill="url(#g_char)"/>
             <rect x="74" y="164" width="55" height="4" rx="2" fill="url(#g_horiz)"/>
-            <path d="M102 78 C99 68 102 52 112 36 C116 30 122 24 126 18 C126.5 17.5 127.5 18 127 19 C124 28 122 36 124 44 C126 52 133 60 134 70 C135 80 128 88 118 90 C125 80 124 66 118 56 C114 50 110 46 109 40 C108.5 39 107.5 39.5 107.8 40.5 C109 48 108 58 104 66 C102.5 69 101.5 73 102 78 Z" fill="url(#g_horiz)"/>
+            <path d="M102 78 C99 68 102 52 112 36 C116 30 122 24 126 18 C126.5 17.5 127.5 18 127 19 C124 28 122 36 124 44 C126 52 133 60 134 70 C135 80 128 88 118 90 C125 80 124 66 118 56 C114 50 110 46 109 40 C108.5 39 107.5 39.5 107.8 40.5 C109 48 108 58 104 66 C102.5 69 101.5 73 102 78 Z" fill="url(#g_horiz)" filter="url(#olympia-flame-shader)" class="flame-core olympia-flame-animated"/>
             <path d="M112 68 C110 60 113 50 118 42 C118.5 41 119.5 41.5 119.2 42.5 C117.5 48 118 54 122 60 C124 63 125 67 124 72 C122 76 117 78 113 77 Z" fill="#FFF9E6" opacity="0.95"/>
         </g>
         <text x="82" y="44" font-family="'Cinzel', 'Playfair Display', Georgia, serif" font-size="34" font-weight="800" letter-spacing="4" fill="#2E2A25">

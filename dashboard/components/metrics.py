@@ -63,7 +63,8 @@ def render_hero_split_banner():
     - Right Panel: 'OLYMPIC LEGACY IN NUMBERS 1896-2026' with sculpted Olympic rings
       and 5-column metric strip (20,582 Medal Records, 131 Years, 206 Countries, 47 Sports, 1,017 Events).
     """
-    sculpted_rings = get_olympic_sculpted_rings_svg(width=260, height=110)
+    from dashboard.components.kinetic_engine import get_3d_astrolabe_rings_html
+    astrolabe_rings = get_3d_astrolabe_rings_html(width=280, height=120)
 
     hero_html = f"""
     <div style="display: grid; grid-template-columns: 1.55fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
@@ -82,7 +83,7 @@ def render_hero_split_banner():
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
-                    <a href="?role=fan" target="_self" style="background: linear-gradient(135deg, #F3E7C5 0%, #D4AF37 100%); color: #1F1F1F; padding: 0.55rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 14px rgba(212,175,55,0.3);">
+                    <a href="?role=fan" target="_self" class="magnetic-btn" style="background: linear-gradient(135deg, #F3E7C5 0%, #D4AF37 100%); color: #1F1F1F; padding: 0.55rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; box-shadow: 0 4px 14px rgba(212,175,55,0.3);">
                         Explore Analytics →
                     </a>
                     <span style="color: #94A3B8; font-size: 0.82rem; font-family: 'JetBrains Mono', monospace;">
@@ -106,31 +107,31 @@ def render_hero_split_banner():
                         1896 — 2026
                     </span>
                 </div>
-                <div style="padding: 0.5rem 0;">
-                    {sculpted_rings}
+                <div style="padding: 0.2rem 0;">
+                    {astrolabe_rings}
                 </div>
             </div>
             
-            <!-- 5-COLUMN METRIC STRIP -->
+            <!-- 5-COLUMN METRIC STRIP WITH MECHANICAL CIPHER SCRAMBLE -->
             <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; border-top: 1px solid #E5DED2; padding-top: 0.85rem; text-align: center;">
                 <div>
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">20,582</div>
+                    <div class="kinetic-odometer" data-odometer="true" data-target-value="20,582" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">20,582</div>
                     <div style="font-size: 0.68rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Medal Records</div>
                 </div>
                 <div>
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">131</div>
+                    <div class="kinetic-odometer" data-odometer="true" data-target-value="131" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">131</div>
                     <div style="font-size: 0.68rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Years</div>
                 </div>
                 <div>
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">206</div>
+                    <div class="kinetic-odometer" data-odometer="true" data-target-value="206" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">206</div>
                     <div style="font-size: 0.68rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Countries</div>
                 </div>
                 <div>
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">47</div>
+                    <div class="kinetic-odometer" data-odometer="true" data-target-value="47" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">47</div>
                     <div style="font-size: 0.68rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Sports</div>
                 </div>
                 <div>
-                    <div style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">1,017</div>
+                    <div class="kinetic-odometer" data-odometer="true" data-target-value="1,017" style="font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 800; color: #2E2A25;">1,017</div>
                     <div style="font-size: 0.68rem; color: #8B857C; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;">Events</div>
                 </div>
             </div>

@@ -13,6 +13,7 @@ import streamlit as st
 import pandas as pd
 from warehouse.warehouse import get_denormalized_medals
 from dashboard.components.metrics import render_kpi_row, render_viva_note, render_forbes_masthead
+from dashboard.components.kinetic_engine import render_centroid_gravity_pulse_html
 from dashboard.components.charts import display_chart
 from analytics.kmeans import (
     run_kmeans,
@@ -71,6 +72,9 @@ def render_page(df: pd.DataFrame = None):
     )
 
     st.markdown("---")
+
+    # 11. Centroid Gravity Pulse Header
+    st.markdown(render_centroid_gravity_pulse_html(), unsafe_allow_html=True)
 
     tab_km, tab_hc = st.tabs([
         "1. K-Means Clustering",

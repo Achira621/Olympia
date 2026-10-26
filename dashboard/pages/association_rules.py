@@ -13,6 +13,7 @@ import streamlit as st
 import pandas as pd
 from warehouse.warehouse import get_denormalized_medals
 from dashboard.components.metrics import render_kpi_row, render_viva_note, render_forbes_masthead
+from dashboard.components.kinetic_engine import render_apriori_energy_conduits_html
 from analytics.apriori import mine_association_rules
 
 
@@ -28,6 +29,9 @@ def render_page(df: pd.DataFrame = None):
         badge_text="Market Basket Mining Active",
         badge_status="Operational"
     )
+
+    # 11. Interactive Force-Directed Energy Conduits
+    st.markdown(render_apriori_energy_conduits_html(), unsafe_allow_html=True)
 
     # Causation Warning
     st.info("Association vs. Causation: These rules capture historical co-occurrence across sporting disciplines won by a nation in a single Olympic edition. Winning medals in Sport A does not cause medals in Sport B—it reflects multi-discipline national sporting investment.")

@@ -12,6 +12,7 @@ import streamlit as st
 import pandas as pd
 from warehouse.warehouse import get_table_counts, get_schema_info, execute_query, get_denormalized_medals
 from dashboard.components.metrics import render_kpi_row, render_viva_note, render_forbes_masthead
+from dashboard.components.kinetic_engine import render_star_schema_blueprint_html
 
 
 def render_page(df: pd.DataFrame = None):
@@ -39,50 +40,7 @@ def render_page(df: pd.DataFrame = None):
     st.markdown("---")
 
     # 3. Main Star Schema Relational Diagram
-    st.subheader("Star Schema Relational Architecture")
-    st.markdown("""
-```
-                         +-----------------------+
-                         |       dim_game        |
-                         +-----------------------+
-                         | PK: game_id           |
-                         |     year              |
-                         |     season            |
-                         |     games (UNIQUE)    |
-                         +-----------+-----------+
-                                     |
-                                     | 1:N
-+-----------------------+            |            +-----------------------+
-|      dim_country      |            |            |       dim_sport       |
-+-----------------------+            |            +-----------------------+
-| PK: country_id        |            |            | PK: sport_id          |
-|     country_code      |            v            |     sport_name (UQ)   |
-|     country_name (UQ) |---+ +-------------+ +---|                       |
-+-----------------------+   | |             | |   +-----------+-----------+
-                            | |             | |               |
-                            v v             v v               | 1:N
-                         +-----------------------+            v
-                         |      fact_medal       |   +-----------------------+
-                         +-----------------------+   |       dim_event       |
-                         | PK: medal_fact_id     |   +-----------------------+
-                         | FK: game_id           |   | PK: event_id          |
-                         | FK: country_id        |-->| FK: sport_id          |
-                         | FK: sport_id          |   |     event_name        |
-                         | FK: event_id          |   |     event_gender      |
-                         | FK: medal_id          |<--+-----------------------+
-                         |     athletes          |
-                         +-----------+-----------+
-                                     ^
-                                     | 1:N
-                         +-----------+-----------+
-                         |       dim_medal       |
-                         +-----------------------+
-                         | PK: medal_id          |
-                         |     medal_name (UQ)   |
-                         |     medal_points      |
-                         +-----------------------+
-```
-    """)
+    st.markdown(render_star_schema_blueprint_html(counts), unsafe_allow_html=True)
 
     st.markdown("---")
 

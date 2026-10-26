@@ -156,6 +156,66 @@ def create_olympic_3d_globe(
             name="Top Olympic Powers"
         ))
 
+    # 2B. 3D Bezier Comet Arc Trails connecting Historical Olympic Host Cities
+    olympic_host_sequence = [
+        {"city": "Athens (1896)", "lat": 37.98, "lon": 23.72},
+        {"city": "Paris (1900/1924/2024)", "lat": 48.85, "lon": 2.35},
+        {"city": "London (1908/1948/2012)", "lat": 51.50, "lon": -0.12},
+        {"city": "Tokyo (1964/2020)", "lat": 35.67, "lon": 139.65},
+        {"city": "Beijing (2008/2022)", "lat": 39.90, "lon": 116.40},
+        {"city": "Los Angeles (1932/1984/2028)", "lat": 34.05, "lon": -118.24},
+        {"city": "Milano-Cortina (2026)", "lat": 45.46, "lon": 9.19}
+    ]
+
+    arc_lats, arc_lons = [], []
+    for i in range(len(olympic_host_sequence) - 1):
+        c1 = olympic_host_sequence[i]
+        c2 = olympic_host_sequence[i + 1]
+        arc_lats.extend([c1["lat"], c2["lat"], None])
+        arc_lons.extend([c1["lon"], c2["lon"], None])
+
+    # Faint Sandstone Base Arc Trajectory
+    fig.add_trace(go.Scattergeo(
+        lat=arc_lats,
+        lon=arc_lons,
+        mode="lines",
+        line=dict(width=1.5, color="#EBD9C3"),
+        opacity=0.6,
+        hoverinfo="none",
+        name="Historical Arc Trajectory"
+    ))
+
+    # Bright Olympic Gold Comet Trajectory
+    fig.add_trace(go.Scattergeo(
+        lat=arc_lats,
+        lon=arc_lons,
+        mode="lines",
+        line=dict(width=2.5, color="#D4AF37"),
+        opacity=0.9,
+        hoverinfo="none",
+        name="Olympic Torch Comet Trail"
+    ))
+
+    # Host city glowing nodes
+    host_lats = [c["lat"] for c in olympic_host_sequence]
+    host_lons = [c["lon"] for c in olympic_host_sequence]
+    host_names = [f"🏛️ Olympic Host: {c['city']}" for c in olympic_host_sequence]
+
+    fig.add_trace(go.Scattergeo(
+        lat=host_lats,
+        lon=host_lons,
+        mode="markers",
+        marker=dict(
+            size=9,
+            color="#C41E3A",
+            line=dict(color="#D4AF37", width=2),
+            symbol="diamond"
+        ),
+        text=host_names,
+        hoverinfo="text",
+        name="Iconic Olympic Host Cities"
+    ))
+
     # 3. 3D Globe Projection Architecture
     fig.update_geos(
         projection_type=projection,

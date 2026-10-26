@@ -217,4 +217,49 @@ def get_olympic_sculpted_rings_svg(width: int = 340, height: int = 150) -> str:
     </svg>"""
 
 
+def get_olympia_flame_shader_svg() -> str:
+    """Returns the SVG filter definition for procedural fluid heat-haze distortion."""
+    return """
+    <svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+        <filter id="olympia-flame-shader" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02 0.09" numOctaves="3" seed="2" result="noise">
+                <animate attributeName="baseFrequency" values="0.02 0.09; 0.03 0.14; 0.02 0.09" dur="3.5s" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="8" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+    </svg>
+    """
+
+
+def get_olympia_modular_logo(variant: str = "horizontal", width: int = 220, height: int = 50) -> str:
+    """
+    Returns the 4-element modular OLYMPIA logo lockup with procedural fluid flame shader:
+    1. Procedural flame with feTurbulence filter
+    2. Sculpted Olympic rings
+    3. Classical serif wordmark
+    4. Subtitle metadata
+    """
+    from dashboard.components.theme import get_olympia_logo
+    return get_olympia_logo(variant=variant, width=width, height=height)
+
+
+def get_3d_astrolabe_rings_svg(width: int = 340, height: int = 150) -> str:
+    """Returns the 3D Gyroscopic Astrolabe Olympic Rings."""
+    from dashboard.components.kinetic_engine import get_3d_astrolabe_rings_html
+    return get_3d_astrolabe_rings_html(width=width, height=height)
+
+
+def get_isometric_olap_cube_widget(active_op: str = "slice") -> str:
+    """Returns the Interactive 3D CSS Isometric Data Cube widget."""
+    from dashboard.components.kinetic_engine import render_isometric_3d_olap_cube
+    return render_isometric_3d_olap_cube(active_op=active_op)
+
+
+def get_star_schema_blueprint_widget(counts: dict = None) -> str:
+    """Returns the Interactive SVG Star Schema Blueprint widget."""
+    from dashboard.components.kinetic_engine import render_star_schema_blueprint_html
+    return render_star_schema_blueprint_html(counts=counts)
+
+
+
 

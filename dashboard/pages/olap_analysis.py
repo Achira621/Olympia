@@ -25,6 +25,7 @@ from analytics.olap import (
     olap_pivot
 )
 from analytics.visualization import create_bar_chart
+from dashboard.components.kinetic_engine import render_isometric_3d_olap_cube
 
 
 def render_page(df: pd.DataFrame = None):
@@ -68,6 +69,7 @@ def render_page(df: pd.DataFrame = None):
     # 1. SLICE TAB
     # ----------------------------------------------------
     with tab_slice:
+        st.markdown(render_isometric_3d_olap_cube("slice"), unsafe_allow_html=True)
         st.subheader("1. SLICE: Single-Dimension Filter")
         st.markdown("""
         > **What is a Slice?**
@@ -115,6 +117,7 @@ def render_page(df: pd.DataFrame = None):
     # 2. DICE TAB
     # ----------------------------------------------------
     with tab_dice:
+        st.markdown(render_isometric_3d_olap_cube("dice"), unsafe_allow_html=True)
         st.subheader("2. DICE: Multi-Dimensional Sub-Cube")
         st.markdown("""
         > **What is a Dice?**
@@ -153,6 +156,7 @@ def render_page(df: pd.DataFrame = None):
     # 3. ROLL-UP TAB
     # ----------------------------------------------------
     with tab_rollup:
+        st.markdown(render_isometric_3d_olap_cube("rollup"), unsafe_allow_html=True)
         st.subheader("3. ROLL-UP: Summarize Up the Hierarchy")
         st.markdown("""
         > **What is a Roll-Up?**
@@ -183,6 +187,7 @@ def render_page(df: pd.DataFrame = None):
     # 4. DRILL-DOWN TAB
     # ----------------------------------------------------
     with tab_drill:
+        st.markdown(render_isometric_3d_olap_cube("drilldown"), unsafe_allow_html=True)
         st.subheader("4. DRILL-DOWN: Navigate Down to Granular Detail")
         st.markdown("""
         > **What is a Drill-Down?**
@@ -214,6 +219,7 @@ def render_page(df: pd.DataFrame = None):
     # 5. PIVOT TAB
     # ----------------------------------------------------
     with tab_pivot:
+        st.markdown(render_isometric_3d_olap_cube("pivot"), unsafe_allow_html=True)
         st.subheader("5. PIVOT: Rotate Axes for Cross-Tabulation")
         st.markdown("""
         > **What is a Pivot?**

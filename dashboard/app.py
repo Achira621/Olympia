@@ -111,6 +111,15 @@ from dashboard.components.metrics import (
     render_empty_telemetry_card,
     render_telemetry_footer
 )
+from dashboard.components.kinetic_engine import (
+    inject_kinetic_engine,
+    render_monument_accordion,
+    render_isometric_3d_olap_cube,
+    render_apriori_energy_conduits_html,
+    render_centroid_gravity_pulse_html,
+    render_bifurcating_tree_svg_html,
+    render_star_schema_blueprint_html
+)
 
 
 
@@ -140,6 +149,7 @@ def render_html(html_str: str):
 # 2. Design System: OLYMPIA Marble White & Imperial Gold Architecture
 # ------------------------------------------------------------
 inject_olympia_theme()
+inject_kinetic_engine()
 
 # ------------------------------------------------------------
 # 3. Fast Cached Data Loading
@@ -551,6 +561,7 @@ def render_admin_dashboard(df: pd.DataFrame):
                         conn.close()
 
     with tab_audit:
+        st.markdown(render_star_schema_blueprint_html(counts), unsafe_allow_html=True)
         st.markdown("#### Dimensional Integrity & Star Schema Breakdown")
         dim_summary = pd.DataFrame([
             {"Table": "fact_medal (Central Fact)", "Type": "Fact Table", "Row Count": counts.get("fact_medal", 0), "Primary Key": "medal_fact_id", "Integrity": "100% OK"},
@@ -1224,8 +1235,9 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
        - Explore Insights (4 quick action cards)
        - Wide cinematic banner: 'FROM DATA TO GREATER ATHLETES' with runner and 'Watch Story' button.
     """
-    # 1. Split Hero Banner
+    # 1. Split Hero Banner & 5-Panel Monument Accordion Gallery
     render_hero_split_banner()
+    render_monument_accordion()
 
     # 2. Middle Bento Grid Row (3 columns)
     col_m1, col_m2, col_m3 = st.columns([1.35, 1.15, 1.05], gap="medium")
@@ -1452,28 +1464,28 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
         </div>
         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem;">
             <a href="?nav=medals" target="_self" style="text-decoration: none;">
-                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">📊</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Medal Analysis</div>
                     <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Trends & records</div>
                 </div>
             </a>
             <a href="?nav=predictions" target="_self" style="text-decoration: none;">
-                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🎯</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Classification</div>
                     <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Podium prediction</div>
                 </div>
             </a>
             <a href="?nav=olap" target="_self" style="text-decoration: none;">
-                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">🧬</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Clustering</div>
                     <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Country & sports</div>
                 </div>
             </a>
             <a href="?nav=coach" target="_self" style="text-decoration: none;">
-                <div style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
+                <div class="olympia-card" style="background: #FFFFFF; border: 1px solid #E5DED2; border-radius: 12px; padding: 0.95rem; box-shadow: var(--shadow-subtle); text-align: left; transition: transform 0.15s ease;">
                     <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">⚔️</div>
                     <div style="font-weight: 800; font-size: 0.84rem; color: #2E2A25; font-family: 'Cinzel', serif;">Coach Strategy</div>
                     <div style="font-size: 0.72rem; color: #8B857C; margin-top: 0.2rem;">Tactical insights</div>
@@ -1484,7 +1496,7 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
 
     with col_b2:
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #1C1B19 0%, #292622 100%); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 1.2rem 1.4rem; color: #FAF8F2; height: 100%; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-subtle);">
+        <div class="olympia-card" style="background: linear-gradient(135deg, #1C1B19 0%, #292622 100%); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 1.2rem 1.4rem; color: #FAF8F2; height: 100%; display: flex; align-items: center; justify-content: space-between; box-shadow: var(--shadow-subtle);">
             <div>
                 <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #D4AF37; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 0.25rem;">
                     FROM DATA TO
@@ -1493,7 +1505,7 @@ def render_overview_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
                     GREATER ATHLETES
                 </div>
             </div>
-            <a href="?nav=coach" target="_self" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+            <a href="?nav=coach" target="_self" class="magnetic-btn" style="background: #FAF0D8; border: 1px solid #D4AF37; color: #5A4005; padding: 0.45rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
                 ▶ Enter Lab
             </a>
         </div>
@@ -1948,6 +1960,9 @@ def render_olap_view(filtered_df: pd.DataFrame, all_countries: list):
         horizontal=True
     )
 
+    # 10. Interactive 3D CSS Isometric Data Cube
+    st.markdown(render_isometric_3d_olap_cube(olap_view_mode), unsafe_allow_html=True)
+
     if "Drill-Down" in olap_view_mode:
         st.markdown("#### Drill-Down Hierarchy: Country ➔ Sport ➔ Athletes")
         col_dd1, col_dd2 = st.columns(2)
@@ -2072,6 +2087,7 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
     )
 
     if "K-Means" in ml_view:
+        st.markdown(render_centroid_gravity_pulse_html(), unsafe_allow_html=True)
         st.markdown("#### Country Performance Clustering")
         st.markdown("Groups nations into athletic archetypes (*'Global Superpowers'*, *'Specialist Powerhouses'*, *'Emerging Contenders'*).")
 
@@ -2211,6 +2227,7 @@ def render_data_mining_view(filtered_df: pd.DataFrame, df_master: pd.DataFrame):
             st.warning("Insufficient historical appearances for reliable regression forecasting.")
 
     elif "Apriori" in ml_view:
+        st.markdown(render_apriori_energy_conduits_html(), unsafe_allow_html=True)
         st.markdown("#### Pattern Detector: Apriori Association Rules")
         st.markdown("Mines frequent sport combinations won by the same nation within an Olympic Games edition.")
 
